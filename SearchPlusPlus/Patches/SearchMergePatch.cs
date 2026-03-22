@@ -1,27 +1,11 @@
-﻿using System.Collections.Generic;
-using MelonLoader;
-using System;
-using System.Linq;
-using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
-using Il2CppAssets.Scripts.Database;
-using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
-using Il2CppAssets.Scripts.PeroTools.Nice.Datas;
-using CustomAlbums;
+﻿using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.Managers;
-using Il2CppAssets.Scripts.GameCore.Managers;
-using Il2CppPeroPeroGames.GlobalDefines;
-using Il2CppAssets.Scripts.Helpers;
-using System.IO;
-using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using Newtonsoft.Json.Linq;
-using System.Collections.ObjectModel;
-using IronSearch.Tags;
-using IronSearch.Records;
+using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
+using Il2CppPeroPeroGames.GlobalDefines;
+using IronSearch.Records;
+using IronSearch.Tags;
 
 namespace IronSearch.Patches
 {

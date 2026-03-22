@@ -1,24 +1,21 @@
-﻿using ArgumentException = System.ArgumentException;
+﻿using System.Globalization;
+using System.IO.Compression;
+using System.Net;
 using System.Text;
-using CustomAlbums;
-using Range = IronSearch.Records.Range;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using IronSearch.Records;
+using CustomAlbums.Data;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
-using System.Net;
-using CustomAlbums.Managers;
-using CustomAlbums.Data;
-using System.IO.Compression;
 using Il2CppPeroTools2.PeroString;
-using MelonLoader;
-using IronSearch.Patches;
-using IronSearch.Tags;
 using IronPython.Runtime;
-using System.Globalization;
-using System.Diagnostics.CodeAnalysis;
+using IronSearch.Records;
+using IronSearch.Tags;
+using MelonLoader;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using ArgumentException = System.ArgumentException;
+using Range = IronSearch.Records.Range;
 
 namespace IronSearch
 {

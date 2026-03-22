@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
-using CustomAlbums;
 using HarmonyLib;
 using IronSearch.Records.HQMD5;
 using MelonLoader;

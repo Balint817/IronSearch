@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CustomAlbums.Managers;
-using Il2CppAssets.Scripts.Database;
-using IronPython.Runtime;
+﻿using IronPython.Runtime;
 using IronSearch.Patches;
-using IronSearch.Records;
 
 namespace IronSearch.Tags
 {

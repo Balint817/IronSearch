@@ -1,23 +1,4 @@
-﻿using System.Collections.Generic;
-using System;
-using System.Linq;
-using Il2CppAssets.Scripts.Database;
-using Il2CppAssets.Scripts.Structs.Modules;
-using Il2CppPeroPeroGames;
-using CustomAlbums;
-using MelonLoader;
-using Newtonsoft.Json;
-using System.IO;
-using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
-using Il2CppMono;
-using Il2CppSystem.Security.Util;
-using Newtonsoft.Json.Linq;
-using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.Managers;
-using Il2CppPeroTools2.PeroString;
-using IronSearch.Records;
-using PythonExpressionManager;
-using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
+﻿using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
 
 namespace IronSearch.Patches
 {

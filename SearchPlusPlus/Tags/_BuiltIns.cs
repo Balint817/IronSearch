@@ -1,19 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CustomAlbums.Managers;
-using Il2CppAssets.Scripts.Database;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using IronSearch.Records;
-using Range = IronSearch.Records.Range;
-using IronSearch.Patches;
-using System.Collections.Concurrent;
-using IronPython.Runtime;
+﻿using IronSearch.Records;
 using PythonExpressionManager;
-using System.Diagnostics.CodeAnalysis;
+using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {

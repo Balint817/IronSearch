@@ -1,22 +1,16 @@
-﻿using CustomAlbums.Managers;
-using HarmonyLib;
+﻿using System.Collections.ObjectModel;
+using System.Net;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
 using Il2CppAssets.Scripts.UI.Controls;
-using MelonLoader;
-using MelonLoader.Utils;
-using PopupLib.UI;
-using PythonExpressionManager;
 using IronSearch.Patches;
 using IronSearch.Tags;
 using IronSearch.UI;
-using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using Task = System.Threading.Tasks.Task;
-using Harmony;
+using MelonLoader;
+using MelonLoader.Utils;
+using PythonExpressionManager;
 
 namespace IronSearch
 {

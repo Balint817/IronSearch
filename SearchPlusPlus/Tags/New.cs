@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using CustomAlbums.Managers;
+﻿using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
-using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 

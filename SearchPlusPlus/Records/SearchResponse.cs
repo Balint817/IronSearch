@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace IronSearch.Records
+﻿namespace IronSearch.Records
 {
     public class SearchResponse
     {
