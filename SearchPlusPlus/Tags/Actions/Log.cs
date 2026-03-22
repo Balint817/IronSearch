@@ -23,7 +23,7 @@ namespace IronSearch.Tags
             var sb = new StringBuilder();
             foreach (var item in varArgs)
             {
-                sb.Append(item);
+                sb.Append((object)item);
                 sb.Append(separator);
             }
             MelonLogger.Msg(ConsoleColor.DarkCyan, sb.ToString());

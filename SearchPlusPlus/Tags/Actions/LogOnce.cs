@@ -37,7 +37,7 @@ namespace IronSearch.Tags
             sb.Append(separator);
             foreach (var item in varArgs)
             {
-                sb.Append(item);
+                sb.Append((object)item);
                 sb.Append(separator);
             }
 
