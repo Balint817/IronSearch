@@ -256,11 +256,13 @@ namespace IronSearch
 
             RegisterScript("Online", BuiltIns.EvalOnline);
 
+            RegisterScript("Packed", BuiltIns.EvalPacked);
+
             RegisterScript("Ranked", BuiltIns.EvalRanked);
 
-            RegisterScript("Since", BuiltIns.EvalSince);
-
             RegisterScript("Scene", BuiltIns.EvalScene);
+
+            RegisterScript("Since", BuiltIns.EvalSince);
 
             RegisterScript("Streamer", BuiltIns.EvalStreamer);
 
