@@ -768,7 +768,13 @@ namespace IronSearch
             return -1;
         }
 
-
+        public static MemoryStream CopyToMemory(this Stream input)
+        {
+            var ms = new MemoryStream();
+            input.CopyTo(ms);
+            ms.Position = 0;
+            return ms;
+        }
 
     }
 }

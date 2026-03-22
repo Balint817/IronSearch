@@ -15,6 +15,8 @@ using Newtonsoft.Json;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using MelonLoader;
+using Il2CppAssets.Scripts.UI.Controls;
 
 namespace IronSearch
 {
@@ -26,8 +28,35 @@ namespace IronSearch
 
         public static readonly ConcurrentDictionary<string, TimeSpan?> CustomCache = new();
         public static ConcurrentDictionary<string, TimeSpan>? VanillaCache { get; private set; }
+        public static void ForceBuildCache()
+        {
+            VanillaCache ??= new();
+            var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => !x.uid.StartsWith("999_")).ToList();
+            var prevRatio = -1M;
+            var currentRatio = 0.0M;
+
+            var count = allMusic.Count;
+            var countDecimal = (decimal)count;
+
+            for (int i = 0; i < count; i++)
+            {
+                _ = GetMusicLength(allMusic[i]);
+                currentRatio = decimal.Floor((i+1) / countDecimal * 1000)/1000;
+                if (currentRatio > prevRatio)
+                {
+                    var text = $"\rProgress: {currentRatio * 100:F1}%";
+                    Console.Write(text.PadRight(Console.WindowWidth-1));
+                    prevRatio = currentRatio;
+                }
+            }
+            
+        }
         public static TimeSpan? GetMusicLength(MusicInfo musicInfo)
         {
+            if (musicInfo.uid is null)
+            {
+                return null;
+            }
             TimeSpan? result;
             if (BuiltIns.EvalCustom(musicInfo))
             {
@@ -36,19 +65,22 @@ namespace IronSearch
                     return result;
                 }
                 result = GetCustomLength(musicInfo);
-                CustomCache.TryAdd(musicInfo.uid, result);
+                if (result != null)
+                {
+                    CustomCache.TryAdd(musicInfo.uid, result);
+                }
                 return result;
             }
             if (VanillaCache is null)
             {
                 return null;
             }
-            if (VanillaCache.TryGetValue(musicInfo.uid, out var value))
+            if (!VanillaCache.TryGetValue(musicInfo.uid, out var value))
             {
-                VanillaCache.TryAdd(musicInfo.uid, LoadVanillaOne(musicInfo));
-                return value;
+                value = LoadVanillaOne(musicInfo);
+                VanillaCache.TryAdd(musicInfo.uid, value);
             }
-            return null;
+            return value;
         }
 
         internal static void LoadVanillaCache()
@@ -87,8 +119,23 @@ namespace IronSearch
 
         private static TimeSpan LoadVanillaOne(MusicInfo musicInfo)
         {
-            var ac = ResourcesManager.instance.LoadFromName<AudioClip>(musicInfo.music);
-            return TimeSpan.FromSeconds(ac.length);
+            if (musicInfo.music is null)
+            {
+                return TimeSpan.FromSeconds(-1);
+            }
+            try
+            {
+                var ac = ResourcesManager.instance.LoadFromName<AudioClip>(musicInfo.music);
+                var length = ac.length;
+                ac.UnloadAudioData();
+                return TimeSpan.FromSeconds(length);
+            }
+            catch (Exception)
+            {
+
+                MelonLogger.Msg((musicInfo.music ?? "<null>") + ", " + (musicInfo.musicName ?? "<null>") + ", " + (musicInfo.uid ?? "<null>"));
+                throw;
+            }
         }
 
         private static TimeSpan? GetCustomLength(MusicInfo musicInfo)
@@ -98,7 +145,8 @@ namespace IronSearch
             {
                 if (album.IsPackaged)
                 {
-                    return GetFromZip(album.Path);
+                    var t = GetFromZip(album.Path);
+                    return t;
                 }
                 else
                 {
@@ -129,24 +177,24 @@ namespace IronSearch
 
             return null;
         }
-
         private static TimeSpan? GetFromZip(string zipPath)
         {
             using var archive = ZipFile.OpenRead(zipPath);
 
-            // Prefer OGG
             var oggEntry = archive.GetEntry("music.ogg");
             if (oggEntry != null)
             {
                 using var stream = oggEntry.Open();
-                return GetOggLength(stream);
+                using var ms = stream.CopyToMemory();
+                return GetOggLength(ms);
             }
 
             var mp3Entry = archive.GetEntry("music.mp3");
             if (mp3Entry != null)
             {
                 using var stream = mp3Entry.Open();
-                return GetMp3Length(stream);
+                using var ms = stream.CopyToMemory();
+                return GetMp3Length(ms);
             }
 
             return null;
@@ -159,7 +207,7 @@ namespace IronSearch
                 using var reader = new VorbisWaveReader(stream);
                 return reader.TotalTime;
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }
@@ -171,13 +219,24 @@ namespace IronSearch
             {
                 using var mpeg = new MpegFile(stream);
 
-                double seconds = (double)mpeg.Length / mpeg.SampleRate;
-                return TimeSpan.FromSeconds(seconds);
+                return mpeg.Duration;
             }
-            catch
+            catch (Exception ex) 
             {
                 return null;
             }
+        }
+
+        internal static void SaveCache()
+        {
+            if (VanillaCache is null)
+            {
+                return;
+            }
+
+            var json = JsonConvert.SerializeObject(VanillaCache.ToDictionary(x => x.Key, x => x.Value.Ticks));
+
+            File.WriteAllText(AudioLengthBackupFilePath, json);
         }
     }
 }

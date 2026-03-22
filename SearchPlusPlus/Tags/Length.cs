@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Records;
+using MelonLoader;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
@@ -69,11 +70,11 @@ namespace IronSearch.Tags
             switch (varArgs[0])
             {
                 case string n:
-                    return EvalBPM(M.I, n);
+                    return EvalLength(M.I, n);
                 case Range r:
-                    return EvalBPM(M.I, r);
+                    return EvalLength(M.I, r);
                 case MultiRange mr:
-                    return EvalBPM(M.I, mr);
+                    return EvalLength(M.I, mr);
             }
             throw new SearchInputException("expected range string, or range, as length");
         }

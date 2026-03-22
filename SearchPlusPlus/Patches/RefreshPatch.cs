@@ -59,6 +59,10 @@ namespace IronSearch.Patches
         internal static bool FirstCall = true;
         internal static void Prefix(string keyword)
         {
+            if (ModMain.UISystemLoaded && ModMain.IsFirstLengthCacheBuild)
+            {
+                ModMain.BuildCacheIfNecessary();
+            }
             //favorites = DataHelper.collections
             //hiddenSongs = DataHelper.hides
             var text = keyword;

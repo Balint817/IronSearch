@@ -68,6 +68,7 @@ namespace IronSearch
         {
             startSearchStringEntry.Category.SaveToFile(false);
             HQLoader.CreateBackupSync(_hqChartDict);
+            AudioHelper.SaveCache();
         }
         public override void OnPreferencesLoaded()
         {
@@ -78,7 +79,6 @@ namespace IronSearch
             //MelonLogger.Msg(System.ConsoleColor.Magenta, "Re-loading aliases...");
             //LoadAliases();
         }
-
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             if (sceneName == "Welcome")
@@ -90,6 +90,28 @@ namespace IronSearch
                     ShownError = true;
                     ShowText.ShowInfo(s);
                 }
+            }
+            if (sceneName == "UISystem_PC")
+            {
+                UISystemLoaded = true;
+            }
+        }
+
+        internal static bool UISystemLoaded { get; private set; }
+
+        internal static bool IsFirstLengthCacheBuild { get; private set; } = true;
+        internal static void BuildCacheIfNecessary()
+        {
+
+            if (InitFinished && IsFirstLengthCacheBuild)
+            {
+                IsFirstLengthCacheBuild = false;
+                if (AudioHelper.VanillaCache?.IsEmpty ?? true)
+                {
+                    var s = "Re-building length cache, this may take a while!";
+                    MelonLogger.Msg(System.ConsoleColor.Magenta, s);
+                }
+                AudioHelper.ForceBuildCache();
             }
         }
 
@@ -249,7 +271,10 @@ namespace IronSearch
 
             RegisterScript("History", BuiltIns.EvalHistory);
 
+            RegisterScript("Length", BuiltIns.EvalLength);
+
             //RegisterScript("Hide", BuiltIns.EvalHide);
+
             RegisterScript("New", BuiltIns.EvalNew);
 
             RegisterScript("Old", BuiltIns.EvalOld);
@@ -295,6 +320,8 @@ namespace IronSearch
 
             RegisterObject("GetLanguage", BuiltIns.EvalGetLanguageIndex);
             RegisterObject("Language", BuiltIns.EvalGetLanguageIndex);
+
+            RegisterObject("GetLength", BuiltIns.EvalGetLength);
 
             RegisterObject("Hours", BuiltIns.EvalHours);
 
@@ -461,20 +488,6 @@ namespace IronSearch
                 MelonLogger.Msg(System.ConsoleColor.Red, ex.ToString());
                 MelonLogger.Msg(System.ConsoleColor.DarkRed, "Failed to load custom ranking information, certain features will not work properly!");
             }
-
-
-
-            try
-            {
-                RefreshPatch.Prefix(string.Empty);
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Msg(System.ConsoleColor.Red, ex.ToString());
-                MelonLogger.Msg(System.ConsoleColor.DarkRed, "Failed to recover advanced search results. This is a critical error, the mod will most likely NOT work.");
-            }
-
-
 
             InitFinished = true;
         }
