@@ -7,11 +7,9 @@ namespace IronSearch.Tags
     {
         internal static HashSet<string> hasCinema { get; set; } = new();
 
-        // TODO: rename to "lastCheckedCinema"
-        internal static DateTime lastChecked;
+        internal static DateTime lastCheckedCinema;
 
-        // TODO: rename to "isCinemaModified"
-        internal static bool isModified;
+        internal static bool isCinemaModified;
 
         internal static bool EvalCinema(MusicInfo musicInfo)
         {
@@ -29,11 +27,11 @@ namespace IronSearch.Tags
                 return Utils.TryParseCinemaJson(customInfo, false);
             }
             var lastModified = File.GetLastAccessTimeUtc(customInfo.Path);
-            if (lastChecked >= lastModified)
+            if (lastCheckedCinema >= lastModified)
             {
                 return hasCinema.Contains(musicInfo.uid);
             }
-            isModified = true;
+            isCinemaModified = true;
             if (Utils.TryParseCinemaJson(customInfo))
             {
                 hasCinema.Add(musicInfo.uid);

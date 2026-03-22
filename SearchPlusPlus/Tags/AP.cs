@@ -7,8 +7,6 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        // TODO:
-        // find alternative method for customs
         static readonly Range evalAPArgCount = new(0, 1);
         static readonly int[] evalAPDiffs = new[] { 1, 2, 3, 4 };
 

@@ -80,11 +80,5 @@ namespace IronSearch.Tags
             };
             return del2;
         }
-
-
-
-        //TODO:
-        //- EvalSort
-        //- EvalAcc
     }
 }

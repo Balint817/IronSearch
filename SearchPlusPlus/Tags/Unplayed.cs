@@ -7,8 +7,6 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        // TODO:
-        // find alternative method for customs
         static readonly int[] evalUnplayedDiffs = new[] { 1, 2, 3, 4 };
         static readonly Range evalUnplayedArgCount = new Range(0, 1);
         internal static bool EvalUnplayed(MusicInfo musicInfo)

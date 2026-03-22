@@ -53,9 +53,9 @@ namespace IronSearch.Patches
                 SearchPatch.isAdvancedSearch = false;
                 SearchPatch.searchError.PrintSearchError();
             }
-            if (BuiltIns.isModified)
+            if (BuiltIns.isCinemaModified)
             {
-                BuiltIns.lastChecked = DateTime.UtcNow;
+                BuiltIns.lastCheckedCinema = DateTime.UtcNow;
             }
         }
 
@@ -74,7 +74,7 @@ namespace IronSearch.Patches
                 text = Utils.FindKeyword;
                 FirstCall = false;
             }
-            else if (!ModMain.InitFinished)
+            else if (!ModMain.InitSuccessful)
             {
                 return;
             }

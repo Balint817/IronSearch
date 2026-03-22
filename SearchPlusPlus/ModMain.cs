@@ -16,8 +16,7 @@ namespace IronSearch
 {
     public partial class ModMain : MelonMod
     {
-        // TODO: rename to InitSuccessful
-        public static bool InitFinished { get; internal set; } = false;
+        public static bool InitSuccessful { get; internal set; } = false;
         public static bool CustomAlbumsLoaded { get; private set; }
         public static bool HeadquartersLoaded { get; private set; }
         public static bool KeybindsWindowsLoaded { get; private set; }
@@ -72,7 +71,7 @@ namespace IronSearch
         }
         public override void OnPreferencesLoaded()
         {
-            if (!InitFinished)
+            if (!InitSuccessful)
             {
                 return;
             }
@@ -83,7 +82,7 @@ namespace IronSearch
         {
             if (sceneName == "Welcome")
             {
-                if (!InitFinished && !ShownError)
+                if (!InitSuccessful && !ShownError)
                 {
                     var s = "The mod failed basic initialization and has disabled itself.";
                     MelonLogger.Msg(System.ConsoleColor.DarkRed, s);
@@ -103,7 +102,7 @@ namespace IronSearch
         internal static void BuildCacheIfNecessary()
         {
 
-            if (InitFinished && IsFirstLengthCacheBuild)
+            if (InitSuccessful && IsFirstLengthCacheBuild)
             {
                 IsFirstLengthCacheBuild = false;
                 if (AudioHelper.VanillaCache?.IsEmpty ?? true)
@@ -122,7 +121,7 @@ namespace IronSearch
                 MelonLogger.Msg("Checking charts for cinemas, this shouldn't take long...");
                 BuiltIns.hasCinema = AlbumManager.LoadedAlbums.Values.Where(x => Utils.TryParseCinemaJson(x)).Select(x => x.Uid).ToHashSet();
                 MelonLogger.Msg("Cinema tag initialized");
-                BuiltIns.lastChecked = DateTime.UtcNow;
+                BuiltIns.lastCheckedCinema = DateTime.UtcNow;
             }
             catch (Exception ex)
             {
@@ -489,7 +488,7 @@ namespace IronSearch
                 MelonLogger.Msg(System.ConsoleColor.DarkRed, "Failed to load custom ranking information, certain features will not work properly!");
             }
 
-            InitFinished = true;
+            InitSuccessful = true;
         }
     }
 }
