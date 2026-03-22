@@ -264,7 +264,7 @@ namespace IronSearch
 
             RegisterScript("Ranked", BuiltIns.EvalRanked);
 
-            RegisterScript("Recent", BuiltIns.EvalRecent);
+            RegisterScript("Since", BuiltIns.EvalSince);
 
             RegisterScript("Scene", BuiltIns.EvalScene);
 

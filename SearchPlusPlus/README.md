@@ -7,3 +7,8 @@
 ## Feedback
 [Feedback form](https://docs.google.com/forms/d/e/1FAIpQLSevUpaUqkwmkfr6L4F5Zwsc9esofrMk3-MytSN0MSmHZSZhow/viewform)
 **For reporting bugs, open a GitHub Issue! The form is only for feedback.**
+
+
+## Credits
+- Wynter
+- 
