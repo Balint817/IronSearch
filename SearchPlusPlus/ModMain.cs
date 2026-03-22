@@ -413,7 +413,7 @@ namespace IronSearch
 
         public override void OnInitializeMelon()
         {
-
+            AudioHelper.LoadVanillaCache();
         }
 
         internal static void LoadAlbumNames()

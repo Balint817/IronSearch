@@ -1,24 +1,99 @@
 ﻿using System.IO.Compression;
 using CustomAlbums.Data;
+using CustomAlbums.Managers;
+using Il2CppAssets.Scripts.Database;
+using Il2CppSystem.Resources;
+using IronSearch.Tags;
 using NAudio.Vorbis;
+using UnityEngine;
 using NLayer;
+using static MelonLoader.Modules.MelonModule;
+using Il2CppPeroTools2.Resources;
+using System.Collections.Concurrent;
+using MelonLoader.Utils;
+using Newtonsoft.Json;
+using System.Security;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace IronSearch
 {
 
     public static class AudioHelper
     {
-        public static TimeSpan? GetAlbumLength(object albumBoxed)
-        {
+        private const string AudioLengthBackupFile = "chartLengthSearchCache.json";
+        private static readonly string AudioLengthBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, AudioLengthBackupFile);
 
-            if (albumBoxed is not Album album)
+        public static readonly ConcurrentDictionary<string, TimeSpan?> CustomCache = new();
+        public static ConcurrentDictionary<string, TimeSpan>? VanillaCache { get; private set; }
+        public static TimeSpan? GetMusicLength(MusicInfo musicInfo)
+        {
+            TimeSpan? result;
+            if (BuiltIns.EvalCustom(musicInfo))
             {
-                throw new ArgumentException("invalid argument type", nameof(albumBoxed));
+                if (CustomCache.TryGetValue(musicInfo.uid, out result))
+                {
+                    return result;
+                }
+                result = GetCustomLength(musicInfo);
+                CustomCache.TryAdd(musicInfo.uid, result);
+                return result;
+            }
+            if (VanillaCache is null)
+            {
+                return null;
+            }
+            if (VanillaCache.TryGetValue(musicInfo.uid, out var value))
+            {
+                VanillaCache.TryAdd(musicInfo.uid, LoadVanillaOne(musicInfo));
+                return value;
+            }
+            return null;
+        }
+
+        internal static void LoadVanillaCache()
+        {
+            string? text = null;
+            try
+            {
+                text = File.ReadAllText(AudioLengthBackupFilePath);
+            }
+            catch (Exception)
+            {
+                // catch silently
             }
 
-            if (album == null || string.IsNullOrEmpty(album.Path))
-                return null;
+            Dictionary<string,TimeSpan> loadCache = new();
 
+            if (text is not null)
+            {
+                try
+                {
+                    loadCache = JsonConvert.DeserializeObject<Dictionary<string, long>>(text)?.ToDictionary(x => x.Key, x => new TimeSpan(x.Value)) ?? throw new NullReferenceException();
+                }
+                catch (Exception)
+                {
+                    // catch silently
+                }
+            }
+
+            VanillaCache = new();
+            foreach (var item in loadCache)
+            {
+                VanillaCache.TryAdd(item.Key, item.Value);
+            }
+            
+        }
+
+        private static TimeSpan LoadVanillaOne(MusicInfo musicInfo)
+        {
+            var ac = ResourcesManager.instance.LoadFromName<AudioClip>(musicInfo.music);
+            return TimeSpan.FromSeconds(ac.length);
+        }
+
+        private static TimeSpan? GetCustomLength(MusicInfo musicInfo)
+        {
+            var album = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid);
             try
             {
                 if (album.IsPackaged)
@@ -95,7 +170,9 @@ namespace IronSearch
             try
             {
                 using var mpeg = new MpegFile(stream);
-                return mpeg.Length;
+
+                double seconds = (double)mpeg.Length / mpeg.SampleRate;
+                return TimeSpan.FromSeconds(seconds);
             }
             catch
             {
