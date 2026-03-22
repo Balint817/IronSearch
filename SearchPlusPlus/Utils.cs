@@ -400,6 +400,11 @@ namespace IronSearch
         {
             return int.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
         }
+        public static bool TryParseUInt(this string s, out uint x)
+        {
+            return uint.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+        }
+
         public static bool TryParseDouble(this ReadOnlySpan<char> s, out double x)
         {
             return double.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
@@ -412,6 +417,11 @@ namespace IronSearch
         {
             return int.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
         }
+        public static bool TryParseUInt(this ReadOnlySpan<char> s, out uint x)
+        {
+            return uint.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+        }
+
         public static bool TryParseDouble(this Span<char> s, out double x)
         {
             return double.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
@@ -423,6 +433,10 @@ namespace IronSearch
         public static bool TryParseInt(this Span<char> s, out int x)
         {
             return int.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+        }
+        public static bool TryParseUInt(this Span<char> s, out uint x)
+        {
+            return uint.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
         }
 
         public static bool ParseMultiRange(string expression, out MultiRange range)
