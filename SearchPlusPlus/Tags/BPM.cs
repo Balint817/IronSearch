@@ -1,0 +1,79 @@
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CustomAlbums.Managers;
+using Il2CppAssets.Scripts.Database;
+using Range = IronSearch.Records.Range;
+using IronSearch.Records;
+
+namespace IronSearch.Tags
+{
+    internal partial class BuiltIns
+    {
+        internal static ConcurrentDictionary<string, Range?> bpmDict = new();
+        internal static bool EvalBPM(MusicInfo musicInfo, string value)
+        {
+            if (!Utils.ParseRange(value, out var bpmRange))
+            {
+                throw new SearchInputException($"failed to evaluate \"{value}\" as a range");
+            }
+            return EvalBPM(musicInfo, bpmRange);
+        }
+        internal static bool EvalBPM(MusicInfo musicInfo, Range value)
+        {
+            return EvalBPM(musicInfo, value.AsMultiRange());
+        }
+        internal static bool EvalBPM(MusicInfo musicInfo, MultiRange value)
+        {
+            if (!bpmDict.ContainsKey(musicInfo.uid))
+            {
+                AddBPMInfo(musicInfo);
+            }
+            var bpmInfo = bpmDict[musicInfo.uid];
+
+            if (bpmInfo == null)
+            {
+                return value == MultiRange.InvalidRange;
+            }
+            if (value == MultiRange.InvalidRange)
+            {
+                return false;
+            }
+
+            if (value.IsOverlap(bpmInfo))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        internal static void AddBPMInfo(MusicInfo musicInfo)
+        {
+            if (Utils.DetectParseBPM(musicInfo.bpm, out var range))
+            {
+                bpmDict[musicInfo.uid] = range;
+                return;
+            }
+            bpmDict[musicInfo.uid] = null;
+        }
+
+        internal static bool EvalBPM(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
+        {
+            ThrowIfNotMatching(varArgs, 1);
+            ThrowIfNotEmpty(varKwargs);
+            switch (varArgs[0])
+            {
+                case string n:
+                    return EvalBPM(M.I, n);
+                case Range r:
+                    return EvalBPM(M.I, r);
+                case MultiRange mr:
+                    return EvalBPM(M.I, mr);
+            }
+            throw new SearchInputException("expected range string, or range, as BPM");
+        }
+    }
+}

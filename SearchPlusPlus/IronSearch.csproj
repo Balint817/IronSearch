@@ -1,0 +1,92 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+	<EnableNETAnalyzers>True</EnableNETAnalyzers>
+	<AnalysisLevel>6.0</AnalysisLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Obfuscar" Version="2.2.38">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PythonExpressionManager\PythonExpressionManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(MD_DIRECTORY)\MelonLoader\net6\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(MD_DIRECTORY)\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CustomAlbums">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\CustomAlbums.dll</HintPath>
+    </Reference>
+    <Reference Include="Headquarters">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\Headquarters.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>$(MD_DIRECTORY)\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>$(MD_DIRECTORY)\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppPeroString">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\Il2CppPeroString.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSirenix.Serialization">
+      <HintPath>$(MD_DIRECTORY)\MelonLoader\Il2CppAssemblies\Il2CppSirenix.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="KeybindManager">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\KeybindManager.dll</HintPath>
+    </Reference>
+    <Reference Include="LocalizeLib">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\LocalizeLib.dll</HintPath>
+    </Reference>
+    <Reference Include="MelonLoader">
+      <HintPath>$(MD_DIRECTORY)\MelonLoader\net6\MelonLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Managed\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PopupLib">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\PopupLib.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(MD_DIRECTORY)\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="obfuscar.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="_RunObfuscar.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>
