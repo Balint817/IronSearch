@@ -1,4 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using CustomAlbums.Data;
+using CustomAlbums.Managers;
+using Harmony;
 using Il2Cpp;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
@@ -140,10 +143,59 @@ namespace IronSearch.Patches
             {
                 streamer = new List<string>();
             }
+
+            if (ModMain.CustomAlbumsLoaded)
+            {
+                LoadCustomData();
+            }
             //DataHelper.hides.Clear();
 
             SearchPatch.isAdvancedSearch = true;
             //MelonLogger.Msg("Parsed tags: $" + string.Join(" ", SearchPatch.tagGroups.Select(x1 => string.Join("|", x1.Select(x2 => TermToString(x2))))) + '$');
+        }
+
+        private static void LoadCustomData()
+        {
+            var save = Utils.GetCustomAlbumsSave() as CustomAlbumsSave;
+            if (save is null)
+            {
+                return;
+            }
+            history.AddRange(save.History);
+            favorites.AddRange(save.Collections);
+            hides.AddRange(save.Hides);
+
+
+            fullCombos.AddRange(save.FullCombo.SelectMany(kv =>
+            {
+                var albumName = kv.Key;
+                var album = AlbumManager.LoadedAlbums.Values.First(a => a.AlbumName == albumName);
+                var uidBase = album.Uid + '_';
+                return kv.Value.Select(index => uidBase + index);
+            }));
+
+
+            highScores.AddRange(save.Highest.SelectMany(nameToScoreDict =>
+            {
+                var albumName = nameToScoreDict.Key;
+                var album = AlbumManager.LoadedAlbums.Values.First(a => a.AlbumName == albumName);
+                var uidBase = album.Uid + '_';
+                return nameToScoreDict.Value.Select(indexToScore =>
+                {
+                    var score = indexToScore.Value;
+                    return new Highscore()
+                    {
+                        Accuracy = score.Accuracy,
+                        AccuracyStr = score.AccuracyStr,
+                        Clear = (int)score.Clear,
+                        Combo = score.Combo,
+                        Evaluate = score.Evaluate,
+                        Score = score.Score,
+                        Uid = uidBase+indexToScore.Key,
+                    };
+
+                });
+            }));
         }
 
         private static void NullifyAdvancedSearch()

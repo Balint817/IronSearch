@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using CustomAlbums.Data;
 using CustomAlbums.Managers;
+using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
 using Il2CppPeroTools2.PeroString;
@@ -774,6 +775,22 @@ namespace IronSearch
             input.CopyTo(ms);
             ms.Position = 0;
             return ms;
+        }
+
+        public static object? GetCustomAlbumsSave()
+        {
+            if (!ModMain.CustomAlbumsLoaded)
+            {
+                return null;
+            }
+            return GetCustomAlbumsSaveInternal();
+        }
+
+        static object? GetCustomAlbumsSaveInternal()
+        {
+            var saveManagerType = AccessTools.TypeByName("CustomAlbums.Managers.SaveManager");
+            var saveDataField = AccessTools.Field(saveManagerType, "SaveData");
+            return saveDataField.GetValue(null);
         }
 
     }
