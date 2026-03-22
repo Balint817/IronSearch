@@ -793,5 +793,15 @@ namespace IronSearch
             return saveDataField.GetValue(null);
         }
 
+        public static T? MaxByOrDefault<T, TOut>(this IEnumerable<T> values, Func<T, TOut> transformer, T? defaultValue)
+        {
+            var v = values.ToArray();
+            if (v.Length == 0)
+            {
+                return defaultValue;
+            }
+            return v.MaxBy(transformer);
+        }
+
     }
 }

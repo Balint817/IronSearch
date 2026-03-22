@@ -4,6 +4,7 @@ using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
+using IronPython.Runtime.Operations;
 using IronSearch.Records;
 using IronSearch.Tags;
 
@@ -141,16 +142,16 @@ namespace IronSearch.Patches
                 return 1;
             }
 
-            foreach (var i in availableMaps1.Intersect(availableMaps2))
+            foreach (var i in availableMaps1.Intersect(availableMaps2).OrderByDescending(x => x))
             {
                 string s1 = musicInfo1.uid + "_" + i;
                 string s2 = musicInfo2.uid + "_" + i;
-                var score1 = RefreshPatch.highScores.FirstOrDefault(x => x.Uid == s1);
+                var score1 = RefreshPatch.highScores.Where(x => x.Uid == s1).MaxByOrDefault(x => x.Accuracy, null);
                 if (score1 == null)
                 {
                     continue;
                 }
-                var score2 = RefreshPatch.highScores.FirstOrDefault(x => x.Uid == s2);
+                var score2 = RefreshPatch.highScores.Where(x => x.Uid == s1).MaxByOrDefault(x => x.Accuracy, null);
                 if (score2 == null)
                 {
                     continue;
@@ -285,7 +286,7 @@ namespace IronSearch.Patches
             {
                 return 1;
             }
-            var result = difficulties1.OrderBy(x => x).Zip(difficulties2.OrderBy(x => x), (x, y) => x.CompareTo(y)).FirstOrDefault(x => x != 0);
+            var result = difficulties1.OrderByDescending(x => x).Zip(difficulties2.OrderByDescending(x => x), (x, y) => x.CompareTo(y)).FirstOrDefault(x => x != 0);
 
             return result == 0
                 ? difficulties1.Length.CompareTo(difficulties2.Length)
