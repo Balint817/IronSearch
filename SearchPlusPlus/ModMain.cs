@@ -26,7 +26,7 @@ namespace IronSearch
         internal static Dictionary<string, bool> _hqChartDict = new();
         public static ReadOnlyDictionary<string, bool> HQChartDict => new(_hqChartDict);
 
-        //internal static MelonPreferences_Entry<Dictionary<string, string>> expressionEntry = null!;
+        internal static MelonPreferences_Entry<Dictionary<string, string>> expressionEntry = null!;
 
         internal static MelonPreferences_Entry<Dictionary<string, string>> aliasEntry = null!;
 
@@ -56,13 +56,13 @@ namespace IronSearch
                 return aliasEntry.Value;
             }
         }
-        //internal static Dictionary<string, string> ExpressionEntry
-        //{
-        //    get
-        //    {
-        //        return expressionEntry.Value;
-        //    }
-        //}
+        internal static Dictionary<string, string> ExpressionEntry
+        {
+            get
+            {
+                return expressionEntry.Value;
+            }
+        }
         public override void OnApplicationQuit()
         {
             startSearchStringEntry.Category.SaveToFile(false);
@@ -191,9 +191,11 @@ namespace IronSearch
 
 
         const string scriptFolderName = "Scripts";
+        const string exampleScriptName = "Unpacked.py";
         public static string ArgumentName => "M";
         public static string BaseDictName => "T";
         public static string ScriptDirectory => Path.Join(MelonEnvironment.UserDataDirectory, scriptFolderName);
+        public static string ExampleScriptFilePath => Path.Join(ScriptDirectory, exampleScriptName);
         public static UserScriptManager ScriptManager { get; private set; } = null!;
         public static float WaitMultiplierFloat
         {
@@ -216,6 +218,13 @@ namespace IronSearch
             MelonLogger.Msg("Initalizing UserScriptManager...");
 
             MelonLogger.Msg("Checking user script directory...");
+
+            Directory.CreateDirectory(ScriptDirectory);
+            var templateString =
+                $"def {Script.OutputFunctionName}(M, T):\n" +
+                $"\treturn T['Custom'](M,T) and not T['Packed'](M, T)";
+            File.WriteAllText(ExampleScriptFilePath, templateString);
+
             ScriptManager = new(ScriptDirectory, new(new ScriptMelonLogger(), ArgumentName, BaseDictName), (int)Priorities.UserScript);
 
             MelonLogger.Msg("Loading built-ins...");
@@ -401,16 +410,68 @@ namespace IronSearch
             RegisterObject("ByUID", BuiltIns.EvalByUID);
 
 
+            ScriptManager.DefaultPriority = (int)Priorities.Expression;
+
+            MelonLogger.Msg("Loading expressions...");
+            expressionEntry = category.CreateEntry<Dictionary<string, string>>("Expressions", new(), "Expressions", "\nDefine shorthands for searches here.");
+            LoadExpressions();
+
 
 
             ScriptManager.DefaultPriority = (int)Priorities.Alias;
 
             MelonLogger.Msg("Loading aliases...");
-            aliasEntry = category.CreateEntry<Dictionary<string, string>>("TagAliases", new Dictionary<string, string>(), "TagAliases", "\nDefines aliases for existing tags here.");
+            aliasEntry = category.CreateEntry<Dictionary<string, string>>("TagAliases", new(), "TagAliases", "\nDefine aliases for existing tags here.");
             LoadAliases();
 
 
-            // TODO
+            // TODO:
+            // Expressions
+        }
+
+        static readonly Dictionary<string, Script> LoadedExpressions = new();
+        private static void LoadExpressions()
+        {
+            try
+            {
+                if (ExpressionEntry is null)
+                {
+                    return;
+                }
+                foreach (var kv in ExpressionEntry)
+                {
+                    try
+                    {
+                        var key = kv.Key;
+                        var script = ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(LoadExpression(kv.Value)));
+                        LoadedExpressions.Add(key, script);
+                        ScriptManager.ScriptExecutor.RegisterScript(key, script);
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Msg(System.ConsoleColor.Red, ex);
+                        MelonLogger.Msg(System.ConsoleColor.Magenta, $"An error occured while loading the expression: '{kv.Key}'");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Msg(System.ConsoleColor.Red, ex);
+                MelonLogger.Msg(System.ConsoleColor.Magenta, $"An error occured while loading the expressions.");
+            }
+        }
+
+        private static BuiltInDelegate LoadExpression(string expression)
+        {
+
+            var compiled = ScriptManager.ScriptExecutor.Compile(expression);
+            BuiltInDelegate del = (SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs) =>
+            {
+                BuiltIns.ThrowIfNotEmpty(varArgs);
+                BuiltIns.ThrowIfNotEmpty(varKwargs);
+                return ScriptManager.ScriptExecutor.Evaluate(M, compiled);
+            };
+            return del;
         }
 
         private void LoadAliases()
@@ -418,6 +479,10 @@ namespace IronSearch
             try
             {
                 var aliases = Aliases;
+                if (aliases is null)
+                {
+                    return;
+                }
                 var executor = ScriptManager.ScriptExecutor;
                 foreach (var item in aliases)
                 {
