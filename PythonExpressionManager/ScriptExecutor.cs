@@ -1,12 +1,5 @@
-﻿using IronPython.Runtime;
-using Microsoft.Scripting.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Threading.Tasks;
-using static Community.CsharpSqlite.Sqlite3;
+﻿using System.Collections.ObjectModel;
+using IronPython.Runtime;
 
 namespace PythonExpressionManager
 {

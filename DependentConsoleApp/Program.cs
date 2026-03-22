@@ -1,5 +1,4 @@
-﻿using IronPython.Runtime;
-using PythonExpressionManager;
+﻿using PythonExpressionManager;
 
 namespace DependentConsoleApp
 {
