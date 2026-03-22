@@ -15,7 +15,7 @@ namespace IronSearch.Tags
             {
                 return ts.TotalSeconds;
             }
-            return null;
+            return null!;
         }
     }
 }

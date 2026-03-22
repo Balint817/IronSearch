@@ -12,12 +12,12 @@ namespace IronSearch.Records
             }
             return new MultiRange(this);
         }
-        public static bool operator ==(Range a, Range b)
+        public static bool operator ==(Range? a, Range? b)
         {
             if (a is null) return b is null;
             return a.Equals(b);
         }
-        public static bool operator !=(Range a, Range b)
+        public static bool operator !=(Range? a, Range? b)
         {
             return !(a == b);
         }

@@ -207,7 +207,7 @@ namespace IronSearch
                 using var reader = new VorbisWaveReader(stream);
                 return reader.TotalTime;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -221,7 +221,7 @@ namespace IronSearch
 
                 return mpeg.Duration;
             }
-            catch (Exception ex) 
+            catch (Exception) 
             {
                 return null;
             }
