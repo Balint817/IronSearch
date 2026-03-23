@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.IO.Compression;
 using System.Net;
 using System.Text;
@@ -801,6 +802,10 @@ namespace IronSearch
                 return defaultValue;
             }
             return v.MaxBy(transformer);
+        }
+        public static string GetFullStackTrace()
+        {
+            return new StackTrace(true).ToString();
         }
 
     }

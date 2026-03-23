@@ -1,22 +1,25 @@
-﻿using System.IO.Compression;
-using CustomAlbums.Data;
+﻿using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.UI.Controls;
+using Il2CppDiscord;
+using Il2CppPeroTools2.Resources;
 using Il2CppSystem.Resources;
 using IronSearch.Tags;
-using NAudio.Vorbis;
-using UnityEngine;
-using NLayer;
-using static MelonLoader.Modules.MelonModule;
-using Il2CppPeroTools2.Resources;
-using System.Collections.Concurrent;
+using MelonLoader;
 using MelonLoader.Utils;
+using NAudio.Vorbis;
 using Newtonsoft.Json;
+using NLayer;
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.IO.Compression;
 using System.Security;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
-using MelonLoader;
-using Il2CppAssets.Scripts.UI.Controls;
+using UnityEngine;
+using static MelonLoader.Modules.MelonModule;
 
 namespace IronSearch
 {
@@ -28,10 +31,15 @@ namespace IronSearch
 
         public static readonly ConcurrentDictionary<string, TimeSpan?> CustomCache = new();
         public static ConcurrentDictionary<string, TimeSpan>? VanillaCache { get; private set; }
-        public static void ForceBuildCache()
+        public static void ForceBuildVanillaCache()
         {
+            if (VanillaCache is not null)
+            {
+                MelonLogger.Msg($"Vanilla length cache currently contains {VanillaCache.Count} items.");  
+            }
             VanillaCache ??= new();
-            var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => !x.uid.StartsWith("999_")).ToList();
+            var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => x.albumIndex != 999 && !VanillaCache.ContainsKey(x.uid)).ToList();
+            MelonLogger.Msg(ConsoleColor.Magenta, $"Need to load {allMusic.Count} items." + (allMusic.Count > 100 ? " This may take a while." : ""));
             var prevRatio = -1M;
             var currentRatio = 0.0M;
 
@@ -49,7 +57,6 @@ namespace IronSearch
                     prevRatio = currentRatio;
                 }
             }
-            
         }
         public static TimeSpan? GetMusicLength(MusicInfo musicInfo)
         {
@@ -65,10 +72,8 @@ namespace IronSearch
                     return result;
                 }
                 result = GetCustomLength(musicInfo);
-                if (result != null)
-                {
-                    CustomCache.TryAdd(musicInfo.uid, result);
-                }
+                CustomCache.TryAdd(musicInfo.uid, result);
+
                 return result;
             }
             if (VanillaCache is null)
@@ -133,7 +138,7 @@ namespace IronSearch
             catch (Exception)
             {
 
-                MelonLogger.Msg((musicInfo.music ?? "<null>") + ", " + (musicInfo.musicName ?? "<null>") + ", " + (musicInfo.uid ?? "<null>"));
+                MelonLogger.Msg(System.ConsoleColor.DarkRed, (musicInfo.music ?? "<null>") + ", " + (musicInfo.musicName ?? "<null>") + ", " + (musicInfo.uid ?? "<null>"));
                 throw;
             }
         }

@@ -8,6 +8,7 @@ using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.Structs.Modules;
 using IronSearch.Records;
 using IronSearch.Tags;
+using MelonLoader;
 using PythonExpressionManager;
 
 namespace IronSearch.Patches
@@ -69,6 +70,7 @@ namespace IronSearch.Patches
             //favorites = DataHelper.collections
             //hiddenSongs = DataHelper.hides
             var text = keyword;
+            Console.WriteLine("RefreshPatch 1");
             if (FirstCall)
             {
                 text = Utils.FindKeyword;
@@ -82,6 +84,7 @@ namespace IronSearch.Patches
             {
                 return;
             }
+            Console.WriteLine("RefreshPatch 2");
             ModMain.LoadAlbumNames();
             BuiltIns.uniqueLogs.Clear();
             BuiltIns.logOnceIds.Clear();
@@ -101,6 +104,7 @@ namespace IronSearch.Patches
             //"accuracyStr" string
             //"accuracy" float;
 
+            Console.WriteLine("RefreshPatch 3");
             if (!text.StartsWith(ModMain.StartString))
             {
                 SearchPatch.isAdvancedSearch = false;
@@ -128,6 +132,7 @@ namespace IronSearch.Patches
                 new SearchResponse("failed to parse search (Code: {0})", ex, SearchResponse.Type.ParserError).PrintSearchError();
                 return;
             }
+            Console.WriteLine("RefreshPatch 4");
 
             SearchPatch.tagGroups = parseResult;
             history = DataHelper.history.ToSystem();
@@ -146,11 +151,19 @@ namespace IronSearch.Patches
 
             if (ModMain.CustomAlbumsLoaded)
             {
-                LoadCustomData();
+                try
+                {
+                    LoadCustomData();
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Msg(ConsoleColor.Red, "Failed to load custom album data: " + ex);
+                }
             }
             //DataHelper.hides.Clear();
 
             SearchPatch.isAdvancedSearch = true;
+            Console.WriteLine("RefreshPatch 5");
             //MelonLogger.Msg("Parsed tags: $" + string.Join(" ", SearchPatch.tagGroups.Select(x1 => string.Join("|", x1.Select(x2 => TermToString(x2))))) + '$');
         }
 
@@ -161,41 +174,62 @@ namespace IronSearch.Patches
             {
                 return;
             }
-            history.AddRange(save.History);
-            favorites.AddRange(save.Collections);
-            hides.AddRange(save.Hides);
-
-
-            fullCombos.AddRange(save.FullCombo.SelectMany(kv =>
+            if (save.History is not null)
             {
-                var albumName = kv.Key;
-                var album = AlbumManager.LoadedAlbums.Values.First(a => a.AlbumName == albumName);
-                var uidBase = album.Uid + '_';
-                return kv.Value.Select(index => uidBase + index);
-            }));
-
-
-            highScores.AddRange(save.Highest.SelectMany(nameToScoreDict =>
+                history.AddRange(save.History);
+            }
+            if (save.Collections is not null)
             {
-                var albumName = nameToScoreDict.Key;
-                var album = AlbumManager.LoadedAlbums.Values.First(a => a.AlbumName == albumName);
-                var uidBase = album.Uid + '_';
-                return nameToScoreDict.Value.Select(indexToScore =>
+                favorites.AddRange(save.Collections);
+            }
+            if (save.Hides is not null)
+            {
+                hides.AddRange(save.Hides);
+            }
+
+            if (save.FullCombo is not null)
+            {
+                fullCombos.AddRange(save.FullCombo.SelectMany(kv =>
                 {
-                    var score = indexToScore.Value;
-                    return new Highscore()
+                    var albumName = kv.Key;
+                    var album = AlbumManager.LoadedAlbums.Values.FirstOrDefault(a => a.AlbumName == albumName);
+                    if (album is null)
                     {
-                        Accuracy = score.Accuracy,
-                        AccuracyStr = score.AccuracyStr,
-                        Clear = (int)score.Clear,
-                        Combo = score.Combo,
-                        Evaluate = score.Evaluate,
-                        Score = score.Score,
-                        Uid = uidBase+indexToScore.Key,
-                    };
+                        return Array.Empty<string>();
+                    }
+                    var uidBase = album.Uid + '_';
+                    return kv.Value.Select(index => uidBase + index);
+                }));
+            }
 
-                });
-            }));
+            if (save.Highest is not null)
+            {
+                highScores.AddRange(save.Highest.SelectMany(nameToScoreDict =>
+                {
+                    var albumName = nameToScoreDict.Key;
+                    var album = AlbumManager.LoadedAlbums.Values.FirstOrDefault(a => a.AlbumName == albumName);
+                    if (album is null)
+                    {
+                        return Array.Empty<Highscore>();
+                    }
+                    var uidBase = album.Uid + '_';
+                    return nameToScoreDict.Value.Select(indexToScore =>
+                    {
+                        var score = indexToScore.Value;
+                        return new Highscore()
+                        {
+                            Accuracy = score.Accuracy,
+                            AccuracyStr = score.AccuracyStr,
+                            Clear = (int)score.Clear,
+                            Combo = score.Combo,
+                            Evaluate = score.Evaluate,
+                            Score = score.Score,
+                            Uid = uidBase + indexToScore.Key,
+                        };
+
+                    });
+                }));
+            }
         }
 
         private static void NullifyAdvancedSearch()

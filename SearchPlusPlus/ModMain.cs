@@ -101,7 +101,6 @@ namespace IronSearch
         internal static bool IsFirstLengthCacheBuild { get; private set; } = true;
         internal static void BuildCacheIfNecessary()
         {
-
             if (InitSuccessful && IsFirstLengthCacheBuild)
             {
                 IsFirstLengthCacheBuild = false;
@@ -110,7 +109,7 @@ namespace IronSearch
                     var s = "Re-building length cache, this may take a while!";
                     MelonLogger.Msg(System.ConsoleColor.Magenta, s);
                 }
-                AudioHelper.ForceBuildCache();
+                AudioHelper.ForceBuildVanillaCache();
             }
         }
 
