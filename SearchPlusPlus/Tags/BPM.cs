@@ -47,6 +47,10 @@ namespace IronSearch.Tags
 
         internal static void AddBPMInfo(MusicInfo musicInfo)
         {
+            if (bpmDict.ContainsKey(musicInfo.uid))
+            {
+                return;
+            }
             if (Utils.DetectParseBPM(musicInfo.bpm, out var range))
             {
                 bpmDict[musicInfo.uid] = range;
