@@ -32,7 +32,7 @@ namespace IronSearch.Tags
                 throw new SearchInputException($"expected at least 1 positional argument");
             }
         }
-        internal static void ThrowIfNotInRange(IList<dynamic> d, Range r)
+        internal static void ThrowIfNotMatching(IList<dynamic> d, Range r)
         {
             if (!r.Contains(d.Count))
             {

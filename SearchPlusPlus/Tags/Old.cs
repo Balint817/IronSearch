@@ -1,4 +1,5 @@
 ﻿using Il2CppAssets.Scripts.Database;
+using IronPython.Runtime;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -53,6 +54,8 @@ namespace IronSearch.Tags
                     return EvalOld(M.I, s);
                 case Range r:
                     return EvalOld(M.I, r);
+                case PythonRange pr:
+                    return EvalOld(M.I, (Range)pr);
                 case MultiRange mr:
                     return EvalOld(M.I, mr);
                 default:

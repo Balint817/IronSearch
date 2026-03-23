@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Il2CppAssets.Scripts.Database;
+using IronPython.Runtime;
 using IronSearch.Records;
 using MelonLoader;
 using Range = IronSearch.Records.Range;
@@ -73,6 +74,8 @@ namespace IronSearch.Tags
                     return EvalLength(M.I, n);
                 case Range r:
                     return EvalLength(M.I, r);
+                case PythonRange pr:
+                    return EvalLength(M.I, (Range)pr);
                 case MultiRange mr:
                     return EvalLength(M.I, mr);
             }

@@ -1,4 +1,5 @@
 ﻿using Il2CppAssets.Scripts.Database;
+using IronPython.Runtime;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -68,7 +69,7 @@ namespace IronSearch.Tags
         internal static bool EvalUnplayed(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotInRange(varArgs, evalUnplayedArgCount);
+            ThrowIfNotMatching(varArgs, evalUnplayedArgCount);
             if (varArgs.Length == 0)
             {
                 return EvalUnplayed(M.I);
@@ -81,6 +82,8 @@ namespace IronSearch.Tags
                     return EvalUnplayed(M.I, s);
                 case Range r:
                     return EvalUnplayed(M.I, r);
+                case PythonRange pr:
+                    return EvalUnplayed(M.I, (Range)pr);
                 case MultiRange mr:
                     return EvalUnplayed(M.I, mr);
                 default:

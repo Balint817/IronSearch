@@ -317,6 +317,12 @@ namespace IronSearch
             RegisterObject("EmptyMultiRange", BuiltIns.EvalEmptyMultiRange);
             RegisterObject("EMR", BuiltIns.EvalEmptyMultiRange);
 
+            RegisterObject("FullRange", BuiltIns.EvalFullRange);
+            RegisterObject("FR", BuiltIns.EvalFullRange);
+
+            RegisterObject("FullMultiRange", BuiltIns.EvalFullMultiRange);
+            RegisterObject("FMR", BuiltIns.EvalFullMultiRange);
+
             RegisterObject("GetCallbacks", BuiltIns.EvalGetCallbacks);
             RegisterObject("Callbacks", BuiltIns.EvalGetCallbacks);
 

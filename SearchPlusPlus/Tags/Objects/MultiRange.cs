@@ -1,4 +1,7 @@
-﻿using IronSearch.Records;
+﻿using Harmony;
+using IronPython.Modules;
+using IronPython.Runtime;
+using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
@@ -26,6 +29,10 @@ namespace IronSearch.Tags
                 else if (arg is Range r)
                 {
                     multiRanges.Add(r.AsMultiRange());
+                }
+                else if (arg is PythonRange pr)
+                {
+                    multiRanges.Add(((Range)pr).AsMultiRange());
                 }
                 else if (arg is MultiRange mr)
                 {

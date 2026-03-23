@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Il2CppAssets.Scripts.Database;
+using IronPython.Runtime;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -64,6 +65,8 @@ namespace IronSearch.Tags
                     return EvalBPM(M.I, n);
                 case Range r:
                     return EvalBPM(M.I, r);
+                case PythonRange pr:
+                    return EvalBPM(M.I, (Range)pr);
                 case MultiRange mr:
                     return EvalBPM(M.I, mr);
             }

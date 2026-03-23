@@ -10,13 +10,17 @@ namespace IronSearch.Records
             InvalidRange = new() { IsReadOnly = true };
             InvalidRange._ranges.Add(Range.InvalidRange);
 
-            EmptyRange = new() { IsReadOnly = false };
+            FullRange = new() { IsReadOnly = true };
+            FullRange._ranges.Add(Range.FullRange);
+
+            EmptyRange = new() { IsReadOnly = true };
 
         }
         private List<Range> _ranges = new();
 
         public static readonly MultiRange InvalidRange;
         public static readonly MultiRange EmptyRange;
+        public static readonly MultiRange FullRange;
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;

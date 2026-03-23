@@ -1,9 +1,38 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using IronPython.Runtime;
+using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Transactions;
 
 namespace IronSearch.Records
 {
     public class Range : IComparable
     {
+        public static explicit operator Range(PythonRange value)
+        {
+            if (value == null)
+            {
+                return null!;
+            }
+
+            var start = value.start switch
+            {
+                int n => n,
+                long n => n,
+                BigInteger n => (double)n,
+                double n => n,
+                _ => throw new NotSupportedException(),
+            };
+            var stop = value.stop switch
+            {
+                int n => n,
+                long n => n,
+                BigInteger n => (double)n,
+                double n => n,
+                _ => throw new NotSupportedException(),
+            };
+
+            return new Range(start, stop);
+        }
         public MultiRange AsMultiRange()
         {
             if (this.IsReadonly)
@@ -52,11 +81,39 @@ namespace IronSearch.Records
 
             if (range._end == _end)
             {
+                if (ExclusiveEnd)
+                {
+                    if (!range.ExclusiveEnd)
+                    {
+                        return -1;
+                    }
+                }
+                else if (range.ExclusiveEnd)
+                {
+                    return 1;
+                }
+
+                if (range._start == _start)
+                {
+                    if (ExclusiveStart)
+                    {
+                        if (!range.ExclusiveStart)
+                        {
+                            return 1;
+                        }
+                    }
+                    else if (range.ExclusiveStart)
+                    {
+                        return -1;
+                    }
+                    return 0;
+                }
                 return _start.CompareTo(range._start);
             }
             return _end.CompareTo(range._end);
         }
         public static readonly Range InvalidRange = new() { IsReadonly = true };
+        public static readonly Range FullRange = new(double.NegativeInfinity, double.PositiveInfinity) { IsReadonly = true };
 
         private bool _exclusiveStart;
         private bool _exclusiveEnd;
@@ -201,7 +258,32 @@ namespace IronSearch.Records
         }
         public bool Contains(double value)
         {
-            return (_start < value || !ExclusiveStart && _start == value) && (value < _end || !ExclusiveEnd && _end == value);
+            if (double.IsNaN(value))
+            {
+                return false;
+            }
+            if (double.IsNaN(_start))
+            {
+                return false;
+            }
+
+            if (value == _end)
+            {
+                if (_end == double.PositiveInfinity)
+                {
+                    return true;
+                }
+                return !ExclusiveEnd;
+            }
+            if (value == _start)
+            {
+                if (_start == double.NegativeInfinity)
+                {
+                    return true;
+                }
+                return !ExclusiveStart;
+            }
+            return (_start < value && value < _end);
         }
 
         public bool IsOverlap(Range range)

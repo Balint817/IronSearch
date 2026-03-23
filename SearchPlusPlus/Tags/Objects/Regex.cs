@@ -11,7 +11,7 @@ namespace IronSearch.Tags
         {
             var flags = RegexOptions.CultureInvariant
                 | RegexOptions.IgnoreCase;
-            ThrowIfNotInRange(varArgs, evalRegexArgCount);
+            ThrowIfNotMatching(varArgs, evalRegexArgCount);
 
             if (varKwargs.ContainsKey("case"))
             {

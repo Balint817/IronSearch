@@ -1,4 +1,5 @@
 ﻿using Il2CppAssets.Scripts.Database;
+using IronPython.Runtime;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -123,7 +124,7 @@ namespace IronSearch.Tags
         internal static bool EvalAccuracy(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotInRange(varArgs, evalAccArgCount);
+            ThrowIfNotMatching(varArgs, evalAccArgCount);
 
             switch (varArgs.Length)
             {
@@ -135,6 +136,8 @@ namespace IronSearch.Tags
                                 return EvalAccuracy(M.I, s);
                             case Range r:
                                 return EvalAccuracy(M.I, r);
+                            case PythonRange pr:
+                                return EvalAccuracy(M.I, (Range)pr);
                             case MultiRange mr:
                                 return EvalAccuracy(M.I, mr, MultiRange.InvalidRange);
                         }
@@ -174,6 +177,16 @@ namespace IronSearch.Tags
                         if (varArgs[1] is Range r1)
                         {
                             varArgs[1] = r1.AsMultiRange();
+                        }
+
+                        if (varArgs[0] is PythonRange pr0)
+                        {
+                            varArgs[0] = ((Range)pr0).AsMultiRange();
+                        }
+
+                        if (varArgs[1] is PythonRange pr1)
+                        {
+                            varArgs[1] = ((Range)pr1).AsMultiRange();
                         }
 
                         if (varArgs[0] is MultiRange mr1 && varArgs[1] is MultiRange mr2)

@@ -1,4 +1,5 @@
 ﻿using Il2CppAssets.Scripts.Database;
+using IronPython.Runtime;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -87,7 +88,7 @@ namespace IronSearch.Tags
         internal static bool EvalAP(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotInRange(varArgs, evalAPArgCount);
+            ThrowIfNotMatching(varArgs, evalAPArgCount);
 
             switch (varArgs.Length)
             {
@@ -101,6 +102,8 @@ namespace IronSearch.Tags
                             return EvalAP(M.I, s);
                         case Range r:
                             return EvalAP(M.I, r);
+                        case PythonRange pr:
+                            return EvalAP(M.I, (Range)pr);
                         case MultiRange mr:
                             return EvalAP(M.I, mr);
                     }
