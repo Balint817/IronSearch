@@ -11,18 +11,11 @@ namespace IronSearch.Tags
     internal delegate dynamic BuiltInObjectDelegate(SearchArgument input, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
     internal partial class BuiltIns
     {
-        internal static void ThrowIfEmpty(IList<dynamic> d)
-        {
-            if (d.Count == 0)
-            {
-                throw new SearchInputException($"expected at least 1 positional argument");
-            }
-        }
         internal static void ThrowIfNotEmpty(IReadOnlyDictionary<string, dynamic> d)
         {
             if (d.Count != 0)
             {
-                throw new SearchInputException($"unexpected keyword arguments");
+                throw new SearchInputException($"unexpected keyword arguments: {string.Join(", ", d.Keys.Select(x => $"'{x}'"))}");
             }
         }
         internal static void ThrowIfNotEmpty(IList<dynamic> d)
@@ -30,6 +23,13 @@ namespace IronSearch.Tags
             if (d.Count != 0)
             {
                 throw new SearchInputException($"unexpected positional arguments");
+            }
+        }
+        internal static void ThrowIfEmpty(IList<dynamic> d)
+        {
+            if (d.Count == 0)
+            {
+                throw new SearchInputException($"expected at least 1 positional argument");
             }
         }
         internal static void ThrowIfNotInRange(IList<dynamic> d, Range r)
