@@ -5,6 +5,7 @@ using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
 using IronPython.Runtime.Operations;
+using IronPython.Runtime.Types;
 using IronSearch.Records;
 using IronSearch.Tags;
 
@@ -248,6 +249,32 @@ namespace IronSearch.Patches
                 throw new InvalidOperationException("you're not supposed to call this, pass this to the sorter as an argument instead!");
             }
             return musicInfo1.scene.CompareTo(musicInfo2.scene);
+        }
+        public static int SortByLength(MusicInfo musicInfo1, MusicInfo musicInfo2)
+        {
+            if (!sortingFlag)
+            {
+                throw new InvalidOperationException("you're not supposed to call this, pass this to the sorter as an argument instead!");
+            }
+            var length1null = AudioHelper.GetMusicLength(musicInfo1);
+            var length2null = AudioHelper.GetMusicLength(musicInfo2);
+
+            if (length1null is not { } length1)
+            {
+                if (length2null is null)
+                {
+                    return 0;
+                }
+                return -1;
+            }
+
+            if (length2null is not { } length2)
+            {
+                return 1;
+            }
+
+            return length1.CompareTo(length2);
+
         }
         public static int SortByDifficulty(MusicInfo musicInfo1, MusicInfo musicInfo2)
         {

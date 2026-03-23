@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using IronPython.Compiler.Ast;
 using IronPython.Runtime;
+using IronPython.Runtime.Operations;
 
 namespace PythonExpressionManager
 {
@@ -81,9 +83,18 @@ namespace PythonExpressionManager
         public readonly ILogger Logger;
         public bool Evaluate(dynamic data, string input)
         {
-            return new CompiledScript(input, this).Function(data);
+            return Evaluate(data, new CompiledScript(input, this));
         }
         public bool Evaluate(dynamic data, CompiledScript input)
+        {
+            return PythonOps.IsTrue(EvaluateObject(data, input));
+        }
+        public bool EvaluateObject(dynamic data, string input)
+        {
+            return EvaluateObject(data, new CompiledScript(input, this));
+        }
+
+        public bool EvaluateObject(dynamic data, CompiledScript input)
         {
             return input.Function(data);
         }

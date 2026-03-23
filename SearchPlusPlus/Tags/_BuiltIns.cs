@@ -1,9 +1,12 @@
-﻿using IronSearch.Records;
+﻿using IronPython.Runtime;
+using IronSearch.Records;
 using PythonExpressionManager;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
+
+    internal delegate dynamic ExpressionDelegate(SearchArgument input, PythonTuple varArgs, PythonDictionary varKwargs);
     internal delegate bool BuiltInDelegate(SearchArgument input, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
     internal delegate dynamic BuiltInObjectDelegate(SearchArgument input, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
     internal partial class BuiltIns
@@ -59,6 +62,26 @@ namespace IronSearch.Tags
                 }
 
                 return wrappedDel(input, tagDict, args, kwargs);
+            };
+            return del2;
+        }
+        internal static WrappedCLRDelegate WrapCommonChecks(ExpressionDelegate baseDel)
+        {
+
+            WrappedCLRDelegate del2 = (input, tagDict, args, kwargs) =>
+            {
+                switch (input)
+                {
+                    case ExpressionSearchArgument ESA:
+                        break;
+                    case SearchArgument SA:
+                        input = new ExpressionSearchArgument(SA, new(), new());
+                        break;
+                    default:
+                        throw new SearchInputException("invalid song input");
+                }
+
+                return baseDel(input, args, kwargs);
             };
             return del2;
         }

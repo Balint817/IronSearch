@@ -2,17 +2,14 @@
 using System.Reflection;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
+using IronPython.Runtime;
 
 namespace IronSearch
 {
     public class SearchArgument : DynamicObject
     {
-        public MusicInfo I { get; internal init; } = null!;
-        public PeroString PS { get; internal init; } = null!;
-        public SearchArgument()
-        {
-            
-        }
+        public MusicInfo I { get; } = null!;
+        public PeroString PS { get; } = null!;
         public SearchArgument(MusicInfo mi, PeroString ps)
         {
             I = mi; 
@@ -54,6 +51,18 @@ namespace IronSearch
 
             result = null;
             return false;
+        }
+    }
+
+
+    public class ExpressionSearchArgument: SearchArgument
+    {
+        public PythonTuple A { get; } = new();
+        public PythonDictionary K { get; } = new();
+        public ExpressionSearchArgument(SearchArgument searchBase, PythonTuple args, PythonDictionary kwargs): base(searchBase.I, searchBase.PS)
+        {
+            A = args;
+            K = kwargs;
         }
     }
 }

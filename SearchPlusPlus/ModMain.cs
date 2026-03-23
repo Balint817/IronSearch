@@ -5,6 +5,7 @@ using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
 using Il2CppAssets.Scripts.UI.Controls;
+using IronPython.Runtime;
 using IronSearch.Patches;
 using IronSearch.Tags;
 using IronSearch.UI;
@@ -219,6 +220,9 @@ namespace IronSearch
             MelonLogger.Msg("Checking user script directory...");
 
             Directory.CreateDirectory(ScriptDirectory);
+            //var templateString =
+            //    $"def {Script.OutputFunctionName}(M, T):\n" +
+            //    $"\treturn T['Custom']() and not T['Packed']()";
             var templateString =
                 $"def {Script.OutputFunctionName}(M, T):\n" +
                 $"\treturn T['Custom'](M,T) and not T['Packed'](M, T)";
@@ -249,6 +253,7 @@ namespace IronSearch
 
             RegisterScript("AP", BuiltIns.EvalAP);
             RegisterScript("Perfect", BuiltIns.EvalAP);
+            RegisterScript("AllPerfect", BuiltIns.EvalAP);
 
             RegisterScript("Author", BuiltIns.EvalAuthor);
 
@@ -398,6 +403,8 @@ namespace IronSearch
             RegisterObject("ByDifficulty", BuiltIns.EvalByDifficulty);
             RegisterObject("ByDiff", BuiltIns.EvalByDifficulty);
 
+            RegisterObject("ByLength", BuiltIns.EvalByLength);
+
             RegisterObject("ByName", BuiltIns.EvalByName);
 
             RegisterObject("ByRandom", BuiltIns.EvalByRandom);
@@ -459,18 +466,16 @@ namespace IronSearch
                 MelonLogger.Msg(System.ConsoleColor.Magenta, $"An error occured while loading the expressions.");
             }
         }
-
-        private static BuiltInDelegate LoadExpression(string expression)
+        private static ExpressionDelegate LoadExpression(string expression)
         {
-
             var compiled = ScriptManager.ScriptExecutor.Compile(expression);
-            BuiltInDelegate del = (SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs) =>
+            ExpressionDelegate baseDel = (SearchArgument M, PythonTuple varArgs, PythonDictionary varKwargs) =>
             {
-                BuiltIns.ThrowIfNotEmpty(varArgs);
-                BuiltIns.ThrowIfNotEmpty(varKwargs);
-                return ScriptManager.ScriptExecutor.Evaluate(M, compiled);
+                var wrappedArgs = new ExpressionSearchArgument(M, varArgs, varKwargs);
+
+                return ScriptManager.ScriptExecutor.Evaluate(wrappedArgs, compiled);
             };
-            return del;
+            return baseDel;
         }
 
         private void LoadAliases()
