@@ -70,7 +70,6 @@ namespace IronSearch.Patches
             //favorites = DataHelper.collections
             //hiddenSongs = DataHelper.hides
             var text = keyword;
-            Console.WriteLine("RefreshPatch 1");
             if (FirstCall)
             {
                 text = Utils.FindKeyword;
@@ -84,7 +83,6 @@ namespace IronSearch.Patches
             {
                 return;
             }
-            Console.WriteLine("RefreshPatch 2");
             ModMain.LoadAlbumNames();
             BuiltIns.uniqueLogs.Clear();
             BuiltIns.logOnceIds.Clear();
@@ -104,7 +102,6 @@ namespace IronSearch.Patches
             //"accuracyStr" string
             //"accuracy" float;
 
-            Console.WriteLine("RefreshPatch 3");
             if (!text.StartsWith(ModMain.StartString))
             {
                 SearchPatch.isAdvancedSearch = false;
@@ -132,7 +129,6 @@ namespace IronSearch.Patches
                 new SearchResponse("failed to parse search (Code: {0})", ex, SearchResponse.Type.ParserError).PrintSearchError();
                 return;
             }
-            Console.WriteLine("RefreshPatch 4");
 
             SearchPatch.tagGroups = parseResult;
             history = DataHelper.history.ToSystem();
@@ -163,7 +159,6 @@ namespace IronSearch.Patches
             //DataHelper.hides.Clear();
 
             SearchPatch.isAdvancedSearch = true;
-            Console.WriteLine("RefreshPatch 5");
             //MelonLogger.Msg("Parsed tags: $" + string.Join(" ", SearchPatch.tagGroups.Select(x1 => string.Join("|", x1.Select(x2 => TermToString(x2))))) + '$');
         }
 
