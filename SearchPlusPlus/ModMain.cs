@@ -299,7 +299,7 @@ namespace IronSearch
 
             RegisterScript("Scene", BuiltIns.EvalScene);
 
-            RegisterScript("Since", BuiltIns.EvalSince);
+            RegisterScript("Modified", BuiltIns.EvalModified);
 
             RegisterScript("Streamer", BuiltIns.EvalStreamer);
 
@@ -409,7 +409,7 @@ namespace IronSearch
 
             RegisterObject("ByRandom", BuiltIns.EvalByRandom);
 
-            RegisterObject("ByRecent", BuiltIns.EvalByRecent);
+            RegisterObject("ByModified", BuiltIns.EvalByModified);
 
             RegisterObject("ByScene", BuiltIns.EvalByScene);
 

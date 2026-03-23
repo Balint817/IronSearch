@@ -222,7 +222,7 @@ namespace IronSearch.Patches
             return _randomDictionary[musicInfo1.uid][musicInfo2.uid] = Random.Shared.Next(-1, 2);
 
         }
-        public static int SortByRecent(MusicInfo musicInfo1, MusicInfo musicInfo2)
+        public static int SortByModified(MusicInfo musicInfo1, MusicInfo musicInfo2)
         {
             if (!sortingFlag)
             {
