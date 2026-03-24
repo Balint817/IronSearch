@@ -38,6 +38,43 @@ namespace IronSearch.Tags
                         }
                         return EvalModified(M.I, (long)n);
                     }
+                case string s:
+                    // AI
+                    {
+                        s = s.Replace(" ", "").ToLowerInvariant();
+                        long totalTicks = 0;
+                        int pos = 0;
+                        while (pos < s.Length)
+                        {
+                            // parse number
+                            int start = pos;
+                            while (pos < s.Length && char.IsDigit(s[pos]))
+                            {
+                                pos++;
+                            }
+                            if (start == pos)
+                            {
+                                throw new SearchInputException("expected time offset (integer) as 'modified' argument");
+                            }
+                            long value = long.Parse(s[start..pos]);
+                            // parse unit
+                            if (pos >= s.Length)
+                            {
+                                throw new SearchInputException("expected time unit after number in 'modified' argument");
+                            }
+                            char unit = s[pos];
+                            pos++;
+                            totalTicks += unit switch
+                            {
+                                's' => value * TimeSpan.TicksPerSecond,
+                                'm' => value * TimeSpan.TicksPerMinute,
+                                'h' => value * TimeSpan.TicksPerHour,
+                                'd' => value * TimeSpan.TicksPerDay,
+                                _ => throw new SearchInputException($"invalid time unit '{unit}' in 'modified' argument"),
+                            };
+                        }
+                        return EvalModified(M.I, totalTicks);
+                    }
                 default:
                     break;
             }
