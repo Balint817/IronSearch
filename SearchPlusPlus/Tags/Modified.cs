@@ -73,6 +73,7 @@ namespace IronSearch.Tags
                                 'm' => checked(totalTicks + value * TimeSpan.TicksPerMinute),
                                 'h' => checked(totalTicks + value * TimeSpan.TicksPerHour),
                                 'd' => checked(totalTicks + value * TimeSpan.TicksPerDay),
+                                'w' => checked(totalTicks + value * TimeSpan.TicksPerDay * 7),
                                 _ => throw new SearchInputException($"invalid time unit '{unit}' in 'modified' argument"),
                             };
                         }

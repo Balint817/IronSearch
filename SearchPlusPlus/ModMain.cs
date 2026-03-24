@@ -362,6 +362,8 @@ namespace IronSearch
             RegisterObject("Regex", BuiltIns.EvalRegex);
             RegisterObject("Re", BuiltIns.EvalRegex);
 
+            RegisterObject("Weeks", BuiltIns.EvalWeeks);
+
 
 
 
