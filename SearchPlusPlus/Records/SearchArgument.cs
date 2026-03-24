@@ -10,6 +10,12 @@ namespace IronSearch
     {
         public MusicInfo I { get; } = null!;
         public PeroString PS { get; } = null!;
+
+        public SearchArgument(MusicInfo mi)
+        {
+            I = mi;
+            PS = new PeroString(0);
+        }
         public SearchArgument(MusicInfo mi, PeroString ps)
         {
             I = mi; 

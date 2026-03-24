@@ -2,6 +2,7 @@
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
+using IronSearch.Tags;
 using PythonExpressionManager;
 
 namespace IronSearch.Patches
@@ -52,7 +53,14 @@ namespace IronSearch.Patches
             }
             catch (Exception ex)
             {
-                searchError = new SearchResponse(ex, SearchResponse.Type.RuntimeError);
+                if (ex is TerminateSearchException safeException)
+                {
+                    __result = safeException.IsTrue;
+                }
+                else
+                {
+                    searchError = new SearchResponse(ex, SearchResponse.Type.RuntimeError);
+                }
             }
             return false;
         }

@@ -16,6 +16,8 @@ using IronSearch.Tags;
 using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine.UI;
+using UnityEngine;
 using ArgumentException = System.ArgumentException;
 using Range = IronSearch.Records.Range;
 
@@ -23,8 +25,7 @@ namespace IronSearch
 {
 
     public static class Utils
-    {
-        internal static void PrintSearchError(this SearchResponse response, string baseMsg = "The current search resulted in an error. (Code: {0})")
+    {internal static void PrintSearchError(this SearchResponse response, string baseMsg = "The current search resulted in an error. (Code: {0})")
         {
             MelonLogger.Msg(ConsoleColor.Red, string.Format(baseMsg, (int)response.Code));
 
@@ -808,5 +809,26 @@ namespace IronSearch
             return new StackTrace(true).ToString();
         }
 
+        public static Vector2 GetCaretVectorPosition(this InputField inputField)
+        {
+            Text text = inputField.textComponent;
+            int caretIndex = inputField.caretPosition;
+
+            var gen = text.cachedTextGenerator;
+            if (gen.characterCount == 0)
+                return Vector2.zero;
+
+            caretIndex = Mathf.Clamp(caretIndex, 0, gen.characterCount - 1);
+
+            UICharInfo charInfo = gen.characters[caretIndex];
+
+            Vector2 pos = charInfo.cursorPos;
+
+            Vector3 worldPos = text.transform.TransformPoint(pos);
+
+            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, worldPos);
+
+            return screenPos;
+        }
     }
 }

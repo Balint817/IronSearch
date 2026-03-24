@@ -29,13 +29,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Obfuscar" Version="2.2.38">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\PythonExpressionManager\PythonExpressionManager.csproj" />
   </ItemGroup>
 
@@ -67,9 +60,6 @@
     <Reference Include="Il2CppSirenix.Serialization">
       <HintPath>$(MD_DIRECTORY)\MelonLoader\Il2CppAssemblies\Il2CppSirenix.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="KeybindManager">
-      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\KeybindManager.dll</HintPath>
-    </Reference>
     <Reference Include="LocalizeLib">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\LocalizeLib.dll</HintPath>
     </Reference>
@@ -82,17 +72,32 @@
     <Reference Include="PopupLib">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\Mods\PopupLib.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Addressables">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\Unity.Addressables.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\Unity.ResourceManager.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.AudioModule">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(MD_DIRECTORY)\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\..\..\..\Steam\steamapps\common\Muse Dash\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 

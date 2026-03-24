@@ -89,12 +89,12 @@ namespace PythonExpressionManager
         {
             return PythonOps.IsTrue(EvaluateObject(data, input));
         }
-        public bool EvaluateObject(dynamic data, string input)
+        public dynamic EvaluateObject(dynamic data, string input)
         {
             return EvaluateObject(data, new CompiledScript(input, this));
         }
 
-        public bool EvaluateObject(dynamic data, CompiledScript input)
+        public dynamic EvaluateObject(dynamic data, CompiledScript input)
         {
             return input.Function(data);
         }

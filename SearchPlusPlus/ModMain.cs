@@ -12,6 +12,8 @@ using IronSearch.UI;
 using MelonLoader;
 using MelonLoader.Utils;
 using PythonExpressionManager;
+using UnityEngine.AddressableAssets;
+using static Community.CsharpSqlite.Sqlite3;
 
 namespace IronSearch
 {
@@ -20,7 +22,7 @@ namespace IronSearch
         public static bool InitSuccessful { get; internal set; } = false;
         public static bool CustomAlbumsLoaded { get; private set; }
         public static bool HeadquartersLoaded { get; private set; }
-        public static bool KeybindsWindowsLoaded { get; private set; }
+        public static bool PopupLibLoaded { get; private set; }
 
         private static bool ShownError = false;
 
@@ -30,6 +32,8 @@ namespace IronSearch
         internal static MelonPreferences_Entry<Dictionary<string, string>> expressionEntry = null!;
 
         internal static MelonPreferences_Entry<Dictionary<string, string>> aliasEntry = null!;
+
+        internal static MelonPreferences_Entry<Dictionary<string, string>> autoCompleteItems = null!;
 
         internal static MelonPreferences_Entry<double> waitMultiplierEntry = null!;
 
@@ -55,6 +59,13 @@ namespace IronSearch
             get
             {
                 return aliasEntry.Value;
+            }
+        }
+        internal static Dictionary<string, string> AutoCompleteItems
+        {
+            get
+            {
+                return autoCompleteItems.Value;
             }
         }
         internal static Dictionary<string, string> ExpressionEntry
@@ -91,10 +102,20 @@ namespace IronSearch
                     ShowText.ShowInfo(s);
                 }
             }
-            if (sceneName == "UISystem_PC")
+            else if (sceneName == "UISystem_PC")
             {
                 UISystemLoaded = true;
             }
+            else
+            {
+                // ...
+            }
+            SearchFocusPatch.inputField = null;
+        }
+
+        public override void OnGUI()
+        {
+            AutoCompleteManager.OnGUI();
         }
 
         internal static bool UISystemLoaded { get; private set; }
@@ -145,8 +166,8 @@ namespace IronSearch
         {
             CustomAlbumsLoaded = Utils.IsAssemblyLoaded("CustomAlbums");
             HeadquartersLoaded = Utils.IsAssemblyLoaded("Headquarters");
-            KeybindsWindowsLoaded = Utils.IsAssemblyLoaded("PopupLib") && Utils.IsAssemblyLoaded("KeybindManager");
-            if (!KeybindsWindowsLoaded)
+            PopupLibLoaded = Utils.IsAssemblyLoaded("PopupLib");
+            if (!PopupLibLoaded)
             {
                 MelonLogger.Msg(System.ConsoleColor.Magenta, "PopupLib and/or KeybindManager is missing, certain features of the mod will be disabled.");
             }
@@ -237,10 +258,12 @@ namespace IronSearch
             void RegisterScript(string key, BuiltInDelegate del)
             {
                 ScriptManager.ScriptExecutor.RegisterScript(key, ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(del)));
+                AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
             }
             void RegisterObject(string key, BuiltInObjectDelegate del)
             {
                 ScriptManager.ScriptExecutor.RegisterScript(key, ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(del)));
+                AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
             }
 
 
@@ -391,6 +414,10 @@ namespace IronSearch
 
 
 
+            RegisterScript("Exit", BuiltIns.EvalExit);
+
+            RegisterScript("RunOnce", BuiltIns.EvalRunOnce);
+
             RegisterScript("Sorter", BuiltIns.EvalSorter);
             RegisterScript("Sort", BuiltIns.EvalSorter);
 
@@ -439,6 +466,9 @@ namespace IronSearch
             LoadAliases();
 
 
+            autoCompleteItems = category.CreateEntry<Dictionary<string, string>>("AutoCompleteItems", new() { ["NewCustom"]="Unplayed() and Custom()" }, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.");
+
+
             // TODO:
             // Expressions
         }
@@ -460,6 +490,7 @@ namespace IronSearch
                         var script = ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(LoadExpression(kv.Value)));
                         LoadedExpressions.Add(key, script);
                         ScriptManager.ScriptExecutor.RegisterScript(key, script);
+                        AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
                     }
                     catch (Exception ex)
                     {
@@ -481,7 +512,7 @@ namespace IronSearch
             {
                 var wrappedArgs = new ExpressionSearchArgument(M, varArgs, varKwargs);
 
-                return ScriptManager.ScriptExecutor.Evaluate(wrappedArgs, compiled);
+                return ScriptManager.ScriptExecutor.EvaluateObject(wrappedArgs, compiled);
             };
             return baseDel;
         }
@@ -500,7 +531,10 @@ namespace IronSearch
                 {
                     try
                     {
-                        executor.RegisterAlias(item.Key, item.Value);
+                        var key = item.Key;
+                        var value = item.Value;
+                        executor.RegisterAlias(key, value);
+                        AutoCompleteManager.AllKeywords.Add(value, new($"{value}()", 0));
                     }
                     catch (Exception ex)
                     {

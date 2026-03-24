@@ -6,10 +6,12 @@ using Il2Cpp;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.Structs.Modules;
+using Il2CppInterop.Runtime.Injection;
 using IronSearch.Records;
 using IronSearch.Tags;
 using MelonLoader;
 using PythonExpressionManager;
+using UnityEngine;
 
 namespace IronSearch.Patches
 {
@@ -43,6 +45,7 @@ namespace IronSearch.Patches
             {
                 return;
             }
+
             ////var _hides = DataHelper.hides;
             ////foreach (var item in hides)
             ////{
@@ -66,6 +69,16 @@ namespace IronSearch.Patches
             if (ModMain.UISystemLoaded && ModMain.IsFirstLengthCacheBuild)
             {
                 ModMain.BuildCacheIfNecessary();
+            }
+            if (ModMain.UISystemLoaded)
+            {
+                Action<string, int> action = (v, i) =>
+                {
+                    MelonLogger.Msg($"index {i}: '{v}'");
+                };
+
+                ClassInjector.RegisterTypeInIl2Cpp<SimpleDropdown>();
+                SimpleDropdown.Create(new string[] { "a", "b", "c" }, action);
             }
             //favorites = DataHelper.collections
             //hiddenSongs = DataHelper.hides

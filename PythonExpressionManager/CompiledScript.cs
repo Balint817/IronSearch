@@ -42,7 +42,12 @@ namespace PythonExpressionManager
                 //);
             }
 
-            scriptBuilder.AppendLine($"\n\treturn ({body.Replace("\n", "\\n")})\n\treturn\n{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
+            scriptBuilder.AppendLine("\ttry:");
+            scriptBuilder.AppendLine($"\t\treturn ({body.Replace("\n", "\\n")})");
+            scriptBuilder.AppendLine($"\t\treturn");
+            scriptBuilder.AppendLine("\texcept SystemExit:");
+            scriptBuilder.AppendLine("\t\traise");
+            scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
 
             var script = scriptBuilder.ToString();
             var source = Script.Engine.CreateScriptSourceFromString(script);

@@ -36,7 +36,7 @@ namespace DependentConsoleApp
 
             var fooBars = new List<FooBar>() { new() { Foo = false, Bar = false }, new() { Foo = true, Bar = false }, new() { Foo = false, Bar = true }, new() { Foo = true, Bar = true } };
 
-            var compiled = executor.Compile("foo() ^ bar()");
+            var compiled = executor.Compile("exit()");
 
             foreach (var fooBar in fooBars)
             {
