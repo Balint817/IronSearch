@@ -56,7 +56,10 @@ namespace IronSearch.Tags
                             {
                                 throw new SearchInputException("expected time offset (integer) as 'modified' argument");
                             }
-                            long value = long.Parse(s[start..pos]);
+                            if (!long.TryParse(s[start..pos], out var value))
+                            {
+                                throw new SearchInputException("invalid number in 'modified' argument");
+                            }
                             // parse unit
                             if (pos >= s.Length)
                             {
@@ -64,12 +67,12 @@ namespace IronSearch.Tags
                             }
                             char unit = s[pos];
                             pos++;
-                            totalTicks += unit switch
+                            totalTicks = unit switch
                             {
-                                's' => value * TimeSpan.TicksPerSecond,
-                                'm' => value * TimeSpan.TicksPerMinute,
-                                'h' => value * TimeSpan.TicksPerHour,
-                                'd' => value * TimeSpan.TicksPerDay,
+                                's' => checked(totalTicks + value * TimeSpan.TicksPerSecond),
+                                'm' => checked(totalTicks + value * TimeSpan.TicksPerMinute),
+                                'h' => checked(totalTicks + value * TimeSpan.TicksPerHour),
+                                'd' => checked(totalTicks + value * TimeSpan.TicksPerDay),
                                 _ => throw new SearchInputException($"invalid time unit '{unit}' in 'modified' argument"),
                             };
                         }
