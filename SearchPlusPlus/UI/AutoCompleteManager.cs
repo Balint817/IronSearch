@@ -330,6 +330,14 @@ namespace IronSearch.UI
             SearchFocusPatch.inputField.m_CaretSelectPosition = SearchFocusPatch.inputField.m_CaretPosition;
         }
 
+        internal static void AddManagerKeywords()
+        {
+            foreach (var item in ModMain.ScriptManager.ScriptExecutor.RegisteredKeys)
+            {
+                AllKeywords.Add(item.Key, new($"{item.Key}()", 0));
+            }
+        }
+
 
 
         //private static void AutoCompleteSetField()

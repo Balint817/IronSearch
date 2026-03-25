@@ -19,6 +19,7 @@ namespace IronSearch
 {
     public partial class ModMain : MelonMod
     {
+        static bool? _initStepTracker = null;
         public static bool InitSuccessful { get; internal set; } = false;
         public static bool CustomAlbumsLoaded { get; private set; }
         public static bool HeadquartersLoaded { get; private set; }
@@ -157,13 +158,20 @@ namespace IronSearch
 
         public override void OnEarlyInitializeMelon()
         {
+            _initStepTracker = false;
             HQLoadTask = HQLoader.LoadHQ(cts.Token);
             var e = (MelonEvent)HarmonyLib.AccessTools.Field(typeof(MelonEvents), nameof(MelonHarmonyInit)).GetValue(null)!;
             e.Subscribe(MelonHarmonyInit);
+            _initStepTracker = null;
         }
 
         void MelonHarmonyInit()
         {
+            if (_initStepTracker is false)
+            {
+                return;
+            }
+            _initStepTracker = false;
             CustomAlbumsLoaded = Utils.IsAssemblyLoaded("CustomAlbums");
             HeadquartersLoaded = Utils.IsAssemblyLoaded("Headquarters");
             PopupLibLoaded = Utils.IsAssemblyLoaded("PopupLib");
@@ -207,6 +215,7 @@ namespace IronSearch
 
 
             LoadUserScripts();
+            _initStepTracker = null;
         }
 
 
@@ -258,12 +267,12 @@ namespace IronSearch
             void RegisterScript(string key, BuiltInDelegate del)
             {
                 ScriptManager.ScriptExecutor.RegisterScript(key, ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(del)));
-                AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
+                //AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
             }
             void RegisterObject(string key, BuiltInObjectDelegate del)
             {
                 ScriptManager.ScriptExecutor.RegisterScript(key, ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(del)));
-                AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
+                //AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
             }
 
 
@@ -466,7 +475,10 @@ namespace IronSearch
             LoadAliases();
 
 
-            autoCompleteItems = category.CreateEntry<Dictionary<string, string>>("AutoCompleteItems", new() { ["NewCustom"]="Unplayed() and Custom()" }, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.");
+            autoCompleteItems = category.CreateEntry<Dictionary<string, string>>("AutoCompleteItems", new() {
+                ["NewCustom"]="Unplayed() and Custom()",
+                ["Vanilla"]="not Custom()"
+            }, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.");
 
 
             // TODO:
@@ -552,7 +564,13 @@ namespace IronSearch
 
         public override void OnInitializeMelon()
         {
+            if (_initStepTracker is false)
+            {
+                return;
+            }
+            _initStepTracker = false;
             AudioHelper.LoadVanillaCache();
+            _initStepTracker = null;
         }
 
         internal static void LoadAlbumNames()
@@ -580,6 +598,10 @@ namespace IronSearch
         }
         public override void OnLateInitializeMelon()
         {
+            if (_initStepTracker is false)
+            {
+                return;
+            }
             if (CustomAlbumsLoaded)
             {
                 LoadCinema();
@@ -598,6 +620,8 @@ namespace IronSearch
                 MelonLogger.Msg(System.ConsoleColor.Red, ex.ToString());
                 MelonLogger.Msg(System.ConsoleColor.DarkRed, "Failed to load custom ranking information, certain features will not work properly!");
             }
+
+            AutoCompleteManager.AddManagerKeywords();
 
             InitSuccessful = true;
         }
