@@ -7,7 +7,7 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        internal static readonly ConcurrentDictionary<string, bool> uniqueLogs = new();
+        internal static readonly ConcurrentDictionary<string, bool> logUnique = new();
         internal static bool EvalLogUnique(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             var separator = " ";
@@ -29,7 +29,7 @@ namespace IronSearch.Tags
                 sb.Append(separator);
             }
             var result = sb.ToString();
-            if (uniqueLogs.TryAdd(result, false))
+            if (logUnique.TryAdd(result, false))
             {
                 MelonLogger.Msg(ConsoleColor.DarkCyan, result);
             }

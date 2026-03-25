@@ -20,5 +20,10 @@ namespace IronSearch.Records
         protected SearchInputException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+
+        public override string ToString()
+        {
+            return "input error: " + Message;
+        }
     }
 }

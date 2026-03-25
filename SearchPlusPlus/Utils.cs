@@ -20,20 +20,22 @@ using UnityEngine.UI;
 using UnityEngine;
 using ArgumentException = System.ArgumentException;
 using Range = IronSearch.Records.Range;
+using PythonExpressionManager;
 
 namespace IronSearch
 {
 
     public static class Utils
-    {internal static void PrintSearchError(this SearchResponse response, string baseMsg = "The current search resulted in an error. (Code: {0})")
+    {
+        internal static void PrintSearchError(this SearchResponse response, string baseMsg = "The current search resulted in an error. (Code: {0})")
         {
-            MelonLogger.Msg(ConsoleColor.Red, string.Format(baseMsg, (int)response.Code));
+            MelonLogger.Msg(ConsoleColor.Red, string.Format(baseMsg, response.Code));
 
             if (response.Message != null)
             {
                 MelonLogger.Msg(ConsoleColor.Magenta, response.Message);
             }
-            if (response.Exception != null)
+            if (response.Exception != null && response.Exception is not PythonException)
             {
                 MelonLogger.Msg(ConsoleColor.Red, response.Exception);
             }
@@ -451,6 +453,10 @@ namespace IronSearch
             range = null!;
             var l = new List<Range>();
             var nullFlag = true;
+            if (expression.StartsWith("(") && expression.EndsWith(")"))
+            {
+                expression = expression[1..^1];
+            }
             foreach (var substr in expression.Trim(' ').Split(' '))
             {
                 var result = ParseRange(substr, out var r, min, max);

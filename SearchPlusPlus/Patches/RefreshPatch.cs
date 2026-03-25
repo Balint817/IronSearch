@@ -97,8 +97,10 @@ namespace IronSearch.Patches
                 return;
             }
             ModMain.LoadAlbumNames();
-            BuiltIns.uniqueLogs.Clear();
+            BuiltIns.logUnique.Clear();
             BuiltIns.logOnceIds.Clear();
+            BuiltIns.helpIds.Clear();
+            BuiltIns.helpEnabled = true;
             SearchPatch.searchError = null;
             BuiltIns.GlobalVariables.Clear();
             BuiltIns.LocalVariables.Clear();

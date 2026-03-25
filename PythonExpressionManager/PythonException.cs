@@ -3,7 +3,7 @@
 namespace PythonExpressionManager
 {
     [Serializable]
-    internal class PythonException : Exception
+    public class PythonException : Exception
     {
         public PythonException()
         {
