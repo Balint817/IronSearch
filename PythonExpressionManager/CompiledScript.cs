@@ -28,26 +28,18 @@ namespace PythonExpressionManager
             {
                 scriptBuilder.AppendLine($"\t{tagDict}['{item.Key}'] = {item.Key} = lambda *{args}, **{kwargs}: {instance.BaseDictName}['{item.Key}']({instance.ArgumentName}, {instance.BaseDictName}, *{args}, **{kwargs})");
 
-
-                //// raw function (manual call: must pass input + tagDict)
-                //scriptBuilder.AppendLine(
-                //    $"\t{tagDict}['{item.Key}'] = lambda {instance.ArgumentName}, {tagDict}, *{args}, **{kwargs}: " +
-                //    $"{instance.BaseDictName}['{item.Key}']({instance.ArgumentName}, {tagDict}, *{args}, **{kwargs})"
-                //);
-
-                //// convenience wrapper (auto-injects input + tagDict)
-                //scriptBuilder.AppendLine(
-                //    $"\t{item.Key} = lambda *{args}, **{kwargs}: " +
-                //    $"{instance.BaseDictName}['{item.Key}']({instance.ArgumentName}, {tagDict}, *{args}, **{kwargs})"
-                //);
             }
 
-            scriptBuilder.AppendLine("\ttry:");
-            scriptBuilder.AppendLine($"\t\treturn ({body.Replace("\n", "\\n")})");
-            scriptBuilder.AppendLine($"\t\treturn");
-            scriptBuilder.AppendLine("\texcept SystemExit:");
-            scriptBuilder.AppendLine("\t\traise");
-            scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
+
+            scriptBuilder.AppendLine($"\treturn ({body.Replace("\n", "\\n")})");
+            scriptBuilder.AppendLine($"\treturn");
+
+            //scriptBuilder.AppendLine("\ttry:");
+            //scriptBuilder.AppendLine($"\t\treturn ({body.Replace("\n", "\\n")})");
+            //scriptBuilder.AppendLine($"\t\treturn");
+            //scriptBuilder.AppendLine("\texcept SystemExit:");
+            //scriptBuilder.AppendLine("\t\traise");
+            //scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
 
             var script = scriptBuilder.ToString();
             var source = Script.Engine.CreateScriptSourceFromString(script);

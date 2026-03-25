@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ionic.BZip2;
 using IronSearch.Patches;
 using MelonLoader;
+using PopupLib;
 using PopupLib.UI;
 using PythonExpressionManager;
 using UnityEngine;
@@ -15,13 +18,115 @@ namespace IronSearch.UI
     {
         public class KeywordInfo
         {
+            public string Value { get; }
+            public int Priority { get; }
+
             public KeywordInfo(string value, int priority)
             {
-                
+                Value = value;
+                Priority = priority;
             }
         }
-        static bool IsShown = false;
-        static SimpleDropdown? CurrentDropdown;
+
+        internal class CurrentCompleteInfo : IDisposable
+        {
+            public readonly int StartIndex;
+            public readonly int EndIndex;
+            public readonly string FullText;
+            private Dictionary<string, KeywordInfo> _currentKeywords;
+            public ReadOnlyDictionary<string, KeywordInfo> CurrentKeywords => new(_currentKeywords);
+
+            private List<KeyValuePair<string, KeywordInfo>> _sortedKeywords;
+            public ReadOnlyCollection<KeyValuePair<string, KeywordInfo>> SortedKeywords => _sortedKeywords.AsReadOnly();
+
+            public SimpleDropdown? CurrentDropdown { get; private set; }
+
+            public CurrentCompleteInfo(string fullText, int startIndex, int endIndex, Dictionary<string, KeywordInfo> currentKeywords, Action<string, int> callback)
+            {
+                _currentKeywords = currentKeywords;
+                FullText = fullText;
+                StartIndex = startIndex;
+                EndIndex = endIndex;
+                var containsText = fullText[startIndex..endIndex];
+
+                var lowerText = containsText.ToLowerInvariant();
+
+                _sortedKeywords = _currentKeywords
+                    .Where(kvp => kvp.Key.StartsWith(containsText, StringComparison.OrdinalIgnoreCase))
+                    .Select(kvp =>
+                    {
+                        var key = kvp.Key;
+                        var info = kvp.Value;
+
+                        double score = 0;
+
+                        // priority weight
+                        score -= info.Priority * 10;
+
+                        // similarity
+                        int dist = LevenshteinDistance(lowerText, key.ToLowerInvariant());
+                        score += Math.Max(0, 20 - dist);
+
+                        // prefix exact match bonus (e.g. casing match)
+                        if (key.StartsWith(containsText, StringComparison.Ordinal))
+                            score += 5;
+
+                        return new
+                        {
+                            kvp,
+                            score
+                        };
+                    })
+                    .OrderByDescending(x => x.score)
+                    .ThenBy(x => x.kvp.Key, StringComparer.OrdinalIgnoreCase)
+                    .Select(x => x.kvp)
+                    .ToList();
+
+                CurrentDropdown = SimpleDropdown.Create(
+                    _sortedKeywords.Select(x => x.Key).ToList(),
+                    callback
+                );
+            }
+
+            public void Dispose()
+            {
+                if (CurrentDropdown != null)
+                {
+                    CurrentDropdown.Close();
+                }
+                CurrentDropdown = null;
+            }
+
+            // Basic Levenshtein distance
+            private static int LevenshteinDistance(string a, string b)
+            {
+                int[,] dp = new int[a.Length + 1, b.Length + 1];
+
+                for (int i = 0; i <= a.Length; i++)
+                    dp[i, 0] = i;
+
+                for (int j = 0; j <= b.Length; j++)
+                    dp[0, j] = j;
+
+                for (int i = 1; i <= a.Length; i++)
+                {
+                    for (int j = 1; j <= b.Length; j++)
+                    {
+                        int cost = a[i - 1] == b[j - 1] ? 0 : 1;
+
+                        dp[i, j] = Math.Min(
+                            Math.Min(dp[i - 1, j] + 1,     // delete
+                                     dp[i, j - 1] + 1),    // insert
+                            dp[i - 1, j - 1] + cost        // replace
+                        );
+                    }
+                }
+
+                return dp[a.Length, b.Length];
+            }
+        }
+        static CurrentCompleteInfo? CurrentInfo;
+        
         static Dictionary<string, KeywordInfo> currentKeywords = new();
         public static readonly Dictionary<string, KeywordInfo> AllKeywords = new()
         {
@@ -65,32 +170,39 @@ namespace IronSearch.UI
         private static string StartString => ModMain.StartString;
         internal static void OnGUI()
         {
-            if (!IsShown)
+            if (CurrentInfo == null)
             {
-                return;
+                if (Input.GetKeyDown(KeyCode.Tab))
+                {
+                    AutoCompleteShow();
+                }
             }
-            if (Input.GetKeyDown(KeyCode.Tab))
+            else
             {
-                
+                if (!PopupUtils.IsSearchOpen)
+                {
+                    StopCurrentAutoComplete();
+                    return;
+                }
             }
         }
-        private static void AutoCompleteCallback()
+        private static void AutoCompleteShow()
         {
             if (!ModMain.PopupLibLoaded || !ModMain.UISystemLoaded || !ModMain.InitSuccessful)
             {
                 return;
             }
-            AutoCompleteCallbackInternal();
+            AutoCompleteShowInternal();
         }
 
         internal static void StopCurrentAutoComplete()
         {
-            CurrentDropdown?.Close();
-            CurrentDropdown = null;
+            CurrentInfo?.Dispose();
+            CurrentInfo = null;
         }
-        private static void AutoCompleteCallbackInternal()
+        private static void AutoCompleteShowInternal()
         {
-            if (CurrentDropdown != null)
+            if (CurrentInfo != null)
             {
                 return;
             }
@@ -129,11 +241,11 @@ namespace IronSearch.UI
                         MelonLogger.Msg(ConsoleColor.Red, $"invalid auto-complete item name: '{key}'");
                         continue;
                     }
-                    //if (!currentKeywords.TryAdd(key, item.Value))
-                    //{
-                    //    MelonLogger.Msg(ConsoleColor.Red, $"auto-complete item '{key}' encountered a conflict, skipped.");
-                    //    continue;
-                    //}
+                    if (!currentKeywords.TryAdd(key, new(item.Value, 0)))
+                    {
+                        MelonLogger.Msg(ConsoleColor.Red, $"auto-complete item '{key}' encountered a conflict, skipped.");
+                        //continue;
+                    }
                 }
             }
             catch (Exception ex)
@@ -201,9 +313,24 @@ namespace IronSearch.UI
                 return;
             }
 
-
-            // TODO: get keyword surrounding the caret
+            CurrentInfo = new CurrentCompleteInfo(findKeyword, startIndex, endIndex, currentKeywords, (s,i) =>
+            {
+                var kw = currentKeywords[s].Value;
+                var fullText = findKeyword;
+                var newText = fullText.Substring(0, startIndex) + kw + fullText.Substring(endIndex+1);
+                var newCaret = startIndex + kw.Length + 1;
+                SetText(newText, newCaret);
+            });
         }
+
+        static void SetText(string newText, int newCaret)
+        {
+            SearchFocusPatch.inputField.SetText(newText);
+            SearchFocusPatch.inputField.m_CaretPosition = newCaret;
+            SearchFocusPatch.inputField.m_CaretSelectPosition = SearchFocusPatch.inputField.m_CaretPosition;
+        }
+
+
 
         //private static void AutoCompleteSetField()
         //{
