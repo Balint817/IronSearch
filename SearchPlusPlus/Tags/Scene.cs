@@ -29,6 +29,7 @@ namespace IronSearch.Tags
 
             {"touhou", "08"},
             {"gensokyo", "08"},
+            {"danmaku", "08"},
 
             {"djmax", "09"},
             {"graveyard", "09"},
@@ -73,19 +74,19 @@ namespace IronSearch.Tags
                         sceneFilter = value;
                         break;
                     }
-                    var t = validScenes.Keys.Where(x => x.Contains(value)).ToArray();
-                    if (t.Length > 1)
+                    var matches = validScenes
+                        .Where(x => x.Key.Contains(value, StringComparison.OrdinalIgnoreCase))
+                        .GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.ToArray());
+                    if (matches.Count > 1)
                     {
-                        if (t.Select(x => validScenes[x]).ToHashSet().Count > 1)
-                        {
-                            throw new SearchInputException($"scene filter search \"{t}\" is ambiguous between {string.Join(", ", t.Reverse().Skip(1).Reverse().Select(x => '"' + x + '"'))} and \"{t.Last()}\"");
-                        }
+                        var t = matches.Values.Select(x => "("+string.Join(", ", x)+")");
+                        throw new SearchInputException($"scene filter search \"{t}\" is ambiguous between {string.Join(", ", t.Reverse().Skip(1).Reverse().Select(x => '"' + x + '"'))} and \"{t.Last()}\"");
                     }
-                    else if (t.Length < 1)
+                    else if (matches.Count < 1)
                     {
-                        throw new SearchInputException($"scene filter \"{t}\" couldn't be found");
+                        throw new SearchInputException($"scene filter \"{value}\" couldn't be found");
                     }
-                    sceneFilter = validScenes[t[0]];
+                    sceneFilter = matches.Keys.First();
                     break;
             }
             if (musicInfo.scene[6..] == sceneFilter)

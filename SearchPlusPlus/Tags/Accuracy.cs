@@ -197,9 +197,5 @@ namespace IronSearch.Tags
             throw new SearchInputException("invalid argument types for accuracy");
 
         }
-
-
-
-
     }
 }

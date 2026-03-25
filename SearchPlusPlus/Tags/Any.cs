@@ -10,11 +10,11 @@ namespace IronSearch.Tags
 
         internal static bool EvalAny(PeroString pStr, MusicInfo musicInfo, string filter)
         {
-            return (EvalTag(pStr, musicInfo, filter) || EvalTitle(pStr, musicInfo, filter) || EvalAuthor(pStr, musicInfo, filter) || EvalDesigner(pStr, musicInfo, filter));
+            return (EvalTag(pStr, musicInfo, filter) || EvalTitle(pStr, musicInfo, filter) || EvalAuthor(pStr, musicInfo, filter) || EvalDesigner(pStr, musicInfo, filter) || EvalAlbum(musicInfo, pStr, filter));
         }
         internal static bool EvalAny(MusicInfo musicInfo, Regex re)
         {
-            return (EvalTag(musicInfo, re) || EvalTitle(musicInfo, re) || EvalAuthor(musicInfo, re) || EvalDesigner(musicInfo, re));
+            return (EvalTag(musicInfo, re) || EvalTitle(musicInfo, re) || EvalAuthor(musicInfo, re) || EvalDesigner(musicInfo, re) || EvalAlbum(musicInfo, re));
         }
         internal static bool EvalAny(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

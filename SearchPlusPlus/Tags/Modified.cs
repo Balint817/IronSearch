@@ -39,46 +39,11 @@ namespace IronSearch.Tags
                         return EvalModified(M.I, (long)n);
                     }
                 case string s:
-                    // AI
+                    if (!s.TryTimeStringToTicks(out var l))
                     {
-                        s = s.Replace(" ", "").ToLowerInvariant();
-                        long totalTicks = 0;
-                        int pos = 0;
-                        while (pos < s.Length)
-                        {
-                            // parse number
-                            int start = pos;
-                            while (pos < s.Length && char.IsDigit(s[pos]))
-                            {
-                                pos++;
-                            }
-                            if (start == pos)
-                            {
-                                throw new SearchInputException("expected time offset (integer) as 'modified' argument");
-                            }
-                            if (!long.TryParse(s[start..pos], out var value))
-                            {
-                                throw new SearchInputException("invalid number in 'modified' argument");
-                            }
-                            // parse unit
-                            if (pos >= s.Length)
-                            {
-                                throw new SearchInputException("expected time unit after number in 'modified' argument");
-                            }
-                            char unit = s[pos];
-                            pos++;
-                            totalTicks = unit switch
-                            {
-                                's' => checked(totalTicks + value * TimeSpan.TicksPerSecond),
-                                'm' => checked(totalTicks + value * TimeSpan.TicksPerMinute),
-                                'h' => checked(totalTicks + value * TimeSpan.TicksPerHour),
-                                'd' => checked(totalTicks + value * TimeSpan.TicksPerDay),
-                                'w' => checked(totalTicks + value * TimeSpan.TicksPerDay * 7),
-                                _ => throw new SearchInputException($"invalid time unit '{unit}' in 'modified' argument"),
-                            };
-                        }
-                        return EvalModified(M.I, totalTicks);
+                        throw new SearchInputException("failed to parse string as time in 'modified' argument");
                     }
+                    return EvalModified(M.I, l);
                 default:
                     break;
             }
