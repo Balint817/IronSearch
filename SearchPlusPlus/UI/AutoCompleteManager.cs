@@ -130,20 +130,6 @@ namespace IronSearch.UI
         static Dictionary<string, KeywordInfo> currentKeywords = new();
         public static readonly Dictionary<string, KeywordInfo> AllKeywords = new()
         {
-            //["and"]= "and",
-            //["if"]= "if",
-            //["else"]= "else",
-            //["for"]= "for",
-            //["in"]= "in",
-            //["is"]= "is",
-            //["or"]= "or",
-            //["not"]= "not",
-            //["abs"]= "abs",
-            //["all"]= "all",
-            //["any"]= "any",
-
-            //TODO
-
             ["bool"] = new("bool", 1),
             ["chr"] = new("chr", 1),
             ["dict"] = new("dict", 1),

@@ -11,18 +11,8 @@ namespace IronSearch.Tags
         internal static readonly ConcurrentDictionary<string, bool> runOnceIds = new();
         internal static bool EvalRunOnce(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            if (!varKwargs.ContainsKey("id"))
-            {
-                throw new SearchInputException("missing 'id' from RunOnce");
-            }
-            if (varKwargs["id"] is not string id)
-            {
-                throw new SearchInputException("invalid RunOnce ID");
-            }
-            varKwargs.Remove("id");
-
             ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotMatching(varArgs, 1);
+            ThrowIfNotMatching(varArgs, 2);
 
             if (!Utils.IsCallable(varArgs[0]))
             {
@@ -41,6 +31,10 @@ namespace IronSearch.Tags
                 {
                     throw new SearchInputException("invalid RunOnce function");
                 }
+            }
+            if (varArgs[1] is not string id)
+            {
+                throw new SearchInputException("invalid RunOnce id");
             }
 
             if (runOnceIds.TryAdd(id, false))

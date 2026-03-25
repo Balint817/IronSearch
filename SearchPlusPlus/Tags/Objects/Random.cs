@@ -23,6 +23,10 @@ namespace IronSearch.Tags
                         {
                             throw new ArgumentException("invalid random arguments");
                         }
+                        if (n2 < n1)
+                        {
+                            (n1, n2) = (n2, n1);
+                        }
                         return Random.Shared.Next(n1, n2);
                     }
 
@@ -32,6 +36,10 @@ namespace IronSearch.Tags
                         {
                             throw new ArgumentException("invalid random arguments");
                         }
+                        if (n2 < n1)
+                        {
+                            (n1, n2) = (n2, n1);
+                        }
                         return Random.Shared.NextInt64(n1, n2);
                     }
                 case BigInteger n1:
@@ -39,6 +47,10 @@ namespace IronSearch.Tags
                         if (varArgs.Length != 2 || varArgs[1] is not BigInteger n2 || n1 > long.MaxValue || n2 > long.MaxValue)
                         {
                             throw new ArgumentException("invalid random arguments");
+                        }
+                        if (n2 < n1)
+                        {
+                            (n1, n2) = (n2, n1);
                         }
                         return Random.Shared.NextInt64((long)n1, (long)n2);
                     }
