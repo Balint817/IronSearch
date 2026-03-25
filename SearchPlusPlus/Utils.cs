@@ -836,5 +836,60 @@ namespace IronSearch
 
             return screenPos;
         }
+
+        public static bool TryTimeStringToTicks(this string s, out long l)
+        {
+            l = 0;
+            // AI
+            
+            s = s.Replace(" ", "").ToLowerInvariant();
+            long totalTicks = 0;
+            int pos = 0;
+            while (pos < s.Length)
+            {
+                // parse number
+                int start = pos;
+                while (pos < s.Length && char.IsDigit(s[pos]))
+                {
+                    pos++;
+                }
+                if (start == pos)
+                {
+                    return false;
+                    //throw new SearchInputException("expected time offset (integer) as 'modified' argument");
+                }
+                if (!long.TryParse(s[start..pos], out var value))
+                {
+                    return false;
+                    //throw new SearchInputException("invalid number in 'modified' argument");
+                }
+                // parse unit
+                if (pos >= s.Length)
+                {
+                    return false;
+                }
+                char unit = s[pos];
+                pos++;
+                try
+                {
+                    totalTicks = unit switch
+                    {
+                        's' => checked(totalTicks + value * TimeSpan.TicksPerSecond),
+                        'm' => checked(totalTicks + value * TimeSpan.TicksPerMinute),
+                        'h' => checked(totalTicks + value * TimeSpan.TicksPerHour),
+                        'd' => checked(totalTicks + value * TimeSpan.TicksPerDay),
+                        'w' => checked(totalTicks + value * TimeSpan.TicksPerDay * 7),
+                        _ => throw new Exception(),
+                    };
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+            l = totalTicks;
+            return true;
+            
+        }
     }
 }
