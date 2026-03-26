@@ -633,13 +633,8 @@ namespace IronSearch
                             return null;
                         }
                         end = (start *= -1);
-                        // Your ToString doesn't show pipes for single numbers, 
-                        // but we'll map them just in case.
-                        if (hasLeadingPipe || hasTrailingPipe)
-                        {
-                            failureReason = $"A single number cannot be exclusive.";
-                            return null;
-                        }
+                        exclusiveEnd = hasLeadingPipe;
+                        exclusiveStart = hasTrailingPipe;
                     }
                 }
                 else
@@ -689,13 +684,8 @@ namespace IronSearch
                             return null;
                         }
                         end = start;
-                        // Your ToString doesn't show pipes for single numbers, 
-                        // but we'll map them just in case.
-                        if (hasLeadingPipe || hasTrailingPipe)
-                        {
-                            failureReason = $"A single number cannot be exclusive.";
-                            return null;
-                        }
+                        exclusiveEnd = hasLeadingPipe;
+                        exclusiveStart = hasTrailingPipe;
                     }
                 }
             }
