@@ -6,6 +6,7 @@ using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
 using IronPython.Runtime.Operations;
 using IronPython.Runtime.Types;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using IronSearch.Tags;
 
@@ -109,7 +110,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByUID()()");
             }
             return musicInfo1.uid.CompareTo(musicInfo2.uid);
         }
@@ -117,7 +118,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByName()()");
             }
             return musicInfo1.GetLocal(_langIndex).name.CompareTo(musicInfo2.GetLocal(_langIndex).name);
         }
@@ -125,7 +126,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByAccuracy()()");
             }
             var hasMaps1 = Utils.GetAvailableMaps(musicInfo1, out var availableMaps1);
             var hasMaps2 = Utils.GetAvailableMaps(musicInfo2, out var availableMaps2);
@@ -172,7 +173,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByBPM()()");
             }
             if (!BuiltIns.bpmDict.ContainsKey(musicInfo1.uid))
             {
@@ -200,7 +201,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByRandom()()");
             }
             if (musicInfo1.uid == musicInfo2.uid)
             {
@@ -226,7 +227,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByModified()()");
             }
             BuiltIns.InitNewIfNeeded();
             var idx1 = BuiltIns.sortedByLastModified!.IndexOf(musicInfo1.uid);
@@ -246,7 +247,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByScene()()");
             }
             return musicInfo1.scene.CompareTo(musicInfo2.scene);
         }
@@ -254,7 +255,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByLength()()");
             }
             var length1null = AudioHelper.GetMusicLength(musicInfo1);
             var length2null = AudioHelper.GetMusicLength(musicInfo2);
@@ -280,7 +281,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new InvalidOperationException("You're not supposed to call this, pass this to the sorter as an argument instead!");
+                throw new SearchCallNotAllowed("ByDifficulty()()");
             }
             var hasMaps1 = Utils.GetAvailableMaps(musicInfo1, out var availableMaps1);
             var hasMaps2 = Utils.GetAvailableMaps(musicInfo2, out var availableMaps2);
