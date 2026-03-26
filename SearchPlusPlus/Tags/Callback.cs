@@ -1,5 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -18,7 +19,7 @@ namespace IronSearch.Tags
         {
             if (!Utils.ParseRange(s, out var r))
             {
-                throw new SearchInputException($"failed to parse range '{s}'");
+                throw SearchParseException.ForRange(s, "Callback()", "a callback level range");
             }
             return EvalCallback(musicInfo, r.AsMultiRange());
         }
@@ -85,7 +86,7 @@ namespace IronSearch.Tags
                     case MultiRange mr:
                         return EvalCallback(M.I, mr);
                     default:
-                        throw new SearchInputException("invalid 'callback' argument");
+                        throw new SearchWrongTypeException("an integer, range string, Python range, or multi-range for callback", varArgs[0]?.GetType(), "Callback()");
                 }
             }
 
@@ -100,7 +101,7 @@ namespace IronSearch.Tags
                     case string s:
                         if (!Utils.ParseRange(s, out var parsedRange))
                         {
-                            throw new SearchInputException($"failed to parse range '{s}'");
+                            throw SearchParseException.ForRange(s, "Callback()", "a callback level range");
                         }
                         callbackRange = parsedRange.AsMultiRange();
                         break;
@@ -114,7 +115,7 @@ namespace IronSearch.Tags
                         callbackRange = mr;
                         break;
                     default:
-                        throw new SearchInputException("invalid 'callback' argument");
+                        throw new SearchWrongTypeException("an integer, range string, Python range, or multi-range for the callback value", varArgs[0]?.GetType(), "Callback()");
                 }
 
                 MultiRange levelRange;
@@ -126,7 +127,7 @@ namespace IronSearch.Tags
                     case string s:
                         if (!Utils.ParseRange(s, out var parsedRange))
                         {
-                            throw new SearchInputException($"failed to parse range '{s}'");
+                            throw SearchParseException.ForRange(s, "Callback()", "a callback level range");
                         }
                         levelRange = parsedRange.AsMultiRange();
                         break;
@@ -140,13 +141,13 @@ namespace IronSearch.Tags
                         levelRange = mr;
                         break;
                     default:
-                        throw new SearchInputException("invalid 'callback' argument");
+                        throw new SearchWrongTypeException("an integer, range string, Python range, or multi-range for the chart/level index", varArgs[1]?.GetType(), "Callback()");
                 }
 
                 return EvalCallback(M.I, callbackRange, levelRange);
             }
 
-            throw new SearchInputException("how tf did u get here");
+            throw new SearchValidationException("Invalid callback arguments.", "Callback()");
         }
     }
 }

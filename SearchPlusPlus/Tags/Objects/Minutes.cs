@@ -1,4 +1,5 @@
-﻿using IronSearch.Records;
+using IronSearch.Exceptions;
+using IronSearch.Records;
 
 namespace IronSearch.Tags
 {
@@ -13,7 +14,7 @@ namespace IronSearch.Tags
             {
                 return TimeSpan.FromMinutes(n).Ticks;
             }
-            throw new SearchInputException("expected integer as time unit multiple");
+            throw new SearchWrongTypeException("an integer number of minutes", varArgs[0]?.GetType(), "Minutes()");
         }
     }
 }

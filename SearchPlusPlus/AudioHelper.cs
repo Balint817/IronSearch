@@ -1,10 +1,7 @@
 ﻿using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
-using Il2CppAssets.Scripts.UI.Controls;
-using Il2CppDiscord;
 using Il2CppPeroTools2.Resources;
-using Il2CppSystem.Resources;
 using IronSearch.Tags;
 using MelonLoader;
 using MelonLoader.Utils;
@@ -12,20 +9,15 @@ using NAudio.Vorbis;
 using Newtonsoft.Json;
 using NLayer;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
-using System.Security;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using static MelonLoader.Modules.MelonModule;
 
 namespace IronSearch
 {
 
     public static class AudioHelper
     {
+        //TODO: consider loading the lengths of customs asynchronously starting at OnLateInitializeMelon
         private const string AudioLengthBackupFile = "chartLengthSearchCache.json";
         private static readonly string AudioLengthBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, AudioLengthBackupFile);
 
@@ -141,6 +133,25 @@ namespace IronSearch
                 MelonLogger.Msg(System.ConsoleColor.DarkRed, (musicInfo.music ?? "<null>") + ", " + (musicInfo.musicName ?? "<null>") + ", " + (musicInfo.uid ?? "<null>"));
                 throw;
             }
+        }
+
+        internal static Task CustomCacheTask { get; private set; }
+        static bool waitingFlag = true;
+        internal static async Task BuildCustomCache()
+        {
+            var allCustoms = AlbumManager.LoadedAlbums.Values.ToList();
+            await Task.Run(() =>
+            {
+                for (int i = 0; i < allCustoms.Count; i++)
+                {
+                    var album = allCustoms[i];
+                    var musicInfo = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.FirstOrDefault(x => x.uid == album.Uid);
+                    if (musicInfo is not null)
+                    {
+                        GetMusicLength(musicInfo);
+                    }
+                }
+            });
         }
 
         private static TimeSpan? GetCustomLength(MusicInfo musicInfo)

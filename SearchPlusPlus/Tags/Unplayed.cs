@@ -1,5 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -31,7 +32,7 @@ namespace IronSearch.Tags
         {
             if (!Utils.ParseRange(value, out var range))
             {
-                throw new SearchInputException($"failed to parse range '{value}'");
+                throw SearchParseException.ForRange(value, "Unplayed()", "a numeric range over difficulty indices (e.g. 1-4)");
             }
             return EvalUnplayed(musicInfo, range.AsMultiRange());
         }
@@ -87,9 +88,8 @@ namespace IronSearch.Tags
                 case MultiRange mr:
                     return EvalUnplayed(M.I, mr);
                 default:
-                    break;
+                    throw new SearchWrongTypeException("an integer difficulty index, a string range, or a numeric range", varArgs[0]?.GetType(), "Unplayed()");
             }
-            return false;
         }
     }
 }

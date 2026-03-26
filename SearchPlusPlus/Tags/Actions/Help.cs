@@ -57,7 +57,7 @@ namespace IronSearch.Tags
                 case float varFloat:
                 case double varDouble:
                 case decimal varDecimal:
-                    MelonLogger.Msg(ConsoleColor.DarkCyan, $"The object {arg0} is a decimal (or floating point) number!");
+                    MelonLogger.Msg(ConsoleColor.DarkCyan, $"The object {arg0} is a real (or floating point) number!");
                     break;
                 case bool varBool:
                     MelonLogger.Msg(ConsoleColor.DarkCyan, $"The object {arg0} is an True/False (boolean) value!");
@@ -115,12 +115,24 @@ namespace IronSearch.Tags
                     MelonLogger.Msg(ConsoleColor.DarkCyan, $"This isn't a valid variable name: " + functionName);
                     return;
                 }
-                if (!ModMain.HelpStrings.TryGetValue(functionName, out string helpString))
+                string? unaliasedName = null;
+                if (!ModMain.HelpStrings.TryGetValue(functionName, out var helpString))
                 {
-                    MelonLogger.Msg(ConsoleColor.DarkCyan, $"It seems \"{functionName}\" does not work here (or if they do, they never told anybody what they actually do around here)");
-                    return;
+                    if (!ModMain.Aliases.TryGetValue(functionName, out unaliasedName) || !ModMain.HelpStrings.TryGetValue(unaliasedName, out helpString))
+                    {
+                        MelonLogger.Msg(ConsoleColor.DarkCyan, $"It seems \"{functionName}\" does not work here (or if they do, they never told anybody what they actually do around here)");
+                        return;
+                    }
+
                 }
-                MelonLogger.Msg(ConsoleColor.DarkCyan, $"Help(\"{functionName}\"):\n{helpString}");
+                var sb = new StringBuilder();
+                sb.Append($"Help(\"{functionName}\"):");
+                if (unaliasedName is not null)
+                {
+                    sb.Append($" (alias for \"{unaliasedName}\")");
+                }
+                sb.Append($"\n{helpString}");
+                MelonLogger.Msg(ConsoleColor.DarkCyan, sb.ToString());
             }
         }
     }

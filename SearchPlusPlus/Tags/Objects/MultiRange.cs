@@ -1,6 +1,7 @@
-﻿using Harmony;
+using Harmony;
 using IronPython.Modules;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -22,7 +23,7 @@ namespace IronSearch.Tags
                 {
                     if (!Utils.ParseMultiRange(s, out var mr))
                     {
-                        throw new SearchInputException($"failed to parse range '{s}'");
+                        throw SearchParseException.ForMultiRange(s, "MultiRange()", "one or more ranges separated by spaces, or range objects");
                     }
                     multiRanges.Add(mr);
                 }
@@ -40,7 +41,7 @@ namespace IronSearch.Tags
                 }
                 else
                 {
-                    throw new SearchInputException($"received invalid type in multi range");
+                    throw new SearchWrongTypeException("a range string, range, or multi-range object", arg?.GetType(), "MultiRange()");
                 }
             }
             var result = new MultiRange();

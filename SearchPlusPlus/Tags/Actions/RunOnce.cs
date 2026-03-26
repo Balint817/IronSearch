@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Text;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using MelonLoader;
 
@@ -11,36 +12,34 @@ namespace IronSearch.Tags
         internal static readonly ConcurrentDictionary<string, bool> runOnceIds = new();
         internal static bool EvalRunOnce(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            if (!varKwargs.ContainsKey("id"))
-            {
-                throw new SearchInputException("missing 'id' from RunOnce");
-            }
-            if (varKwargs["id"] is not string id)
-            {
-                throw new SearchInputException("invalid RunOnce ID");
-            }
-            varKwargs.Remove("id");
-
             ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotMatching(varArgs, 1);
+            ThrowIfNotMatching(varArgs, 2);
 
             if (!Utils.IsCallable(varArgs[0]))
             {
-                throw new SearchInputException("invalid RunOnce function");
+                throw new SearchValidationException("RunOnce() requires a function with no arguments as the first argument.", "RunOnce()");
             }
             if (varArgs[0] is Delegate d)
             {
                 if (d.Method.ContainsGenericParameters || d.Method.IsAbstract)
                 {
-                    throw new SearchInputException("invalid RunOnce function");
+                    throw new SearchValidationException("RunOnce() cannot use an abstract or open generic delegate.", "RunOnce()");
+                }
+                if (d.Method.GetParameters().Length != 0)
+                {
+                    throw new SearchValidationException("RunOnce() requires a function with no arguments as the first argument.", "RunOnce()");
                 }
             }
             else
             {
                 if (Utils.GetPythonArgCount(varArgs[0]) != 0)
                 {
-                    throw new SearchInputException("invalid RunOnce function");
+                    throw new SearchValidationException("RunOnce() requires a function with no arguments as the first argument.", "RunOnce()");
                 }
+            }
+            if (varArgs[1] is not string id)
+            {
+                throw new SearchWrongTypeException("a string id as the second argument", varArgs[1]?.GetType(), "RunOnce()");
             }
 
             if (runOnceIds.TryAdd(id, false))

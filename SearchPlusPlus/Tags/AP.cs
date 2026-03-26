@@ -1,5 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -19,7 +20,7 @@ namespace IronSearch.Tags
 
             if (!Utils.ParseRange(value, out diffRange))
             {
-                throw new SearchInputException($"failed to parse range \"{value}\"");
+                throw SearchParseException.ForRange(value, "AP()", "an accuracy/range over difficulties (e.g. 1-4)");
             }
 
             if (diffRange == Range.InvalidRange)
@@ -110,7 +111,7 @@ namespace IronSearch.Tags
                     break;
             }
 
-            throw new SearchInputException("invalid argument types for AP");
+            throw new SearchWrongTypeException("no arguments, or a range string / range / multi-range for AP", varArgs.Length > 0 ? varArgs[0]?.GetType() : null, "AP()");
         }
     }
 }

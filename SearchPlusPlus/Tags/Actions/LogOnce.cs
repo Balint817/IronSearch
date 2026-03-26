@@ -1,5 +1,6 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Text;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using MelonLoader;
 
@@ -15,18 +16,18 @@ namespace IronSearch.Tags
             {
                 if (varKwargs["sep"] is not string s)
                 {
-                    throw new SearchInputException("invalid separator type");
+                    throw new SearchWrongTypeException("a string for `sep=`", varKwargs["sep"]?.GetType(), "LogOnce()");
                 }
                 separator = s;
                 varKwargs.Remove("sep");
             }
             if (!varKwargs.ContainsKey("id"))
             {
-                throw new SearchInputException("missing 'id' from LogOnce");
+                throw new SearchValidationException("LogOnce() requires an `id=` keyword so the message is only printed once per id.", "LogOnce()");
             }
             if (varKwargs["id"] is not string id)
             {
-                throw new SearchInputException("invalid LogOnce ID");
+                throw new SearchWrongTypeException("a string for `id=`", varKwargs["id"]?.GetType(), "LogOnce()");
             }
             varKwargs.Remove("id");
 

@@ -1,6 +1,7 @@
-﻿using System.Numerics;
+using System.Numerics;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 
 namespace IronSearch.Tags
@@ -34,55 +35,20 @@ namespace IronSearch.Tags
                     {
                         if (n > long.MaxValue)
                         {
-                            throw new SearchInputException("time offset given as 'modified' argument is too large");
+                            throw new SearchValidationException("The time offset is too large (must fit in a 64-bit signed integer).", "Modified()");
                         }
                         return EvalModified(M.I, (long)n);
                     }
                 case string s:
-                    // AI
+                    if (!s.TryTimeStringToTicks(out var l))
                     {
-                        s = s.Replace(" ", "").ToLowerInvariant();
-                        long totalTicks = 0;
-                        int pos = 0;
-                        while (pos < s.Length)
-                        {
-                            // parse number
-                            int start = pos;
-                            while (pos < s.Length && char.IsDigit(s[pos]))
-                            {
-                                pos++;
-                            }
-                            if (start == pos)
-                            {
-                                throw new SearchInputException("expected time offset (integer) as 'modified' argument");
-                            }
-                            if (!long.TryParse(s[start..pos], out var value))
-                            {
-                                throw new SearchInputException("invalid number in 'modified' argument");
-                            }
-                            // parse unit
-                            if (pos >= s.Length)
-                            {
-                                throw new SearchInputException("expected time unit after number in 'modified' argument");
-                            }
-                            char unit = s[pos];
-                            pos++;
-                            totalTicks = unit switch
-                            {
-                                's' => checked(totalTicks + value * TimeSpan.TicksPerSecond),
-                                'm' => checked(totalTicks + value * TimeSpan.TicksPerMinute),
-                                'h' => checked(totalTicks + value * TimeSpan.TicksPerHour),
-                                'd' => checked(totalTicks + value * TimeSpan.TicksPerDay),
-                                'w' => checked(totalTicks + value * TimeSpan.TicksPerDay * 7),
-                                _ => throw new SearchInputException($"invalid time unit '{unit}' in 'modified' argument"),
-                            };
-                        }
-                        return EvalModified(M.I, totalTicks);
+                        throw new SearchValidationException("Could not parse that string as a time offset (e.g. duration like 1h30m or a tick count).", "Modified()");
                     }
+                    return EvalModified(M.I, l);
                 default:
                     break;
             }
-            throw new SearchInputException("expected time offset (integer) as 'modified' argument");
+            throw new SearchWrongTypeException("an integer, long, or time string for how far back to look", varArgs[0]?.GetType(), "Modified()");
         }
     }
 }

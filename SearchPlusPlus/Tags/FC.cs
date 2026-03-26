@@ -1,5 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -21,7 +22,7 @@ namespace IronSearch.Tags
         {
             if (!Utils.ParseRange(value, out var range))
             {
-                throw new SearchInputException($"failed to parse range '{value}'");
+                throw SearchParseException.ForRange(value, "FC()", "a numeric range over difficulty indices");
             }
             return EvalFC(musicInfo, range.AsMultiRange());
         }

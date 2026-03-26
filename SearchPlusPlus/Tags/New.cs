@@ -1,6 +1,7 @@
-﻿using CustomAlbums.Managers;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -13,7 +14,7 @@ namespace IronSearch.Tags
         {
             if (!Utils.ParseRange(s, out var r))
             {
-                throw new SearchInputException($"failed to parse range '{s}'");
+                throw SearchParseException.ForRange(s, "New()", "a rank/index range such as 0-10");
             }
             return EvalNew(musicInfo, r);
         }
@@ -62,7 +63,7 @@ namespace IronSearch.Tags
                 default:
                     break;
             }
-            throw new SearchInputException("expected integer, string range, or range, as 'new' argument");
+            throw new SearchWrongTypeException("an integer, a range string, or a range object", varArgs[0]?.GetType(), "New()");
         }
         internal static void InitNewIfNeeded()
         {

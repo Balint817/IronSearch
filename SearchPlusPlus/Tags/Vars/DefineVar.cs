@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppPeroPeroGames.GlobalDefines;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -25,7 +26,7 @@ namespace IronSearch.Tags
 
             if (varArgs[0] is not string s)
             {
-                throw new SearchInputException("expected string as variable name");
+                throw new SearchWrongTypeException("a string variable name", varArgs[0]?.GetType(), "DefineVar()");
             }
             LocalVariables.TryAdd(M.I.uid, new());
 

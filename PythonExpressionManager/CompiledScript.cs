@@ -1,17 +1,33 @@
 ﻿using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Text;
+using IronPython.Runtime.Exceptions;
+using IronPython.Runtime.Operations;
 using Microsoft.Scripting.Hosting;
 
 namespace PythonExpressionManager
 {
     public sealed class CompiledScript
     {
+        static CompiledScript()
+        {
+            var assembly = typeof(IronPython.Runtime.Exceptions.FloatingPointException).Assembly;
+            pythonExceptionType = assembly.GetTypes().First(x => x.FullName == "IronPython.Runtime.Exceptions.PythonException");
+            baseExceptionField = pythonExceptionType.GetField("_pyExceptionObject", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            traceBackField = pythonExceptionType.GetField("_traceBack", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            extractMethod = pythonExceptionType.GetMethod("Extract", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        }
         const string tagDict = "___";
         const string args = "____";
         const string kwargs = "_____";
         const string f1 = "______";
         const string f2 = "_______";
+        const string searchExpressionName = "<expression>";
         internal dynamic Function;
+        static readonly Type pythonExceptionType;
+        static readonly FieldInfo baseExceptionField;
+        static readonly FieldInfo traceBackField;
+        static readonly MethodInfo extractMethod;
         //internal ReadOnlyDictionary<string, dynamic> Scripts;
         internal CompiledScript(string body, ScriptExecutor instance)
         {
@@ -33,6 +49,7 @@ namespace PythonExpressionManager
 
             scriptBuilder.AppendLine($"\treturn ({body.Replace("\n", "\\n")})");
             scriptBuilder.AppendLine($"\treturn");
+            scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
 
             //scriptBuilder.AppendLine("\ttry:");
             //scriptBuilder.AppendLine($"\t\treturn ({body.Replace("\n", "\\n")})");
@@ -42,7 +59,7 @@ namespace PythonExpressionManager
             //scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
 
             var script = scriptBuilder.ToString();
-            var source = Script.Engine.CreateScriptSourceFromString(script);
+            var source = Script.Engine.CreateScriptSourceFromString(script, searchExpressionName, Microsoft.Scripting.SourceCodeKind.File);
             var scope = Script.Engine.CreateScope();
             try
             {
@@ -52,17 +69,46 @@ namespace PythonExpressionManager
             }
             catch (Exception ex)
             {
-                try
-                {
-                    var engine = scope.Engine;
-                    var eo = engine.GetService<ExceptionOperations>();
-                    string error = eo.FormatException(ex);
-                    throw new PythonException(error);
-                }
-                catch (Exception)
-                {
-                    throw ex;
-                }
+                ConvertException(ex);
+            }
+        }
+
+        public static void ConvertException(Exception wrappedEx)
+        {
+            switch (wrappedEx)
+            {
+                case Microsoft.Scripting.SyntaxErrorException ex:
+                    {
+                        var message = new StringBuilder();
+                        message.AppendLine(ex.Message);
+
+                        var originalCodeLine = ex.GetCodeLine();
+
+                        if (!string.IsNullOrEmpty(originalCodeLine) || originalCodeLine.Length < 10)
+                        {
+                            var trimmedCodeLine = originalCodeLine.TrimStart(' ')[8..^1];
+                            var trimmedColumn = Math.Max(ex.Column - (originalCodeLine.Length - trimmedCodeLine.Length + 1), 1);
+
+                            message.AppendLine($"File {searchExpressionName}, Column: {trimmedColumn}");
+                            message.AppendLine("\t" + trimmedCodeLine);
+                            message.AppendLine("\t" + new string(' ', trimmedColumn - 1) + "^");
+                        }
+                        else
+                        {
+                            message.AppendLine($"File {searchExpressionName}, Column: {ex.Column}");
+                            message.AppendLine("<failed to recover information>");
+                        }
+                        throw new PythonException(message.ToString(), ex);
+                    }
+
+                default:
+                    if (wrappedEx.GetType().IsAssignableTo(pythonExceptionType))
+                    {
+                        var traceBack = traceBackField.GetValue(baseExceptionField.GetValue(wrappedEx));
+                        var traceString = (string)extractMethod.Invoke(traceBack, Array.Empty<object>())!;
+                        throw new PythonException(traceString, wrappedEx);
+                    }
+                    throw wrappedEx;
             }
         }
     }
