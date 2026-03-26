@@ -1,4 +1,7 @@
-﻿using CustomAlbums.Data;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.IO.Compression;
+using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.Resources;
@@ -8,10 +11,8 @@ using MelonLoader.Utils;
 using NAudio.Vorbis;
 using Newtonsoft.Json;
 using NLayer;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.IO.Compression;
 using UnityEngine;
+using static IronPython.Modules.PythonIterTools;
 
 namespace IronSearch
 {
@@ -141,6 +142,7 @@ namespace IronSearch
         internal static CancellationTokenSource customCts = new();
         internal static async Task BuildCustomCache(CancellationToken token)
         {
+            MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Started async calculation of custom chart lengths.");
             await Task.Run(() =>
             {
                 var allCustoms = AlbumManager.LoadedAlbums.Values.ToList();
@@ -149,15 +151,19 @@ namespace IronSearch
                 {
                     if (token.IsCancellationRequested)
                     {
+                        MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Custom async calculation cancelled. Progress: {i}/{count} ({(i / (float)count * 100):F1}%)");
                         return;
                     }
                     var album = allCustoms[i];
-                    var musicInfo = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.FirstOrDefault(x => x.uid == album.Uid);
-                    if (musicInfo is not null)
-                    {
-                        var length = GetCustomLengthDirect(musicInfo);
-                        CustomCache.TryAdd(musicInfo.uid, length);
-                    }
+
+
+                    // can't start processing songs early because they don't load till the main UI?
+                    // try evil code hack™️ today!!!
+                    var musicInfo = new MusicInfo();
+                    musicInfo.uid = album.Uid;
+                    var length = GetCustomLengthDirect(musicInfo);
+
+                    CustomCache.TryAdd(musicInfo.uid, length);
                 }
             }, token);
         }
@@ -171,6 +177,7 @@ namespace IronSearch
                 {
                     MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Still need to calculate length for {(AlbumManager.LoadedAlbums.Count - CustomCache.Count)}/{AlbumManager.LoadedAlbums.Count} custom charts! Please wait.");
                 }
+                CustomCacheTask = null!;
             }
             return GetCustomLengthDirect(musicInfo);
         }
