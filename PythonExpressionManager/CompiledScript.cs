@@ -11,11 +11,10 @@ namespace PythonExpressionManager
     {
         static CompiledScript()
         {
-            var assembly = typeof(IronPython.Runtime.Exceptions.FloatingPointException).Assembly;
-            pythonExceptionType = assembly.GetTypes().First(x => x.FullName == "IronPython.Runtime.Exceptions.PythonException");
-            baseExceptionField = pythonExceptionType.GetField("_pyExceptionObject", BindingFlags.NonPublic | BindingFlags.Instance)!;
-            traceBackField = pythonExceptionType.GetField("_traceBack", BindingFlags.NonPublic | BindingFlags.Instance)!;
-            extractMethod = pythonExceptionType.GetMethod("Extract", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            var assembly = typeof(TraceBack).Assembly;
+            pythonAwareExceptionType = assembly.GetTypes().First(x => x.FullName == "IronPython.Runtime.Exceptions.IPythonAwareException");
+            baseExceptionGetterMethod = pythonAwareExceptionType.GetMethod("get_PythonException", BindingFlags.Public | BindingFlags.Instance)!;
+            extractMethod = typeof(TraceBack).GetMethod("Extract", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new NullReferenceException();
         }
         const string tagDict = "___";
         const string args = "____";
@@ -24,9 +23,8 @@ namespace PythonExpressionManager
         const string f2 = "_______";
         const string searchExpressionName = "<expression>";
         internal dynamic Function;
-        static readonly Type pythonExceptionType;
-        static readonly FieldInfo baseExceptionField;
-        static readonly FieldInfo traceBackField;
+        static readonly Type pythonAwareExceptionType;
+        static readonly MethodInfo baseExceptionGetterMethod;
         static readonly MethodInfo extractMethod;
         //internal ReadOnlyDictionary<string, dynamic> Scripts;
         internal CompiledScript(string body, ScriptExecutor instance)
@@ -43,13 +41,25 @@ namespace PythonExpressionManager
             foreach (var item in Scripts)
             {
                 scriptBuilder.AppendLine($"\t{tagDict}['{item.Key}'] = {item.Key} = lambda *{args}, **{kwargs}: {instance.BaseDictName}['{item.Key}']({instance.ArgumentName}, {instance.BaseDictName}, *{args}, **{kwargs})");
-
             }
 
 
-            scriptBuilder.AppendLine($"\treturn ({body.Replace("\n", "\\n")})");
+            scriptBuilder.AppendLine($"\ttry:");
+            scriptBuilder.AppendLine($"\t\treturn ({body.Replace("\n", "\\n")})");
+            scriptBuilder.AppendLine($"\texcept Exception as ex:");
+            scriptBuilder.AppendLine($"\t\timport sys");
+            scriptBuilder.AppendLine($"\t\timport clr");
+            scriptBuilder.AppendLine($"\t\tclr.AddReference('{nameof(PythonExpressionManager)}')");
+            scriptBuilder.AppendLine($"\t\tfrom {nameof(PythonExpressionManager)} import __catchException");
+            scriptBuilder.AppendLine($"\t\texc_type, exc_value, _ = sys.exc_info()");
+            scriptBuilder.AppendLine($"\t\traise __catchException(exc_type, exc_type.__name__, str(exc_value), ex)");
+
             scriptBuilder.AppendLine($"\treturn");
+
             scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
+            //scriptBuilder.AppendLine($"\treturn ({body.Replace("\n", "\\n")})");
+            //scriptBuilder.AppendLine($"\treturn");
+            //scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
 
             //scriptBuilder.AppendLine("\ttry:");
             //scriptBuilder.AppendLine($"\t\treturn ({body.Replace("\n", "\\n")})");
@@ -100,16 +110,21 @@ namespace PythonExpressionManager
                         }
                         throw new PythonException(message.ToString(), ex);
                     }
-
-                default:
-                    if (wrappedEx.GetType().IsAssignableTo(pythonExceptionType))
+                case IronPython.Runtime.UnboundNameException ex:
+                    throw new PythonException("NameError: " + ex.Message);
+                case __catchException ex:
+                    if (PythonOps.IsPythonType(ex._errorType))
                     {
-                        var traceBack = traceBackField.GetValue(baseExceptionField.GetValue(wrappedEx));
-                        var traceString = (string)extractMethod.Invoke(traceBack, Array.Empty<object>())!;
-                        throw new PythonException(traceString, wrappedEx);
+                        throw new PythonException(ex.ToString());
                     }
-                    throw wrappedEx;
+                    if (ex._originalException is System.Exception sysEx)
+                    {
+                        throw sysEx;
+                    }
+                    throw new Exception("an unknown exception occured", ex);
             }
+
+            throw wrappedEx;
         }
     }
 }
