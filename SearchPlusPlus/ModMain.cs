@@ -104,7 +104,6 @@ namespace IronSearch
             else if (sceneName == "UISystem_PC")
             {
                 UISystemLoaded = true;
-                AudioHelper.CustomCacheTask = AudioHelper.BuildCustomCache(AudioHelper.customCts.Token);
             }
             else
             {
@@ -963,6 +962,7 @@ namespace IronSearch
             if (CustomAlbumsLoaded)
             {
                 LoadCinema();
+                AudioHelper.CustomCacheTask = AudioHelper.BuildCustomCache(AudioHelper.customCts.Token);
             }
             LoadAlbumNames();
             try

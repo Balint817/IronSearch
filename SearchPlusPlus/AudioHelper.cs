@@ -60,10 +60,6 @@ namespace IronSearch
             TimeSpan? result;
             if (BuiltIns.EvalCustom(musicInfo))
             {
-                if (!customCts.IsCancellationRequested)
-                {
-                    customCts.Cancel();
-                }
 
                 if (CustomCache.TryGetValue(musicInfo.uid, out result))
                 {
@@ -167,6 +163,14 @@ namespace IronSearch
 
         private static TimeSpan? GetCustomLength(MusicInfo musicInfo)
         {
+            if (!customCts.IsCancellationRequested)
+            {
+                customCts.Cancel();
+                if ((AlbumManager.LoadedAlbums.Count - CustomCache.Count) > 25)
+                {
+                    MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Still need to calculate length for {(AlbumManager.LoadedAlbums.Count - CustomCache.Count)}/{AlbumManager.LoadedAlbums.Count} custom charts! Please wait.");
+                }
+            }
             var album = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid);
             try
             {
