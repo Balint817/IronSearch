@@ -36,27 +36,43 @@ namespace DependentConsoleApp
 
             var fooBars = new List<FooBar>() { new() { Foo = false, Bar = false }, new() { Foo = true, Bar = false }, new() { Foo = false, Bar = true }, new() { Foo = true, Bar = true } };
 
-            var compiled = executor.Compile("exit()");
+            var compiled = executor.Compile("[i for i in 1]");
 
             foreach (var fooBar in fooBars)
             {
-                Console.WriteLine(fooBar);
-                Console.WriteLine(executor.Evaluate(fooBar, compiled));
-                Console.WriteLine("-------------------");
+                try
+                {
+                    Console.WriteLine(fooBar);
+                    Console.WriteLine(executor.Evaluate(fooBar, compiled));
+                    Console.WriteLine("-------------------");
+                }
+                catch (Exception ex)
+                {
+                    try
+                    {
+                        CompiledScript.ConvertException(ex);
+                    }
+                    catch (Exception ex2)
+                    {
+                        Console.WriteLine(ex2.GetType());
+                        Console.WriteLine(ex2.Message);
+                    }
+                }
+                break;
             }
 
-            Console.WriteLine("Press enter to continue...");
-            Console.ReadLine();
-            Console.WriteLine("-----------------------------------");
-            Console.WriteLine();
-            Console.WriteLine();
-            compiled = executor.Compile("foobar()");
-            foreach (var fooBar in fooBars)
-            {
-                Console.WriteLine(fooBar);
-                Console.WriteLine(executor.Evaluate(fooBar, compiled));
-                Console.WriteLine("-------------------");
-            }
+            //Console.WriteLine("Press enter to continue...");
+            //Console.ReadLine();
+            //Console.WriteLine("-----------------------------------");
+            //Console.WriteLine();
+            //Console.WriteLine();
+            //compiled = executor.Compile("foobar()");
+            //foreach (var fooBar in fooBars)
+            //{
+            //    Console.WriteLine(fooBar);
+            //    Console.WriteLine(executor.Evaluate(fooBar, compiled));
+            //    Console.WriteLine("-------------------");
+            //}
         }
     }
 
