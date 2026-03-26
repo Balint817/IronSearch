@@ -27,6 +27,7 @@ namespace IronSearch
 
     public static class Utils
     {
+        // this is a fucking mess and i wanna kms
         internal static void PrintSearchError(this SearchResponse response, string baseMsg = "The current search resulted in an error. (Code: {0})")
         {
             MelonLogger.Msg(ConsoleColor.Red, string.Format(baseMsg, response.Code));
