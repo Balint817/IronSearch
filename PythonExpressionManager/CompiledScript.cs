@@ -33,6 +33,7 @@ namespace PythonExpressionManager
 
             scriptBuilder.AppendLine($"\treturn ({body.Replace("\n", "\\n")})");
             scriptBuilder.AppendLine($"\treturn");
+            scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
 
             //scriptBuilder.AppendLine("\ttry:");
             //scriptBuilder.AppendLine($"\t\treturn ({body.Replace("\n", "\\n")})");
