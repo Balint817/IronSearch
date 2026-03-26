@@ -155,7 +155,8 @@ namespace IronSearch
                     var musicInfo = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.FirstOrDefault(x => x.uid == album.Uid);
                     if (musicInfo is not null)
                     {
-                        GetMusicLength(musicInfo);
+                        var length = GetCustomLengthDirect(musicInfo);
+                        CustomCache.TryAdd(musicInfo.uid, length);
                     }
                 }
             }, token);
@@ -171,6 +172,11 @@ namespace IronSearch
                     MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Still need to calculate length for {(AlbumManager.LoadedAlbums.Count - CustomCache.Count)}/{AlbumManager.LoadedAlbums.Count} custom charts! Please wait.");
                 }
             }
+            return GetCustomLengthDirect(musicInfo);
+        }
+
+        private static TimeSpan? GetCustomLengthDirect(MusicInfo musicInfo)
+        {
             var album = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid);
             try
             {
