@@ -557,7 +557,7 @@ namespace IronSearch
 
             if (expression.Length == 0)
             {
-                failureReason = "The range expression is empty after removing separators.";
+                failureReason = "The rest of the range expression was empty after handling exclusivity.";
                 return null;
             }
 
@@ -577,57 +577,126 @@ namespace IronSearch
                 }
                 end = max;
                 exclusiveStart = hasLeadingPipe; // Pipe at start belongs to 'start'
+                hasTrailingPipe = false;
             }
             else
             {
-                int separatorIndex = expression.IndexOf('-', 1);
-                if (separatorIndex != -1)
+                // Case: A is negative
+                if (expression.StartsWith('-'))
                 {
-                    var span1 = expression.AsSpan(0, separatorIndex);
-                    var span2 = expression.AsSpan(separatorIndex + 1);
+                    expression = expression[1..];
 
-                    if (span2.Length == 0)
+                    int separatorIndex = expression.IndexOf('-', 1);
+                    if (separatorIndex != -1)
                     {
-                        // Case: "A-" -> [min, A]
-                        if (!span1.TryParseDouble(out end))
+                        var span1 = expression.AsSpan(0, separatorIndex);
+                        var span2 = expression.AsSpan(separatorIndex + 1);
+
+                        if (span2.Length == 0)
                         {
-                            failureReason = $"Could not parse a number from \"{span1.ToString()}\" (before '-').";
-                            return null;
+                            // Case: "A-" -> [min, A]
+                            if (!span1.TryParseDouble(out end))
+                            {
+                                failureReason = $"Could not parse a number from \"{span1.ToString()}\" (before '-').";
+                                return null;
+                            }
+                            end *= -1;
+                            start = min;
+                            // EXCEPTION: In your ToString, |A- means A (the end) is exclusive
+                            exclusiveEnd = hasLeadingPipe;
+                            hasTrailingPipe = false;
                         }
-                        start = min;
-                        // EXCEPTION: In your ToString, |A- means A (the end) is exclusive
-                        exclusiveEnd = hasLeadingPipe;
+                        else
+                        {
+                            // Case: "A-B"
+                            if (!span1.TryParseDouble(out start))
+                            {
+                                failureReason = $"Could not parse the start value from \"{span1.ToString()}\".";
+                                return null;
+                            }
+                            start *= -1;
+                            if (!span2.TryParseDouble(out end))
+                            {
+                                failureReason = $"Could not parse the end value from \"{span2.ToString()}\".";
+                                return null;
+                            }
+                            exclusiveStart = hasLeadingPipe;
+                            exclusiveEnd = hasTrailingPipe;
+                        }
                     }
                     else
                     {
-                        // Case: "A-B"
-                        if (!span1.TryParseDouble(out start))
+                        // Case: "A"
+                        if (!expression.AsSpan().TryParseDouble(out start))
                         {
-                            failureReason = $"Could not parse the start value from \"{span1.ToString()}\".";
+                            failureReason = $"Could not parse a number from \"{expression}\".";
                             return null;
                         }
-                        if (!span2.TryParseDouble(out end))
+                        end = (start *= -1);
+                        // Your ToString doesn't show pipes for single numbers, 
+                        // but we'll map them just in case.
+                        if (hasLeadingPipe || hasTrailingPipe)
                         {
-                            failureReason = $"Could not parse the end value from \"{span2.ToString()}\".";
+                            failureReason = $"A single number cannot be exclusive.";
                             return null;
                         }
-                        exclusiveStart = hasLeadingPipe;
-                        exclusiveEnd = hasTrailingPipe;
                     }
                 }
                 else
                 {
-                    // Case: "A"
-                    if (!expression.AsSpan().TryParseDouble(out start))
+                    int separatorIndex = expression.IndexOf('-', 1);
+                    if (separatorIndex != -1)
                     {
-                        failureReason = $"Could not parse a number from \"{expression}\".";
-                        return null;
+                        var span1 = expression.AsSpan(0, separatorIndex);
+                        var span2 = expression.AsSpan(separatorIndex + 1);
+
+                        if (span2.Length == 0)
+                        {
+                            // Case: "A-" -> [min, A]
+                            if (!span1.TryParseDouble(out end))
+                            {
+                                failureReason = $"Could not parse a number from \"{span1.ToString()}\" (before '-').";
+                                return null;
+                            }
+                            start = min;
+                            // EXCEPTION: In your ToString, |A- means A (the end) is exclusive
+                            exclusiveEnd = hasLeadingPipe;
+                            hasTrailingPipe = false;
+                        }
+                        else
+                        {
+                            // Case: "A-B"
+                            if (!span1.TryParseDouble(out start))
+                            {
+                                failureReason = $"Could not parse the start value from \"{span1.ToString()}\".";
+                                return null;
+                            }
+                            if (!span2.TryParseDouble(out end))
+                            {
+                                failureReason = $"Could not parse the end value from \"{span2.ToString()}\".";
+                                return null;
+                            }
+                            exclusiveStart = hasLeadingPipe;
+                            exclusiveEnd = hasTrailingPipe;
+                        }
                     }
-                    end = start;
-                    // Your ToString doesn't show pipes for single numbers, 
-                    // but we'll map them just in case.
-                    exclusiveStart = hasLeadingPipe;
-                    exclusiveEnd = hasTrailingPipe;
+                    else
+                    {
+                        // Case: "A"
+                        if (!expression.AsSpan().TryParseDouble(out start))
+                        {
+                            failureReason = $"Could not parse a number from \"{expression}\".";
+                            return null;
+                        }
+                        end = start;
+                        // Your ToString doesn't show pipes for single numbers, 
+                        // but we'll map them just in case.
+                        if (hasLeadingPipe || hasTrailingPipe)
+                        {
+                            failureReason = $"A single number cannot be exclusive.";
+                            return null;
+                        }
+                    }
                 }
             }
 
