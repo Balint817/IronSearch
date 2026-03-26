@@ -14,6 +14,8 @@ namespace PythonExpressionManager
             var assembly = typeof(IronPython.Runtime.Exceptions.FloatingPointException).Assembly;
             pythonExceptionType = assembly.GetTypes().First(x => x.FullName == "IronPython.Runtime.Exceptions.PythonException");
             baseExceptionField = pythonExceptionType.GetField("_pyExceptionObject", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            traceBackField = pythonExceptionType.GetField("_traceBack", BindingFlags.NonPublic | BindingFlags.Instance)!;
+            extractMethod = pythonExceptionType.GetMethod("Extract", BindingFlags.NonPublic | BindingFlags.Instance)!;
         }
         const string tagDict = "___";
         const string args = "____";
@@ -24,6 +26,8 @@ namespace PythonExpressionManager
         internal dynamic Function;
         static readonly Type pythonExceptionType;
         static readonly FieldInfo baseExceptionField;
+        static readonly FieldInfo traceBackField;
+        static readonly MethodInfo extractMethod;
         //internal ReadOnlyDictionary<string, dynamic> Scripts;
         internal CompiledScript(string body, ScriptExecutor instance)
         {
@@ -100,8 +104,9 @@ namespace PythonExpressionManager
                 default:
                     if (wrappedEx.GetType().IsAssignableTo(pythonExceptionType))
                     {
-                        var baseException = (PythonExceptions.BaseException)baseExceptionField.GetValue(wrappedEx)!;
-                        throw new PythonException(baseException.ToString(), wrappedEx);
+                        var traceBack = traceBackField.GetValue(baseExceptionField.GetValue(wrappedEx));
+                        var traceString = (string)extractMethod.Invoke(traceBack, Array.Empty<object>())!;
+                        throw new PythonException(traceString, wrappedEx);
                     }
                     throw wrappedEx;
             }
