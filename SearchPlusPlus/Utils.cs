@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO.Compression;
 using System.Net;
@@ -35,9 +35,31 @@ namespace IronSearch
             {
                 MelonLogger.Msg(ConsoleColor.Magenta, response.Message);
             }
-            if (response.Exception != null && response.Exception is not PythonException)
+            if (response.Exception != null)
             {
-                MelonLogger.Msg(ConsoleColor.Red, response.Exception);
+                switch (response.Exception)
+                {
+                    case PythonException pe:
+                        MelonLogger.Msg(ConsoleColor.Red, response.Exception.Message);
+                        break;
+                    default:
+                        try
+                        {
+                            CompiledScript.ConvertException(response.Exception);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (ex is PythonException pe)
+                            {
+                                MelonLogger.Msg(ConsoleColor.Red, response.Exception.Message);
+                            }
+                            else
+                            {
+                                MelonLogger.Msg(ConsoleColor.Red, response.Exception);
+                            }
+                        }
+                        break;
+                }
             }
         }
         internal static void EnsureNoDefaultParameter<T>(T parameter, string parameterName)
@@ -391,7 +413,7 @@ namespace IronSearch
         public static readonly char[] parseSplitChars = new char[] { '-' };
         public static bool ParseRange(string expression, out Range range)
         {
-            return ParseRange(expression, out range, double.NegativeInfinity, double.PositiveInfinity) ?? false;
+            return ParseRange(expression, out range, double.NegativeInfinity, double.PositiveInfinity, out _) ?? false;
         }
         public static bool TryParseDouble(this string s, out double x)
         {
@@ -446,10 +468,19 @@ namespace IronSearch
 
         public static bool ParseMultiRange(string expression, out MultiRange range)
         {
-            return ParseMultiRange(expression, out range, double.NegativeInfinity, double.PositiveInfinity) ?? false;
+            return ParseMultiRange(expression, out range, double.NegativeInfinity, double.PositiveInfinity, out _) ?? false;
         }
         public static bool? ParseMultiRange(string expression, out MultiRange range, double min, double max)
         {
+            return ParseMultiRange(expression, out range, min, max, out _);
+        }
+
+        /// <summary>
+        /// Same as <see cref="ParseMultiRange(string,out MultiRange,double,double)"/> but sets a user-facing reason when parsing fails.
+        /// </summary>
+        public static bool? ParseMultiRange(string expression, out MultiRange range, double min, double max, out string? failureReason)
+        {
+            failureReason = null;
             range = null!;
             var l = new List<Range>();
             var nullFlag = true;
@@ -459,20 +490,26 @@ namespace IronSearch
             }
             foreach (var substr in expression.Trim(' ').Split(' '))
             {
-                var result = ParseRange(substr, out var r, min, max);
-                if (result == false)
+                if (string.IsNullOrWhiteSpace(substr))
                 {
-                    return false;
+                    continue;
                 }
 
+                var result = ParseRange(substr, out var r, min, max, out var subReason);
                 if (result == true)
                 {
                     l.Add(r);
                     nullFlag = false;
                 }
+                else
+                {
+                    failureReason = $"In segment \"{substr}\": {subReason}";
+                    return false;
+                }
             }
             if (nullFlag)
             {
+                failureReason = "No valid range segments were found (empty or whitespace only).";
                 return null;
             }
             range = new(l.ToArray());
@@ -480,8 +517,21 @@ namespace IronSearch
         }
         public static bool? ParseRange(string expression, out Range range, double min, double max)
         {
+            return ParseRange(expression, out range, min, max, out _);
+        }
+
+        /// <summary>
+        /// Same as <see cref="ParseRange(string,out Range,double,double)"/> but sets a user-facing reason when parsing fails.
+        /// </summary>
+        public static bool? ParseRange(string expression, out Range range, double min, double max, out string? failureReason)
+        {
+            failureReason = null;
             range = null!;
-            if (string.IsNullOrWhiteSpace(expression)) return null;
+            if (string.IsNullOrWhiteSpace(expression))
+            {
+                failureReason = "The value is empty or only whitespace.";
+                return null;
+            }
 
             if (min > max) (max, min) = (min, max);
 
@@ -505,7 +555,11 @@ namespace IronSearch
             bool hasTrailingPipe = expression.EndsWith("|");
             if (hasTrailingPipe) expression = expression[..^1];
 
-            if (expression.Length == 0) return null;
+            if (expression.Length == 0)
+            {
+                failureReason = "The range expression is empty after removing separators.";
+                return null;
+            }
 
             double start, end;
             bool exclusiveStart = false;
@@ -515,7 +569,12 @@ namespace IronSearch
             if (expression.EndsWith("+"))
             {
                 // Case: "A+" -> [A, max]
-                if (!expression.AsSpan(0, expression.Length - 1).TryParseDouble(out start)) return null;
+                var head = expression.AsSpan(0, expression.Length - 1);
+                if (!head.TryParseDouble(out start))
+                {
+                    failureReason = $"Could not parse a number from \"{head.ToString()}\" (the part before '+').";
+                    return null;
+                }
                 end = max;
                 exclusiveStart = hasLeadingPipe; // Pipe at start belongs to 'start'
             }
@@ -530,7 +589,11 @@ namespace IronSearch
                     if (span2.Length == 0)
                     {
                         // Case: "A-" -> [min, A]
-                        if (!span1.TryParseDouble(out end)) return null;
+                        if (!span1.TryParseDouble(out end))
+                        {
+                            failureReason = $"Could not parse a number from \"{span1.ToString()}\" (before '-').";
+                            return null;
+                        }
                         start = min;
                         // EXCEPTION: In your ToString, |A- means A (the end) is exclusive
                         exclusiveEnd = hasLeadingPipe;
@@ -538,8 +601,16 @@ namespace IronSearch
                     else
                     {
                         // Case: "A-B"
-                        if (!span1.TryParseDouble(out start)) return null;
-                        if (!span2.TryParseDouble(out end)) return null;
+                        if (!span1.TryParseDouble(out start))
+                        {
+                            failureReason = $"Could not parse the start value from \"{span1.ToString()}\".";
+                            return null;
+                        }
+                        if (!span2.TryParseDouble(out end))
+                        {
+                            failureReason = $"Could not parse the end value from \"{span2.ToString()}\".";
+                            return null;
+                        }
                         exclusiveStart = hasLeadingPipe;
                         exclusiveEnd = hasTrailingPipe;
                     }
@@ -547,7 +618,11 @@ namespace IronSearch
                 else
                 {
                     // Case: "A"
-                    if (!expression.AsSpan().TryParseDouble(out start)) return null;
+                    if (!expression.AsSpan().TryParseDouble(out start))
+                    {
+                        failureReason = $"Could not parse a number from \"{expression}\".";
+                        return null;
+                    }
                     end = start;
                     // Your ToString doesn't show pipes for single numbers, 
                     // but we'll map them just in case.
@@ -564,10 +639,18 @@ namespace IronSearch
             }
 
             // 4. Bounds Check
-            if (!(min <= end && end <= max) || !(min <= start && start <= max)) return false;
+            if (!(min <= end && end <= max) || !(min <= start && start <= max))
+            {
+                failureReason = $"The values ({start} to {end}) are outside the allowed range [{min}, {max}].";
+                return false;
+            }
 
             // 5. Logical validity (cannot be exclusive on a single point)
-            if (start == end && (exclusiveStart || exclusiveEnd)) return false;
+            if (start == end && (exclusiveStart || exclusiveEnd))
+            {
+                failureReason = "A single value cannot use exclusive bounds (|) on the start or end.";
+                return false;
+            }
 
             range = new Range(start, end) { ExclusiveStart = exclusiveStart, ExclusiveEnd = exclusiveEnd };
             return true;
@@ -856,12 +939,12 @@ namespace IronSearch
                 if (start == pos)
                 {
                     return false;
-                    //throw new SearchInputException("expected time offset (integer) as 'modified' argument");
+                    //throw new SearchValidationException("expected time offset (integer) as 'modified' argument", "modified");
                 }
                 if (!long.TryParse(s[start..pos], out var value))
                 {
                     return false;
-                    //throw new SearchInputException("invalid number in 'modified' argument");
+                    //throw new SearchValidationException("invalid number in 'modified' argument", "modified");
                 }
                 // parse unit
                 if (pos >= s.Length)

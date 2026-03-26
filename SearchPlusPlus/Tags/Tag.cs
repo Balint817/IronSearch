@@ -1,8 +1,9 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
 using Il2CppPeroTools2.PeroString;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 
 namespace IronSearch.Tags
@@ -68,7 +69,7 @@ namespace IronSearch.Tags
                     break;
             }
 
-            throw new SearchInputException("expected string or regex as tag");
+            throw new SearchWrongTypeException("a string or regular expression for the tag text", varArgs[0]?.GetType(), "Tag()");
         }
     }
 }

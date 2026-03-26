@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SimpleDropdown : MonoBehaviour
 {
-    private List<string> items;
-    private Action<string, int> onSelected;
+    private List<string> items = null!;
+    private Action<string, int>? onSelected;
 
     private Vector2 scroll;
     private int selectedIndex = 0;
@@ -179,8 +179,13 @@ public class SimpleDropdown : MonoBehaviour
     {
         if (index < 0 || index >= items.Count)
             return;
-
-        onSelected?.Invoke(items[index], index);
-        Close();
+        try
+        {
+            onSelected?.Invoke(items[index], index);
+        }
+        finally
+        {
+            Close();
+        }
     }
 }

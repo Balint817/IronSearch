@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Il2CppInterop.Runtime.Injection;
 using Ionic.BZip2;
 using IronSearch.Patches;
 using MelonLoader;
 using PopupLib;
 using PopupLib.UI;
 using PythonExpressionManager;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace IronSearch.UI
@@ -82,6 +83,10 @@ namespace IronSearch.UI
                     .Select(x => x.kvp)
                     .ToList();
 
+                if (!ClassInjector.IsTypeRegisteredInIl2Cpp<SimpleDropdown>())
+                {
+                    ClassInjector.RegisterTypeInIl2Cpp<SimpleDropdown>();
+                }
                 CurrentDropdown = SimpleDropdown.Create(
                     _sortedKeywords.Select(x => x.Key).ToList(),
                     callback
@@ -307,13 +312,21 @@ namespace IronSearch.UI
                 var newCaret = startIndex + kw.Length + 1;
                 SetText(newText, newCaret);
             });
+
+
         }
 
         static void SetText(string newText, int newCaret)
         {
-            SearchFocusPatch.inputField.SetText(newText);
-            SearchFocusPatch.inputField.m_CaretPosition = newCaret;
-            SearchFocusPatch.inputField.m_CaretSelectPosition = SearchFocusPatch.inputField.m_CaretPosition;
+            var inputField = SearchFocusPatch.inputField;
+            if (inputField == null)
+            {
+                MelonLogger.Msg(ConsoleColor.Red, "input field is null when trying to set auto-complete text");
+                return;
+            }
+            inputField.SetText(newText);
+            inputField.m_CaretPosition = newCaret;
+            inputField.m_CaretSelectPosition = inputField.m_CaretPosition;
         }
 
         internal static void AddManagerKeywords()

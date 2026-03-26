@@ -1,4 +1,5 @@
-﻿using IronPython.Runtime;
+using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using System.Numerics;
 using Range = IronSearch.Records.Range;
@@ -17,7 +18,7 @@ namespace IronSearch.Tags
             {
                 if (varKwargs["end"] is not bool b)
                 {
-                    throw new SearchInputException("invalid 'end' argument in range");
+                    throw new SearchWrongTypeException("True or False for `end=` (exclusive end)", varKwargs["end"]?.GetType(), "Range()");
                 }
 
                 exclusiveEnd = true;
@@ -28,7 +29,7 @@ namespace IronSearch.Tags
             {
                 if (varKwargs["start"] is not bool b)
                 {
-                    throw new SearchInputException("invalid 'start' argument in range");
+                    throw new SearchWrongTypeException("True or False for `start=` (exclusive start)", varKwargs["start"]?.GetType(), "Range()");
                 }
                 exclusiveStart = true;
                 varKwargs.Remove("start");
@@ -45,7 +46,7 @@ namespace IronSearch.Tags
                     case string s:
                         if (!Utils.ParseRange(s, out var range))
                         {
-                            throw new SearchInputException($"failed to parse range '{s}'");
+                            throw SearchParseException.ForRange(s, "Range()", "a range string such as 1-10, 5+, or *");
                         }
                         if (exclusiveEnd.HasValue)
                         {
@@ -87,7 +88,7 @@ namespace IronSearch.Tags
                         start = i;
                         break;
                     default:
-                        throw new SearchInputException($"unsupported type for range start: {arg0.GetType()}");
+                        throw new SearchWrongTypeException("a number for the range start", arg0?.GetType(), "Range()");
                 }
                 var arg1 = varArgs[1];
                 switch (arg1)
@@ -102,7 +103,7 @@ namespace IronSearch.Tags
                         end = i;
                         break;
                     default:
-                        throw new SearchInputException($"unsupported type for range start: {arg0.GetType()}");
+                        throw new SearchWrongTypeException("a number for the range end", arg1?.GetType(), "Range()");
                 }
                 return new Range(start, end);
             }

@@ -289,9 +289,6 @@ namespace IronSearch
 
             MelonLogger.Msg("Loading built-ins...");
 
-            //TODO: rework all error messages in BuiltIns to be more user-friendly, since they can be seen by users.
-            //possibly introduce more specific exceptions for different error types (e.g. argument parsing errors, missing information errors, etc.) to make it easier to give more specific error messages, and to generalize the messages.
-
             ScriptManager.DefaultPriority = (int)Priorities.BuiltIn;
 
             RegisterScript("Accuracy", BuiltIns.EvalAccuracy);

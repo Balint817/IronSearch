@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppPeroPeroGames.GlobalDefines;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -25,13 +26,13 @@ namespace IronSearch.Tags
 
             if (varArgs[0] is not string s)
             {
-                throw new SearchInputException("expected string as variable name");
+                throw new SearchWrongTypeException("a string variable name", varArgs[0]?.GetType(), "GetGlobalVar()");
             }
             if (GlobalVariables.TryGetValue(s, out var v))
             {
                 return v;
             }
-            throw new SearchInputException($"attempted to access undefined global variable '{s}'");
+            throw new SearchReferenceException(s, SearchReferenceException.ReferenceKind.Global, "GetGlobalVar()");
         }
     }
 }

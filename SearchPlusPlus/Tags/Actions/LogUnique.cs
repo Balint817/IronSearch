@@ -1,5 +1,6 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Text;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using MelonLoader;
 
@@ -15,7 +16,7 @@ namespace IronSearch.Tags
             {
                 if (varKwargs["sep"] is not string s)
                 {
-                    throw new SearchInputException("invalid separator type");
+                    throw new SearchWrongTypeException("a string for `sep=`", varKwargs["sep"]?.GetType(), "LogUnique()");
                 }
                 separator = s;
                 varKwargs.Remove("sep");

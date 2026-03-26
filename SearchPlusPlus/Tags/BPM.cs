@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -13,7 +14,7 @@ namespace IronSearch.Tags
         {
             if (!Utils.ParseRange(value, out var bpmRange))
             {
-                throw new SearchInputException($"failed to evaluate \"{value}\" as a range");
+                throw SearchParseException.ForRange(value, "BPM()", "a BPM range (e.g. 160-180)");
             }
             return EvalBPM(musicInfo, bpmRange);
         }
@@ -74,7 +75,7 @@ namespace IronSearch.Tags
                 case MultiRange mr:
                     return EvalBPM(M.I, mr);
             }
-            throw new SearchInputException("expected range string, or range, as BPM");
+            throw new SearchWrongTypeException("a BPM range string, Python range, or multi-range object", varArgs[0]?.GetType(), "BPM()");
         }
     }
 }

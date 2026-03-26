@@ -1,5 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Patches;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
@@ -23,7 +24,7 @@ namespace IronSearch.Tags
             {
                 if (!Utils.ParseRange(splitValue[0], out accRange))
                 {
-                    throw new SearchInputException($"failed to parse range \"{splitValue[0]}\"");
+                    throw SearchParseException.ForRange(splitValue[0], "Accuracy()", "an accuracy percentage range");
                 }
 
                 //accRange.Update(accRange.Start / 100, accRange.End / 100);
@@ -33,19 +34,19 @@ namespace IronSearch.Tags
             {
                 if (splitValue[0] == "?")
                 {
-                    throw new SearchInputException("wildcard '?' is not allowed in this context");
+                    throw new SearchValidationException("The wildcard '?' is not allowed for the accuracy value in this form; use two numbers or ranges.", "Accuracy()");
                 }
 
                 if (!Utils.ParseRange(splitValue[0], out accRange))
                 {
-                    throw new SearchInputException($"failed to parse range \"{splitValue[0]}\"");
+                    throw SearchParseException.ForRange(splitValue[0], "Accuracy()", "an accuracy percentage range");
                 }
 
                 //accRange.Update(accRange.Start / 100, accRange.End / 100);
 
                 if (!Utils.ParseRange(splitValue[1], out diffRange))
                 {
-                    throw new SearchInputException($"failed to parse range \"{splitValue[1]}\"");
+                    throw SearchParseException.ForRange(splitValue[1], "Accuracy()", "a difficulty index range");
                 }
                 if (diffRange == Range.InvalidRange)
                 {
@@ -60,7 +61,7 @@ namespace IronSearch.Tags
                 return EvalAccuracy(musicInfo, accRange, diffRange);
             }
 
-            throw new SearchInputException($"invalid input \"{value}\"");
+            throw new SearchValidationException($"Accuracy filter \"{value}\" is invalid. Use one range (accuracy), or two ranges (accuracy and difficulty).", "Accuracy()");
         }
 
         internal static bool EvalAccuracy(MusicInfo musicInfo, Range accRange)
@@ -77,7 +78,7 @@ namespace IronSearch.Tags
         {
             if (accRange == MultiRange.InvalidRange)
             {
-                throw new SearchInputException("wildcard '?' or invalid range is not allowed in this context");
+                throw new SearchValidationException("The wildcard '?' cannot be used for the accuracy range here.", "Accuracy()");
             }
             foreach (var r in accRange.Ranges)
             {
@@ -150,11 +151,11 @@ namespace IronSearch.Tags
                         {
                             if (!Utils.ParseRange(s, out var r))
                             {
-                                throw new SearchInputException($"failed to parse range \"{varArgs[0]}\"");
+                                throw SearchParseException.ForRange(s, "Accuracy()", "an accuracy percentage range");
                             }
                             if (r == Range.InvalidRange)
                             {
-                                throw new SearchInputException("wildcard '?' is not allowed in this context");
+                                throw new SearchValidationException("The wildcard '?' cannot be used for the accuracy range here.", "Accuracy()");
                             }
                             varArgs[0] = r;
                         }
@@ -163,7 +164,7 @@ namespace IronSearch.Tags
                         {
                             if (!Utils.ParseRange(s2, out var r))
                             {
-                                throw new SearchInputException($"failed to parse range \"{varArgs[0]}\"");
+                                throw SearchParseException.ForRange(s2, "Accuracy()", "a difficulty index range");
                             }
                             varArgs[1] = r;
                         }
@@ -194,7 +195,7 @@ namespace IronSearch.Tags
                     }
                     break;
             }
-            throw new SearchInputException("invalid argument types for accuracy");
+            throw new SearchWrongTypeException("one or two arguments: string range, or range / multi-range objects", null, "Accuracy()");
 
         }
     }

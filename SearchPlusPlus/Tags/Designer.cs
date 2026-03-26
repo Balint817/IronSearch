@@ -1,6 +1,7 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 
 namespace IronSearch.Tags
@@ -60,7 +61,7 @@ namespace IronSearch.Tags
                     break;
             }
 
-            throw new SearchInputException("expected string or regex as designer");
+            throw new SearchWrongTypeException("a string or regular expression for the designer name", varArgs[0]?.GetType(), "Designer()");
         }
     }
 }

@@ -116,7 +116,7 @@ namespace IronSearch.Tags
                     return;
                 }
                 string? unaliasedName = null;
-                if (!ModMain.HelpStrings.TryGetValue(functionName, out string helpString))
+                if (!ModMain.HelpStrings.TryGetValue(functionName, out var helpString))
                 {
                     if (!ModMain.Aliases.TryGetValue(functionName, out unaliasedName) || !ModMain.HelpStrings.TryGetValue(unaliasedName, out helpString))
                     {

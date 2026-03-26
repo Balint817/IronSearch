@@ -1,8 +1,8 @@
 ﻿using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppPeroTools2.PeroString;
+using IronSearch.Exceptions;
 using IronSearch.Records;
-using IronSearch.Tags;
 using PythonExpressionManager;
 
 namespace IronSearch.Patches

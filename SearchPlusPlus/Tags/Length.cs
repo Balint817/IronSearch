@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using MelonLoader;
 using Range = IronSearch.Records.Range;
@@ -15,7 +16,9 @@ namespace IronSearch.Tags
             {
                 if (!value.TryTimeStringToTicks(out var l))
                 {
-                    throw new SearchInputException("failed to parse time string in 'length' argument");
+                    throw new SearchValidationException(
+                        $"Could not parse \"{value}\" as a numeric range or a length/time string (for example mm:ss).",
+                        "Length()");
                 }
                 var asSeconds = new TimeSpan(l).TotalSeconds;
                 range = new Range(asSeconds - 0.5, asSeconds + 0.5) { ExclusiveEnd = true };
@@ -56,7 +59,7 @@ namespace IronSearch.Tags
                 case MultiRange mr:
                     return EvalLength(M.I, mr);
             }
-            throw new SearchInputException("expected range string, or range, as length");
+            throw new SearchWrongTypeException("a range string, Python range, or multi-range object", varArgs[0]?.GetType(), "Length()");
         }
     }
 }

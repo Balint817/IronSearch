@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+using System.Numerics;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -21,7 +22,7 @@ namespace IronSearch.Tags
                     {
                         if (varArgs.Length != 2 || varArgs[1] is not int n2)
                         {
-                            throw new ArgumentException("invalid random arguments");
+                            throw new SearchValidationException("Random() with arguments expects two integers: min and max.", "Random()");
                         }
                         if (n2 < n1)
                         {
@@ -34,7 +35,7 @@ namespace IronSearch.Tags
                     {
                         if (varArgs.Length != 2 || varArgs[1] is not long n2)
                         {
-                            throw new ArgumentException("invalid random arguments");
+                            throw new SearchValidationException("Random() with arguments expects two integers: min and max.", "Random()");
                         }
                         if (n2 < n1)
                         {
@@ -46,7 +47,7 @@ namespace IronSearch.Tags
                     {
                         if (varArgs.Length != 2 || varArgs[1] is not BigInteger n2 || n1 > long.MaxValue || n2 > long.MaxValue)
                         {
-                            throw new ArgumentException("invalid random arguments");
+                            throw new SearchValidationException("Random() with arguments expects two integers: min and max.", "Random()");
                         }
                         if (n2 < n1)
                         {
@@ -57,7 +58,7 @@ namespace IronSearch.Tags
                 default:
                     break;
             }
-            throw new SearchInputException("invalid random arguments");
+            throw new SearchValidationException("random() expects no arguments (0-1 float), or two integers/long integers for a bounded range.", "Random()");
         }
     }
 }

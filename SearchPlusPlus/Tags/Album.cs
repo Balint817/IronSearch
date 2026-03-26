@@ -1,5 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using System.Text.RegularExpressions;
 
@@ -12,7 +13,7 @@ namespace IronSearch.Tags
         {
             if (string.IsNullOrEmpty(value))
             {
-                throw new SearchInputException("received empty value in 'album'");
+                throw new SearchValidationException("Album filter cannot be empty.", "Album()");
             }
             if (!BuiltIns.albumNameLists.TryGetValue(musicInfo.m_MusicExInfo.m_AlbumUidIndex, out var albumNames))
             {
@@ -24,7 +25,7 @@ namespace IronSearch.Tags
         {
             if (value is null)
             {
-                throw new SearchInputException("received empty value in 'album'");
+                throw new SearchValidationException("Album filter cannot be empty.", "Album()");
             }
             if (!BuiltIns.albumNameLists.TryGetValue(musicInfo.m_MusicExInfo.m_AlbumUidIndex, out var albumNames))
             {

@@ -1,4 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using HarmonyLib;
+using Il2CppAssets.Scripts.Database;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 
 namespace IronSearch.Tags
@@ -53,18 +55,18 @@ namespace IronSearch.Tags
             switch (value.Length)
             {
                 case 0:
-                    throw new SearchInputException("received an empty string as 'scene'");
+                    throw new SearchValidationException("Scene filter cannot be empty.", "Scene()");
                 case 1:
                     if (!char.IsDigit(value[0]))
                     {
-                        throw new SearchInputException("expected digit as single character input for 'scene'");
+                        throw new SearchValidationException("For a one-character scene filter, use a single digit (1–9).", "Scene()");
                     }
                     sceneFilter = '0' + value;
                     break;
                 case 2:
                     if (!value.All(x => char.IsDigit(x)))
                     {
-                        throw new SearchInputException("expected two digits as double character input for 'scene'");
+                        throw new SearchValidationException("For a two-character scene filter, use two digits (e.g. 01).", "Scene()");
                     }
                     sceneFilter = value;
                     break;
@@ -79,12 +81,11 @@ namespace IronSearch.Tags
                         .GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.ToArray());
                     if (matches.Count > 1)
                     {
-                        var t = matches.Values.Select(x => "("+string.Join(", ", x)+")");
-                        throw new SearchInputException($"scene filter search \"{t}\" is ambiguous between {string.Join(", ", t.Reverse().Skip(1).Reverse().Select(x => '"' + x + '"'))} and \"{t.Last()}\"");
+                        throw new SearchValidationException($"Scene filter \"{value}\" matches more than one scene name; be more specific.", "Scene()");
                     }
                     else if (matches.Count < 1)
                     {
-                        throw new SearchInputException($"scene filter \"{value}\" couldn't be found");
+                        throw new SearchValidationException($"No scene matches \"{value}\".", "Scene()");
                     }
                     sceneFilter = matches.Keys.First();
                     break;
@@ -111,7 +112,7 @@ namespace IronSearch.Tags
                 case string s:
                     return EvalScene(M.I, s);
             }
-            throw new SearchInputException("invalid scene input, expected scene name, ID, or number");
+            throw new SearchWrongTypeException("a scene name, numeric ID, or string digits", arg1?.GetType(), "Scene()");
 
         }
     }

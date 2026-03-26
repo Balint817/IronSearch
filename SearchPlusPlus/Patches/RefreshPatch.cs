@@ -70,16 +70,6 @@ namespace IronSearch.Patches
             {
                 ModMain.BuildCacheIfNecessary();
             }
-            if (ModMain.UISystemLoaded)
-            {
-                Action<string, int> action = (v, i) =>
-                {
-                    MelonLogger.Msg($"index {i}: '{v}'");
-                };
-
-                ClassInjector.RegisterTypeInIl2Cpp<SimpleDropdown>();
-                SimpleDropdown.Create(new string[] { "a", "b", "c" }, action);
-            }
             //favorites = DataHelper.collections
             //hiddenSongs = DataHelper.hides
             var text = keyword;
@@ -132,7 +122,15 @@ namespace IronSearch.Patches
             //    MelonLogger.Msg(ConsoleColor.Red, "syntax error: advanced search was empty");
             //    return;
             //}
-            text = text[ModMain.StartString.Length..].Trim(' ');
+            try
+            {
+                text = text[ModMain.StartString.Length..].Trim(' ');
+            }
+            catch (Exception)
+            {
+                MelonLogger.Msg("bruh does this rly error");
+                throw;
+            }
 
             CompiledScript parseResult;
             try
@@ -141,7 +139,7 @@ namespace IronSearch.Patches
             }
             catch (Exception ex)
             {
-                new SearchResponse("failed to parse search (Code: {0})", ex, SearchResponse.Type.ParserError).PrintSearchError();
+                new SearchResponse("Failed to parse search.", ex, SearchResponse.Type.ParserError).PrintSearchError();
                 return;
             }
 

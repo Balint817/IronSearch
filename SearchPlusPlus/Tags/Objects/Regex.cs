@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -29,7 +30,7 @@ namespace IronSearch.Tags
                 }
                 else
                 {
-                    throw new SearchInputException("invalid 'case' argument");
+                    throw new SearchWrongTypeException("True or False for `case=`", varKwargs["case"]?.GetType(), "Regex()");
                 }
                 varKwargs.Remove("case");
             }
@@ -50,7 +51,7 @@ namespace IronSearch.Tags
                     return Regex.IsMatch(s0, s1, flags);
                 }
             }
-            throw new SearchInputException("invalid regex arguments");
+            throw new SearchValidationException("Regex() expects a pattern string, or two strings (text, pattern) to test a match.", "Regex()");
         }
     }
 }

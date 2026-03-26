@@ -1,6 +1,7 @@
-﻿using System.Numerics;
+using System.Numerics;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 
 namespace IronSearch.Tags
@@ -34,20 +35,20 @@ namespace IronSearch.Tags
                     {
                         if (n > long.MaxValue)
                         {
-                            throw new SearchInputException("time offset given as 'modified' argument is too large");
+                            throw new SearchValidationException("The time offset is too large (must fit in a 64-bit signed integer).", "Modified()");
                         }
                         return EvalModified(M.I, (long)n);
                     }
                 case string s:
                     if (!s.TryTimeStringToTicks(out var l))
                     {
-                        throw new SearchInputException("failed to parse string as time in 'modified' argument");
+                        throw new SearchValidationException("Could not parse that string as a time offset (e.g. duration like 1h30m or a tick count).", "Modified()");
                     }
                     return EvalModified(M.I, l);
                 default:
                     break;
             }
-            throw new SearchInputException("expected time offset (integer) as 'modified' argument");
+            throw new SearchWrongTypeException("an integer, long, or time string for how far back to look", varArgs[0]?.GetType(), "Modified()");
         }
     }
 }

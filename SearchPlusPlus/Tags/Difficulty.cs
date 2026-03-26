@@ -1,5 +1,6 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;
 
@@ -16,7 +17,7 @@ namespace IronSearch.Tags
         {
             if (!Utils.ParseRange(s, out var r))
             {
-                throw new SearchInputException($"failed to parse range '{s}'");
+                throw SearchParseException.ForRange(s, "Difficulty()", "a difficulty level range");
             }
             return EvalDifficulty(musicInfo, r.AsMultiRange());
         }
@@ -92,7 +93,7 @@ namespace IronSearch.Tags
                     case MultiRange mr:
                         return EvalDifficulty(M.I, mr);
                     default:
-                        throw new SearchInputException("invalid 'difficulty' argument");
+                        throw new SearchWrongTypeException("an integer, range string, Python range, or multi-range for difficulty", varArgs[0]?.GetType(), "Difficulty()");
                 }
             }
             if (varArgs.Length == 2)
@@ -106,7 +107,7 @@ namespace IronSearch.Tags
                     case string s:
                         if (!Utils.ParseRange(s, out var parsedRange))
                         {
-                            throw new SearchInputException($"failed to parse range '{s}'");
+                            throw SearchParseException.ForRange(s, "Difficulty()", "a difficulty level range");
                         }
                         diffRange = parsedRange.AsMultiRange();
                         break;
@@ -120,7 +121,7 @@ namespace IronSearch.Tags
                         diffRange = mr;
                         break;
                     default:
-                        throw new SearchInputException("invalid 'difficulty' argument");
+                        throw new SearchWrongTypeException("an integer, range string, Python range, or multi-range for the difficulty value", varArgs[0]?.GetType(), "Difficulty()");
                 }
                 MultiRange levelRange;
                 switch (varArgs[1])
@@ -131,7 +132,7 @@ namespace IronSearch.Tags
                     case string s:
                         if (!Utils.ParseRange(s, out var parsedRange))
                         {
-                            throw new SearchInputException($"failed to parse range '{s}'");
+                            throw SearchParseException.ForRange(s, "Difficulty()", "a difficulty level range");
                         }
                         levelRange = parsedRange.AsMultiRange();
                         break;
@@ -145,12 +146,12 @@ namespace IronSearch.Tags
                         levelRange = mr;
                         break;
                     default:
-                        throw new SearchInputException("invalid 'difficulty' argument");
+                        throw new SearchWrongTypeException("an integer, range string, Python range, or multi-range for the chart/level index", varArgs[1]?.GetType(), "Difficulty()");
                 }
                 return EvalDifficulty(M.I, diffRange, levelRange);
             }
 
-            throw new SearchInputException("how tf did u get here");
+            throw new SearchValidationException("Invalid difficulty arguments.", "Difficulty()");
         }
     }
 }

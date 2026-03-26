@@ -1,4 +1,5 @@
-﻿using IronPython.Runtime;
+using IronPython.Runtime;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using PythonExpressionManager;
 using Range = IronSearch.Records.Range;
@@ -15,35 +16,35 @@ namespace IronSearch.Tags
         {
             if (d.Count != 0)
             {
-                throw new SearchInputException($"unexpected keyword arguments: {string.Join(", ", d.Keys.Select(x => $"'{x}'"))}");
+                throw SearchArgumentException.UnexpectedKeywords(d.Keys);
             }
         }
         internal static void ThrowIfNotEmpty(IList<dynamic> d)
         {
             if (d.Count != 0)
             {
-                throw new SearchInputException($"unexpected positional arguments");
+                throw SearchArgumentException.UnexpectedPositionalArguments();
             }
         }
         internal static void ThrowIfEmpty(IList<dynamic> d)
         {
             if (d.Count == 0)
             {
-                throw new SearchInputException($"expected at least 1 positional argument");
+                throw SearchArgumentException.ExpectedAtLeastOnePositional();
             }
         }
         internal static void ThrowIfNotMatching(IList<dynamic> d, Range r)
         {
             if (!r.Contains(d.Count))
             {
-                throw new SearchInputException($"expected '{r}' arguments, got {d.Count}");
+                throw SearchArgumentException.ArgumentCountNotInRange(r, d.Count);
             }
         }
         internal static void ThrowIfNotMatching(IList<dynamic> d, int n)
         {
             if (d.Count != n)
             {
-                throw new SearchInputException($"expected {n} arguments, got {d.Count}");
+                throw SearchArgumentException.ArgumentCountMismatch(n, d.Count);
             }
         }
 
@@ -58,7 +59,7 @@ namespace IronSearch.Tags
             {
                 if (input is not SearchArgument SA)
                 {
-                    throw new SearchInputException("invalid song input");
+                    throw new SearchValidationException("This tag must run in a song search context.");
                 }
 
                 return wrappedDel(input, tagDict, args, kwargs);
@@ -78,7 +79,7 @@ namespace IronSearch.Tags
                         input = new ExpressionSearchArgument(SA, new(), new());
                         break;
                     default:
-                        throw new SearchInputException("invalid song input");
+                        throw new SearchValidationException("This tag must run in a song search context.");
                 }
 
                 return baseDel(input, args, kwargs);
@@ -96,7 +97,7 @@ namespace IronSearch.Tags
             {
                 if (input is not SearchArgument SA)
                 {
-                    throw new SearchInputException("invalid song input");
+                    throw new SearchValidationException("This tag must run in a song search context.");
                 }
 
                 return wrappedDel(input, tagDict, args, kwargs);
