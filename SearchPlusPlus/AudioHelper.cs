@@ -9,6 +9,7 @@ using NAudio.Vorbis;
 using Newtonsoft.Json;
 using NLayer;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO.Compression;
 using UnityEngine;
 
@@ -59,6 +60,11 @@ namespace IronSearch
             TimeSpan? result;
             if (BuiltIns.EvalCustom(musicInfo))
             {
+                if (!customCts.IsCancellationRequested)
+                {
+                    customCts.Cancel();
+                }
+
                 if (CustomCache.TryGetValue(musicInfo.uid, out result))
                 {
                     return result;
@@ -135,15 +141,20 @@ namespace IronSearch
             }
         }
 
-        internal static Task CustomCacheTask { get; private set; }
-        static bool waitingFlag = true;
-        internal static async Task BuildCustomCache()
+        internal static Task CustomCacheTask = null!;
+        internal static CancellationTokenSource customCts = new();
+        internal static async Task BuildCustomCache(CancellationToken token)
         {
-            var allCustoms = AlbumManager.LoadedAlbums.Values.ToList();
             await Task.Run(() =>
             {
-                for (int i = 0; i < allCustoms.Count; i++)
+                var allCustoms = AlbumManager.LoadedAlbums.Values.ToList();
+                var count = allCustoms.Count;
+                for (int i = 0; i < count; i++)
                 {
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
                     var album = allCustoms[i];
                     var musicInfo = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.FirstOrDefault(x => x.uid == album.Uid);
                     if (musicInfo is not null)
@@ -151,7 +162,7 @@ namespace IronSearch
                         GetMusicLength(musicInfo);
                     }
                 }
-            });
+            }, token);
         }
 
         private static TimeSpan? GetCustomLength(MusicInfo musicInfo)

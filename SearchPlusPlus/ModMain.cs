@@ -104,6 +104,7 @@ namespace IronSearch
             else if (sceneName == "UISystem_PC")
             {
                 UISystemLoaded = true;
+                AudioHelper.CustomCacheTask = AudioHelper.BuildCustomCache(AudioHelper.customCts.Token);
             }
             else
             {
