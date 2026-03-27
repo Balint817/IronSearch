@@ -45,10 +45,10 @@ namespace IronSearch.Exceptions
             }
 
             reason ??= "The value could not be interpreted as a range.";
-            var msg = $"Could not parse \"{expression}\" as a range. {reason}";
+            var msg = $"Could not parse \"{expression}\" as a range.\n{reason}";
             if (!string.IsNullOrEmpty(expectedDescription))
             {
-                msg += $" Expected: {expectedDescription}.";
+                msg += $"\nExpected: {expectedDescription}.";
             }
 
             return new SearchParseException(msg, expression, reason, expectedDescription, parameterContext);
@@ -71,10 +71,10 @@ namespace IronSearch.Exceptions
             }
 
             reason ??= "The value could not be interpreted as a multi-range.";
-            var msg = $"Could not parse \"{expression}\" as a multi-range. {reason}";
+            var msg = $"Could not parse \"{expression}\" as a multi-range.\n{reason}";
             if (!string.IsNullOrEmpty(expectedDescription))
             {
-                msg += $" Expected: {expectedDescription}.";
+                msg += $"\nExpected: {expectedDescription}.";
             }
 
             return new SearchParseException(msg, expression, reason, expectedDescription, parameterContext);

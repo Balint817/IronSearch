@@ -59,7 +59,7 @@ namespace IronSearch.Tags
             {
                 if (input is not SearchArgument SA)
                 {
-                    throw new SearchValidationException("This tag must run in a song search context.");
+                    throw new SearchValidationException("Invalid search context.");
                 }
 
                 return wrappedDel(input, tagDict, args, kwargs);
@@ -79,7 +79,7 @@ namespace IronSearch.Tags
                         input = new ExpressionSearchArgument(SA, new(), new());
                         break;
                     default:
-                        throw new SearchValidationException("This tag must run in a song search context.");
+                        throw new SearchValidationException("Invalid search context.");
                 }
 
                 return baseDel(input, args, kwargs);
@@ -97,7 +97,7 @@ namespace IronSearch.Tags
             {
                 if (input is not SearchArgument SA)
                 {
-                    throw new SearchValidationException("This tag must run in a song search context.");
+                    throw new SearchValidationException("Invalid search context.");
                 }
 
                 return wrappedDel(input, tagDict, args, kwargs);
