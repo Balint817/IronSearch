@@ -21,6 +21,7 @@ using UnityEngine;
 using ArgumentException = System.ArgumentException;
 using Range = IronSearch.Records.Range;
 using PythonExpressionManager;
+using System.Diagnostics.CodeAnalysis;
 
 namespace IronSearch
 {
@@ -982,11 +983,63 @@ namespace IronSearch
             return screenPos;
         }
 
-        public static bool TryTimeStringToTicks(this string s, out long l)
+        public static bool TryTimeStringRangeToTimeRange(this string s, [MaybeNullWhen(false)]out Range r)
         {
-            l = 0;
-            // AI
-            
+            r = null;
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                return false;
+            }
+            var split = s.Split('-');
+            if (split.Length == 1)
+            {
+                if (!TryTimeStringToTimeSpan(split[0], out var ts))
+                {
+                    return false;
+                }
+                var secs = ts.TotalSeconds;
+                r = new Range(secs - 0.5, secs + 0.5)
+                {
+                    ExclusiveEnd = true
+                };
+                return true;
+            }
+            else if (split.Length == 2)
+            {
+                if (!TryTimeStringToTimeSpan(split[0], out var ts))
+                {
+                    return false;
+                }
+                var start = ts.TotalSeconds;
+                if (!TryTimeStringToTimeSpan(split[0], out ts))
+                {
+                    return false;
+                }
+                var end = ts.TotalSeconds;
+                if (end < start)
+                {
+                    (start, end) = (end, start);
+                }
+                r = new Range(start - 0.5, end + 0.5)
+                {
+                    ExclusiveEnd = true
+                };
+                return true;
+            }
+
+            return false;
+        }
+
+        // TODO: make this return a TimeSpan instead of long, and remove the necessity for Day(), etc. functions entirely.
+        public static bool TryTimeStringToTimeSpan(this string s, out TimeSpan ts)
+        {
+            ts = TimeSpan.Zero;
+            if (string.IsNullOrWhiteSpace(s))
+            {
+                return false;
+            }
+
+
             s = s.Replace(" ", "").ToLowerInvariant();
             long totalTicks = 0;
             int pos = 0;
@@ -1032,7 +1085,7 @@ namespace IronSearch
                     return false;
                 }
             }
-            l = totalTicks;
+            ts = new TimeSpan(totalTicks);
             return true;
             
         }

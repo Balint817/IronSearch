@@ -14,14 +14,12 @@ namespace IronSearch.Tags
         {
             if (!Utils.ParseRange(value, out var range))
             {
-                if (!value.TryTimeStringToTicks(out var l))
+                if (!value.TryTimeStringRangeToTimeRange(out range))
                 {
                     throw new SearchValidationException(
                         $"Could not parse \"{value}\" as a numeric range or a length/time string (for example mm:ss).",
                         "Length()");
                 }
-                var asSeconds = new TimeSpan(l).TotalSeconds;
-                range = new Range(asSeconds - 0.5, asSeconds + 0.5) { ExclusiveEnd = true };
             }
             return EvalLength(musicInfo, range);
         }
