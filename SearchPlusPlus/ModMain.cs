@@ -112,9 +112,12 @@ namespace IronSearch
             SearchFocusPatch.inputField = null;
         }
 
-        public override void OnGUI()
+        public override void OnUpdate()
         {
-            AutoCompleteManager.OnGUI();
+            if (InitSuccessful)
+            {
+                AutoCompleteManager.Update();
+            }
         }
 
         internal static bool UISystemLoaded { get; private set; }
