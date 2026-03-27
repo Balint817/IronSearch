@@ -1,25 +1,35 @@
 using System.Numerics;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
+using IronPython.Runtime;
 using IronSearch.Exceptions;
 using IronSearch.Records;
+using Range=IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        internal static bool EvalModified(MusicInfo musicInfo, long tickOffset)
+        internal static bool EvalModified(MusicInfo musicInfo, int seconds)
         {
             if (!EvalCustom(musicInfo))
             {
                 return false;
             }
-            return EvalModifiedInternal(musicInfo, tickOffset);
+            return EvalModifiedInternal(musicInfo, new Range(double.NegativeInfinity, seconds));
         }
-        internal static bool EvalModifiedInternal(MusicInfo musicInfo, long tickOffset)
+        internal static bool EvalModified(MusicInfo musicInfo, Range r)
+        {
+            if (r == Range.InvalidRange)
+            {
+                throw new SearchValidationException("The wildcard '?' cannot be used as a time range", "Modified()");
+            }
+            return EvalModifiedInternal(musicInfo, r);
+        }
+        internal static bool EvalModifiedInternal(MusicInfo musicInfo, Range r)
         {
             var album = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid);
-            return File.GetLastWriteTimeUtc(album.Path) >= DateTime.UtcNow.Subtract(new TimeSpan(tickOffset));
+            return r.Contains(DateTime.UtcNow.Subtract(File.GetLastWriteTimeUtc(album.Path)).TotalSeconds);
         }
         internal static bool EvalModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
@@ -29,26 +39,20 @@ namespace IronSearch.Tags
             {
                 case int n:
                     return EvalModified(M.I, n);
-                case long n:
-                    return EvalModified(M.I, n);
-                case BigInteger n:
-                    {
-                        if (n > long.MaxValue)
-                        {
-                            throw new SearchValidationException("The time offset is too large (must fit in a 64-bit signed integer).", "Modified()");
-                        }
-                        return EvalModified(M.I, (long)n);
-                    }
                 case string s:
-                    if (!s.TryTimeStringToTicks(out var l))
+                    if (!s.TryTimeStringRangeToTimeRange(out var r))
                     {
-                        throw new SearchValidationException("Could not parse that string as a time offset (e.g. duration like 1h30m or a tick count).", "Modified()");
+                        throw new SearchValidationException("Could not parse that string as a time offset (e.g. duration like 1h30m).", "Modified()");
                     }
-                    return EvalModified(M.I, l);
+                    return EvalModified(M.I, r);
+                case Range range:
+                    return EvalModified(M.I, range);
+                case PythonRange pr:
+                    return EvalModified(M.I, (Range)pr);
                 default:
                     break;
             }
-            throw new SearchWrongTypeException("an integer, long, or time string for how far back to look", varArgs[0]?.GetType(), "Modified()");
+            throw new SearchWrongTypeException("an integer, range, or time string for how far back to look", varArgs[0]?.GetType(), "Modified()");
         }
     }
 }
