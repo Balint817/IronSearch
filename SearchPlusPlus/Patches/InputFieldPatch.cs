@@ -31,7 +31,7 @@ namespace IronSearch.Patches
             }
         }
 
-        static bool TryGetInputFieldPosition(out Vector2 position)
+        internal static bool TryGetInputFieldPosition(out Vector2 position)
         {
             position = Vector2.zero;
             if (inputField is null)

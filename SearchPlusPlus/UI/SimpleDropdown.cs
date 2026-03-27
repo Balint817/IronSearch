@@ -19,12 +19,12 @@ public class SimpleDropdown : MonoBehaviour
 
     private float Height => itemHeight * visibleItems + 10f;
 
-    public static SimpleDropdown Create(IEnumerable<string> items, Action<string, int> onSelected)
+    public static SimpleDropdown Create(IEnumerable<string> items, Action<string, int> onSelected, Vector2? topLeft = null)
     {
         var go = new GameObject("SimpleDropdown");
         //DontDestroyOnLoad(go);
         var dropdown = go.AddComponent<SimpleDropdown>();
-        dropdown.Init(items, onSelected);
+        dropdown.Init(items, onSelected, topLeft);
 
         return dropdown;
     }
@@ -70,17 +70,25 @@ public class SimpleDropdown : MonoBehaviour
     {
         if (items.Count == 0) return;
 
-        bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-
-        if ((Input.GetKeyDown(KeyCode.DownArrow)) || (Input.GetKeyDown(KeyCode.PageDown)) || (Input.GetKeyDown(KeyCode.Tab) && !shift))
+        if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             selectedIndex = (selectedIndex + 1) % items.Count;
             EnsureVisible();
         }
+        if (Input.GetKeyDown(KeyCode.PageDown))
+        {
+            selectedIndex = (selectedIndex + visibleItems) % items.Count;
+            EnsureVisible();
+        }
 
-        if ((Input.GetKeyDown(KeyCode.UpArrow)) || (Input.GetKeyDown(KeyCode.PageUp)) || (Input.GetKeyDown(KeyCode.Tab) && shift))
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             selectedIndex = (selectedIndex - 1 + items.Count) % items.Count;
+            EnsureVisible();
+        }
+        if (Input.GetKeyDown(KeyCode.PageUp))
+        {
+            selectedIndex = (selectedIndex - visibleItems + items.Count) % items.Count;
             EnsureVisible();
         }
 
@@ -98,7 +106,7 @@ public class SimpleDropdown : MonoBehaviour
         }
 
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             Select(selectedIndex);
         }

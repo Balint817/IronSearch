@@ -61,7 +61,7 @@ namespace IronSearch.UI
 
                 return 6; // fallback (fuzzy)
             }
-            public CurrentCompleteInfo(string fullText, int startIndex, int endIndex, Dictionary<string, KeywordInfo> currentKeywords, Action<string, int> callback)
+            public CurrentCompleteInfo(string fullText, int startIndex, int endIndex, Dictionary<string, KeywordInfo> currentKeywords, Action<string, int> callback, Vector2 posOverride)
             {
                 _currentKeywords = currentKeywords;
                 FullText = fullText;
@@ -103,15 +103,14 @@ namespace IronSearch.UI
                 .Select(x => x.kvp)
                 .ToList();
 
-                MelonLogger.Msg($"Auto-complete options for '{containsText}' (sorted): {string.Join(", ", _sortedKeywords.Select(x => x.Key))}");
-
                 if (!ClassInjector.IsTypeRegisteredInIl2Cpp<SimpleDropdown>())
                 {
                     ClassInjector.RegisterTypeInIl2Cpp<SimpleDropdown>();
                 }
                 CurrentDropdown = SimpleDropdown.Create(
                     _sortedKeywords.Select(x => x.Key).ToList(),
-                    callback
+                    callback,
+                    posOverride
                 );
             }
 
@@ -193,6 +192,11 @@ namespace IronSearch.UI
             else
             {
                 if (!PopupUtils.IsSearchOpen)
+                {
+                    StopCurrentAutoComplete();
+                    return;
+                }
+                if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
                 {
                     StopCurrentAutoComplete();
                     return;
@@ -286,7 +290,7 @@ namespace IronSearch.UI
             {
                 int i = caretPosition - 1;
 
-                while (i >= 0 &&
+                while (i >= StartString.Length &&
                        string.Concat("A", findKeyword.AsSpan(i, caretPosition - i))
                              .IsValidVariableName())
                 {
@@ -332,14 +336,20 @@ namespace IronSearch.UI
                 return;
             }
 
-            CurrentInfo = new CurrentCompleteInfo(findKeyword, startIndex, endIndex, currentKeywords, (s,i) =>
-            {
-                var kw = currentKeywords[s].Value;
-                var fullText = findKeyword;
-                var newText = fullText.Substring(0, startIndex) + kw + fullText.Substring(endIndex+1);
-                var newCaret = startIndex + kw.Length + 1;
-                SetText(newText, newCaret);
-            });
+            CurrentInfo = new CurrentCompleteInfo(
+                findKeyword,
+                startIndex,
+                endIndex,
+                currentKeywords, (s,i) =>
+                {
+                    var kw = currentKeywords[s].Value;
+                    var fullText = findKeyword;
+                    var newText = string.Concat(fullText.AsSpan(0, startIndex), kw, fullText.AsSpan(endIndex));
+                    var newCaret = startIndex + kw.Length;
+                    SetText(newText, newCaret);
+                },
+                inputField.GetCaretVectorPosition()
+            );
 
 
         }
