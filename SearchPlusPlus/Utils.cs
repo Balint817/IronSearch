@@ -52,11 +52,11 @@ namespace IronSearch
                         {
                             if (ex is PythonException pe)
                             {
-                                MelonLogger.Msg(ConsoleColor.Red, response.Exception.Message);
+                                MelonLogger.Msg(ConsoleColor.Red, ex.Message);
                             }
                             else
                             {
-                                MelonLogger.Msg(ConsoleColor.Red, response.Exception);
+                                MelonLogger.Msg(ConsoleColor.Red, ex);
                             }
                         }
                         break;

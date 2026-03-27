@@ -7,14 +7,14 @@ using System.Runtime.Serialization;
 namespace PythonExpressionManager
 {
     [Serializable]
-    internal class __catchException : Exception
+    internal class __internalException : Exception
     {
         public readonly PythonType _errorType;
         public readonly string _errorName;
         public readonly string _errorMessage;
         public readonly object _originalException;
 
-        public __catchException(PythonType errorType, string errorName, string errorMessage, object originalException)
+        public __internalException(PythonType errorType, string errorName, string errorMessage, object originalException)
         {
             this._errorType = errorType;
             this._errorName = errorName;

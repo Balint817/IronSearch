@@ -50,9 +50,9 @@ namespace PythonExpressionManager
             scriptBuilder.AppendLine($"\t\timport sys");
             scriptBuilder.AppendLine($"\t\timport clr");
             scriptBuilder.AppendLine($"\t\tclr.AddReference('{nameof(PythonExpressionManager)}')");
-            scriptBuilder.AppendLine($"\t\tfrom {nameof(PythonExpressionManager)} import __catchException");
+            scriptBuilder.AppendLine($"\t\tfrom {nameof(PythonExpressionManager)} import __internalException");
             scriptBuilder.AppendLine($"\t\texc_type, exc_value, _ = sys.exc_info()");
-            scriptBuilder.AppendLine($"\t\traise __catchException(exc_type, exc_type.__name__, str(exc_value), ex)");
+            scriptBuilder.AppendLine($"\t\traise __internalException(exc_type, exc_type.__name__, str(exc_value), ex)");
 
             scriptBuilder.AppendLine($"\treturn");
 
@@ -112,16 +112,16 @@ namespace PythonExpressionManager
                     }
                 case IronPython.Runtime.UnboundNameException ex:
                     throw new PythonException("NameError: " + ex.Message);
-                case __catchException ex:
+                case __internalException ex:
                     if (PythonOps.IsPythonType(ex._errorType))
-                    {
-                        throw new PythonException(ex.ToString());
-                    }
-                    if (ex._originalException is System.Exception sysEx)
-                    {
-                        throw sysEx;
-                    }
-                    throw new Exception("an unknown exception occured", ex);
+					{
+						throw new PythonException(ex.ToString());
+					}
+					if (ex._originalException is System.Exception sysEx)
+					{
+						throw sysEx;
+					}
+					throw new Exception("an unknown exception occured", ex);
             }
 
             throw wrappedEx;
