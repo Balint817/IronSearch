@@ -105,6 +105,10 @@ namespace IronSearch.Tags
                     default:
                         throw new SearchWrongTypeException("a number for the range end", arg1?.GetType(), "Range()");
                 }
+                if (end < start)
+                {
+                    (start, end) = (end, start);
+                }
                 return new Range(start, end);
             }
             return false;
