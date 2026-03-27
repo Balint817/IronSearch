@@ -19,7 +19,7 @@ namespace IronSearch.Exceptions
 
         public override string ToString()
         {
-            return "Input error: " + Message;
+            return "Error: " + Message;
         }
     }
 }

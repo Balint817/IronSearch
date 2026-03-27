@@ -15,6 +15,7 @@
         }
         public enum Type
         {
+            TimeoutError = -3,
             ParserError = -2,
             RuntimeError = -1,
             SearchPassed = 0,

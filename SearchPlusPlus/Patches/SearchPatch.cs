@@ -48,8 +48,19 @@ namespace IronSearch.Patches
 
             try
             {
-                var searchResult = ModMain.ScriptManager.ScriptExecutor.Evaluate(new SearchArgument(musicInfo, peroString), tagGroups);
-                __result = searchResult;
+                var task = Task.Run(() =>
+                    ModMain.ScriptManager.ScriptExecutor.Evaluate(
+                        new SearchArgument(musicInfo, peroString), tagGroups)
+                );
+                if (task.Wait(TimeSpan.FromSeconds(10)))
+                {
+                    __result = task.GetAwaiter().GetResult();
+                }
+                else
+                {
+                    searchError = new SearchResponse("The search timed out.", SearchResponse.Type.TimeoutError);
+                    return false;
+                }
             }
             catch (Exception ex)
             {
