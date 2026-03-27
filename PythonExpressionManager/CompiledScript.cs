@@ -113,13 +113,13 @@ namespace PythonExpressionManager
                 case IronPython.Runtime.UnboundNameException ex:
                     throw new PythonException("NameError: " + ex.Message);
                 case __internalException ex:
-                    if (PythonOps.IsPythonType(ex._errorType))
-					{
-						throw new PythonException(ex.ToString());
-					}
 					if (ex._originalException is System.Exception sysEx)
 					{
 						throw sysEx;
+					}
+					if (PythonOps.IsPythonType(ex._errorType))
+					{
+						throw new PythonException(ex.ToString());
 					}
 					throw new Exception("an unknown exception occured", ex);
             }
