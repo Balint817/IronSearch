@@ -21,11 +21,11 @@ namespace IronSearch.Tags
                     if (b)
                     {
                         //default behavior
-                        //flags &= ~RegexOptions.IgnoreCase;
+                        flags &= ~RegexOptions.IgnoreCase;
                     }
                     else
                     {
-                        flags |= RegexOptions.IgnoreCase;
+                        //flags |= RegexOptions.IgnoreCase;
                     }
                 }
                 else
@@ -48,7 +48,7 @@ namespace IronSearch.Tags
             {
                 if (varArgs[0] is string s0 && varArgs[1] is string s1)
                 {
-                    return Regex.IsMatch(s0, s1, flags);
+                    return Regex.IsMatch(s1, s0, flags);
                 }
             }
             throw new SearchValidationException("Regex() expects a pattern string, or two strings (text, pattern) to test a match.", "Regex()");
