@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using Harmony;
@@ -39,6 +40,7 @@ namespace IronSearch.Patches
 
         //Singleton<TerminalManager>
         //DBMusicTagDefine.newMusicUids;
+        private static Stopwatch _sw = new();
         internal static void Postfix()
         {
             if (SearchPatch.isAdvancedSearch != true)
@@ -57,6 +59,11 @@ namespace IronSearch.Patches
                 SearchPatch.isAdvancedSearch = false;
                 SearchPatch.searchError.PrintSearchError();
             }
+            else
+            {
+                _sw.Stop();
+                MelonLogger.Msg($"Advanced search completed in {_sw.Elapsed.TotalSeconds:F1} seconds.");
+            }
             if (BuiltIns.isCinemaModified)
             {
                 BuiltIns.lastCheckedCinema = DateTime.UtcNow;
@@ -64,6 +71,7 @@ namespace IronSearch.Patches
         }
 
         internal static bool FirstCall = true;
+
         internal static void Prefix(string keyword)
         {
             if (ModMain.UISystemLoaded && ModMain.IsFirstLengthCacheBuild)
@@ -132,6 +140,7 @@ namespace IronSearch.Patches
                 throw;
             }
 
+            _sw.Restart();
             CompiledScript parseResult;
             try
             {
@@ -139,6 +148,7 @@ namespace IronSearch.Patches
             }
             catch (Exception ex)
             {
+                _sw.Stop();
                 new SearchResponse("Failed to parse search.", ex, SearchResponse.Type.ParserError).PrintSearchError();
                 return;
             }
