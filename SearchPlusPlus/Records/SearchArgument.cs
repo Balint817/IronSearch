@@ -25,7 +25,6 @@ namespace IronSearch
         {
             const BindingFlags flags =
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
-            // First, try direct properties
             var prop = this.GetType().GetProperty(binder.Name, flags);
             if (prop != null)
             {
@@ -40,17 +39,6 @@ namespace IronSearch
                 if (mProp != null)
                 {
                     result = mProp.GetValue(I);
-                    return true;
-                }
-            }
-
-            // Forward to PS
-            if (PS != null)
-            {
-                var psProp = PS.GetType().GetProperty(binder.Name, flags);
-                if (psProp != null)
-                {
-                    result = psProp.GetValue(PS);
                     return true;
                 }
             }
