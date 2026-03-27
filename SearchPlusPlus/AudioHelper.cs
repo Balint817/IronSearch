@@ -142,7 +142,7 @@ namespace IronSearch
         internal static CancellationTokenSource customCts = new();
         internal static async Task BuildCustomCache(CancellationToken token)
         {
-            MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Started async calculation of custom chart lengths.");
+            MelonLogger.Msg($"Started async calculation of custom chart lengths.");
             await Task.Run(() =>
             {
                 var allCustoms = AlbumManager.LoadedAlbums.Values.ToList();
@@ -151,7 +151,7 @@ namespace IronSearch
                 {
                     if (token.IsCancellationRequested)
                     {
-                        MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Custom async calculation cancelled. Progress: {i}/{count} ({(i / (float)count * 100):F1}%)");
+                        MelonLogger.Msg($"Custom async calculation cancelled. Progress: {i}/{count}");
                         return;
                     }
                     var album = allCustoms[i];
