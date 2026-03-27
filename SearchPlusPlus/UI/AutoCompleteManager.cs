@@ -42,6 +42,25 @@ namespace IronSearch.UI
 
             public SimpleDropdown? CurrentDropdown { get; private set; }
 
+            int GetMatchTier(string key, string input)
+            {
+                if (key.Equals(input, StringComparison.Ordinal))
+                    return 0; // best
+                if (key.Equals(input, StringComparison.OrdinalIgnoreCase))
+                    return 1;
+
+                if (key.StartsWith(input, StringComparison.Ordinal))
+                    return 2;
+                if (key.StartsWith(input, StringComparison.OrdinalIgnoreCase))
+                    return 3;
+
+                if (key.Contains(input, StringComparison.Ordinal))
+                    return 4;
+                if (key.Contains(input, StringComparison.OrdinalIgnoreCase))
+                    return 5;
+
+                return 6; // fallback (fuzzy)
+            }
             public CurrentCompleteInfo(string fullText, int startIndex, int endIndex, Dictionary<string, KeywordInfo> currentKeywords, Action<string, int> callback)
             {
                 _currentKeywords = currentKeywords;
@@ -53,35 +72,38 @@ namespace IronSearch.UI
                 var lowerText = containsText.ToLowerInvariant();
 
                 _sortedKeywords = _currentKeywords
-                    .Where(kvp => kvp.Key.StartsWith(containsText, StringComparison.OrdinalIgnoreCase))
-                    .Select(kvp =>
+                .Select(kvp =>
+                {
+                    var key = kvp.Key;
+                    var info = kvp.Value;
+
+                    double score = 0;
+
+                    int tier = GetMatchTier(key, containsText);
+
+                    score -= info.Priority * 5;
+
+                    if (containsText.Length > 0)
                     {
-                        var key = kvp.Key;
-                        var info = kvp.Value;
+                        var keyLower = key.ToLowerInvariant();
+                        var comparePart = keyLower.Length >= lowerText.Length
+                            ? keyLower.Substring(0, lowerText.Length)
+                            : keyLower;
 
-                        double score = 0;
-
-                        // priority weight
-                        score -= info.Priority * 10;
-
-                        // similarity
-                        int dist = LevenshteinDistance(lowerText, key.ToLowerInvariant());
+                        int dist = LevenshteinDistance(lowerText, comparePart);
                         score += Math.Max(0, 20 - dist);
+                    }
 
-                        // prefix exact match bonus (e.g. casing match)
-                        if (key.StartsWith(containsText, StringComparison.Ordinal))
-                            score += 5;
+                    return new { tier, kvp, score };
+                })
+                .OrderBy(x => x.tier)
+                .ThenByDescending(x => x.score)
+                .ThenBy(x => x.kvp.Key, StringComparer.OrdinalIgnoreCase)
+                .Where(x => (x.score + 5 * (6 - x.tier)) > 0)
+                .Select(x => x.kvp)
+                .ToList();
 
-                        return new
-                        {
-                            kvp,
-                            score
-                        };
-                    })
-                    .OrderByDescending(x => x.score)
-                    .ThenBy(x => x.kvp.Key, StringComparer.OrdinalIgnoreCase)
-                    .Select(x => x.kvp)
-                    .ToList();
+                MelonLogger.Msg($"Auto-complete options for '{containsText}' (sorted): {string.Join(", ", _sortedKeywords.Select(x => x.Key))}");
 
                 if (!ClassInjector.IsTypeRegisteredInIl2Cpp<SimpleDropdown>())
                 {
@@ -159,7 +181,7 @@ namespace IronSearch.UI
 
         };
         private static string StartString => ModMain.StartString;
-        internal static void OnGUI()
+        internal static void Update()
         {
             if (CurrentInfo == null)
             {
@@ -259,15 +281,21 @@ namespace IronSearch.UI
                 }
                 return i;
             }
+
             int LookBackwards()
             {
-                int i = caretPosition;
-                while (i < findKeyword.Length && string.Concat("A", findKeyword.AsSpan(i, caretPosition-i+1)).IsValidVariableName())
+                int i = caretPosition - 1;
+
+                while (i >= 0 &&
+                       string.Concat("A", findKeyword.AsSpan(i, caretPosition - i))
+                             .IsValidVariableName())
                 {
                     i--;
                 }
-                return i;
+
+                return i + 1;
             }
+
 
             if (caretPosition == StartString.Length)
             {
@@ -293,12 +321,12 @@ namespace IronSearch.UI
             else
             {
                 // random spot in the middle, looks both ways
-                endIndex = LookBackwards();
-                startIndex = LookForward();
+                startIndex = LookBackwards();
+                endIndex = LookForward();
             }
 
             surroundingKeyword = findKeyword[startIndex..endIndex];
-            if (!surroundingKeyword.IsValidVariableName())
+            if (surroundingKeyword != string.Empty && !surroundingKeyword.IsValidVariableName())
             {
                 // short-circuit auto-complete on invalid variable name
                 return;
