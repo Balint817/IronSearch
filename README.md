@@ -1,4 +1,4 @@
-﻿# IronSearch
+# IronSearch
 ## Installation
 - Download IronSearch.dll and place it your Mods directory
 - Download PythonExpressionManager.dll and place it in your UserLibs directory
