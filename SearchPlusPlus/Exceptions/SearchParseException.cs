@@ -44,7 +44,7 @@ namespace IronSearch.Exceptions
                 throw new InvalidOperationException("ForRange was called but the expression parsed successfully.");
             }
 
-            reason ??= "The value could not be interpreted as a range.";
+            reason ??= "The range string was invalid.";
             var msg = $"Could not parse \"{expression}\" as a range.\n{reason}";
             if (!string.IsNullOrEmpty(expectedDescription))
             {
@@ -70,7 +70,7 @@ namespace IronSearch.Exceptions
                 throw new InvalidOperationException("ForMultiRange was called but the expression parsed successfully.");
             }
 
-            reason ??= "The value could not be interpreted as a multi-range.";
+            reason ??= "The multi-range string was invalid.";
             var msg = $"Could not parse \"{expression}\" as a multi-range.\n{reason}";
             if (!string.IsNullOrEmpty(expectedDescription))
             {
