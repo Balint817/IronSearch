@@ -23,7 +23,8 @@ namespace IronSearch.Tags
 
             try
             {
-                helpMutex.WaitOne(varArgs[0]);
+                helpMutex.WaitOne();
+                EvalHelpInternal(varArgs[0]);
             }
             finally
             {

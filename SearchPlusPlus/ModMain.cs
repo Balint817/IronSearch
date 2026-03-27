@@ -498,16 +498,6 @@ namespace IronSearch
                 + "The '?' wildcard for the highest difficulty is supported."
             );
 
-
-
-
-            RegisterObject("Days", BuiltIns.EvalDays);
-            RegisterHelp(new() { "Days" },
-                "Usage: Days(dayRange)\n\n"
-                + "Returns a time range (in ticks) representing the specified number of days.\n"
-                + "For example, Days(7) would represent the time range of the last 7 days."
-            );
-
             RegisterObject("EmptyMultiRange", BuiltIns.EvalEmptyMultiRange);
             RegisterObject("EMR", BuiltIns.EvalEmptyMultiRange);
             RegisterHelp(new() { "EmptyMultiRange", "EMR" },
@@ -578,11 +568,10 @@ namespace IronSearch
                 + "Returns the music's length in seconds."
             );
 
-            RegisterObject("Hours", BuiltIns.EvalHours);
-            RegisterHelp(new() { "Hours" },
-                "Usage: Hours(hourRange)\n\n"
-                + "Returns a time range (in ticks) representing the specified number of hours.\n"
-                + "For example, Hours(24) would represent the time range of the last 24 hours."
+            RegisterScript("Help", BuiltIns.EvalHelp);
+            RegisterHelp(new() { "Help" },
+                "Usage: Help('name')\n\n"
+                + "Returns the help text for the given function... But you already knew that."
             );
 
             RegisterObject("InvalidMultiRange", BuiltIns.EvalInvalidMultiRange);
@@ -599,13 +588,6 @@ namespace IronSearch
                 "Usage: InvalidRange()\n\n"
                 + "Returns an invalid range, which matches nothing.\n"
                 + "Equivalent to the '?' wildcard. Just like the ',' wildcard, not useable everywhere."
-            );
-
-            RegisterObject("Minutes", BuiltIns.EvalMinutes);
-            RegisterHelp(new() { "Minutes" },
-                "Usage: Minutes(minuteRange)\n\n"
-                + "Returns a time range (in ticks) representing the specified number of minutes.\n"
-                + "For example, Minutes(90) would represent the time range of the last 90 minutes."
             );
 
             RegisterObject("MultiRange", BuiltIns.EvalMultiRange);
@@ -655,13 +637,6 @@ namespace IronSearch
                 + "Parses a regex pattern and returns a regex object that can be used in other functions.\n"
                 + "The regex syntax is the same as Python's regex syntax.\n"
                 + "Teaching regex syntax is out of scope for this help string. If you don't know how to use it, don't worry, you probably won't need it."
-            );
-
-            RegisterObject("Weeks", BuiltIns.EvalWeeks);
-            RegisterHelp(new() { "Weeks" },
-                "Usage: Weeks(weekRange)\n\n"
-                + "Returns a time range (in ticks) representing the specified number of weeks.\n"
-                + "For example, Weeks(2) would represent the time range of the last 2 weeks."
             );
 
 
@@ -731,8 +706,8 @@ namespace IronSearch
             RegisterScript("RunOnce", BuiltIns.EvalRunOnce);
             RegisterHelp(new() { "RunOnce" },
                 "Usage: RunOnce(function, id)\n\n"
-                + "Runs the specified script only the first time it is encountered in a search, and returns True. Every subsequent time it is encountered, it returns False.\n"
-                + "For example, if you want to check if a song has a difficulty above 3, but only want to check it once for performance reasons, you could do: RunOnce(Difficulty('3+')) and then check for the difficulty in the rest of the search."
+                + "Runs the specified script only the first time it is encountered in a search.\n"
+                + "Always returns True."
             );
 
             RegisterScript("Sorter", BuiltIns.EvalSorter);

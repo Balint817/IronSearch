@@ -33,7 +33,7 @@ namespace IronSearch.Tags
 
             LocalVariables.TryAdd(M.I.uid, new());
 
-            GlobalVariables[M.I.uid][s] = varArgs[1];
+            LocalVariables[M.I.uid][s] = varArgs[1];
             return true;
         }
     }
