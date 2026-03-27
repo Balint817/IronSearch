@@ -416,55 +416,57 @@ namespace IronSearch
         {
             return ParseRange(expression, out range, double.NegativeInfinity, double.PositiveInfinity, out _) ?? false;
         }
+        public const NumberStyles numberStyles = NumberStyles.Number
+            ^ NumberStyles.AllowThousands
+            ^ NumberStyles.AllowTrailingSign; // why the fuck is this a thing?????????????
         public static bool TryParseDouble(this string s, out double x)
         {
-            return double.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return double.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseLong(this string s, out long x)
         {
-            return long.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return long.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseInt(this string s, out int x)
         {
-            return int.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return int.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseUInt(this string s, out uint x)
         {
-            return uint.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return uint.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
-
         public static bool TryParseDouble(this ReadOnlySpan<char> s, out double x)
         {
-            return double.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return double.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseLong(this ReadOnlySpan<char> s, out long x)
         {
-            return long.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return long.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseInt(this ReadOnlySpan<char> s, out int x)
         {
-            return int.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return int.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseUInt(this ReadOnlySpan<char> s, out uint x)
         {
-            return uint.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return uint.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
 
         public static bool TryParseDouble(this Span<char> s, out double x)
         {
-            return double.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return double.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseLong(this Span<char> s, out long x)
         {
-            return long.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return long.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseInt(this Span<char> s, out int x)
         {
-            return int.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return int.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseUInt(this Span<char> s, out uint x)
         {
-            return uint.TryParse(s, NumberStyles.Number ^ NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out x);
+            return uint.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
 
         public static bool ParseMultiRange(string expression, out MultiRange range)
