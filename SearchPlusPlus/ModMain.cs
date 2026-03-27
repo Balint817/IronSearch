@@ -323,9 +323,8 @@ namespace IronSearch
             );
 
             RegisterScript("AP", BuiltIns.EvalAP);
-            RegisterScript("Perfect", BuiltIns.EvalAP);
             RegisterScript("AllPerfect", BuiltIns.EvalAP);
-            RegisterHelp(new() { "AP", "Perfect", "AllPerfect" },
+            RegisterHelp(new() { "AP", "AllPerfect" },
                 "Usage: AP() or AP(difficultyRange)\n\n"
                 + "Checks if the music has an all perfect in the specified difficulty range.\n"
                 + "The difficulty range can be a range from 1-5, specifying which difficulties are matched, or the wildcard '?' to select the highest difficulty."
@@ -530,6 +529,16 @@ namespace IronSearch
                 + "Returns a full multi-range, which matches everything. Equivalent to the wildcard '*'"
             );
 
+            RegisterObject("GetBPM", BuiltIns.EvalGetBPM);
+            RegisterHelp(new() { "GetBPM" },
+                "Usage: GetBPM()\n\n"
+                + "Returns the BPM of the song as a Range (or None if BPM parsing fails)"
+            );
+            RegisterObject("GetModified", BuiltIns.EvalGetModified);
+            RegisterHelp(new() { "GetModified" },
+                "Usage: GetModified()\n\n"
+                + "Returns the last-modified time of the song (or None if the request is not valid)."
+            );
 
             RegisterObject("GetCallbacks", BuiltIns.EvalGetCallbacks);
             RegisterObject("Callbacks", BuiltIns.EvalGetCallbacks);
@@ -827,7 +836,11 @@ namespace IronSearch
             ScriptManager.DefaultPriority = (int)Priorities.Expression;
 
             MelonLogger.Msg("Loading expressions...");
-            expressionEntry = category.CreateEntry<Dictionary<string, string>>("Expressions", new(), "Expressions", "\nDefine shorthands for searches here.");
+            expressionEntry = category.CreateEntry<Dictionary<string, string>>("Expressions", new()
+            {
+                ["NewCustom"] = "Unplayed() and Custom()",
+
+            }, "Expressions", "\nDefine shorthands for searches here.");
             LoadExpressions();
 
 
@@ -835,12 +848,14 @@ namespace IronSearch
             ScriptManager.DefaultPriority = (int)Priorities.Alias;
 
             MelonLogger.Msg("Loading aliases...");
-            aliasEntry = category.CreateEntry<Dictionary<string, string>>("TagAliases", new(), "TagAliases", "\nDefine aliases for existing tags here.");
+            aliasEntry = category.CreateEntry<Dictionary<string, string>>("TagAliases", new()
+            {
+                ["Perfect"]= "AllPerfect"
+            }, "TagAliases", "\nDefine aliases for existing tags here.");
             LoadAliases();
 
 
             autoCompleteItems = category.CreateEntry<Dictionary<string, string>>("AutoCompleteItems", new() {
-                ["NewCustom"]="Unplayed() and Custom()",
                 ["Vanilla"]="not Custom()"
             }, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.");
         }
