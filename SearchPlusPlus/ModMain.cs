@@ -906,7 +906,7 @@ namespace IronSearch
                         var key = item.Key;
                         var value = item.Value;
                         executor.RegisterAlias(key, value);
-                        AutoCompleteManager.AllKeywords.Add(value, new($"{value}()", 0));
+                        AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
                     }
                     catch (Exception ex)
                     {
