@@ -19,7 +19,6 @@ namespace IronSearch
 
     public static class AudioHelper
     {
-        //TODO: consider loading the lengths of customs asynchronously starting at OnLateInitializeMelon
         private const string AudioLengthBackupFile = "chartLengthSearchCache.json";
         private static readonly string AudioLengthBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, AudioLengthBackupFile);
 
@@ -142,6 +141,7 @@ namespace IronSearch
         internal static CancellationTokenSource customCts = new();
         internal static async Task BuildCustomCache(CancellationToken token)
         {
+            var sw = Stopwatch.StartNew();
             MelonLogger.Msg($"Started async calculation of custom chart lengths.");
             await Task.Run(() =>
             {
@@ -151,7 +151,9 @@ namespace IronSearch
                 {
                     if (token.IsCancellationRequested)
                     {
-                        MelonLogger.Msg($"Custom async calculation cancelled. Progress: {i}/{count}");
+                        sw.Stop();
+                        MelonLogger.Msg($"Custom async calculation cancelled after {sw.Elapsed.TotalSeconds:F1} seconds. Progress: {i}/{count}");
+                        MelonLogger.Msg($"Remaining time estimate: {(1-i/count)*sw.Elapsed.TotalSeconds:F1} seconds");
                         return;
                     }
                     var album = allCustoms[i];
@@ -166,6 +168,8 @@ namespace IronSearch
                     CustomCache.TryAdd(musicInfo.uid, length);
                 }
             }, token);
+            sw.Stop();
+            MelonLogger.Msg($"Finished customs in {sw.Elapsed.TotalSeconds:F1} seconds.");
         }
 
         private static TimeSpan? GetCustomLength(MusicInfo musicInfo)
