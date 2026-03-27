@@ -16,7 +16,7 @@ namespace IronSearch.Patches
                 }
                 else
                 {
-                    __result = "Looks like there's nothing here...";
+                    __result = "But nobody came.";
                 }
                 return false;
             }
