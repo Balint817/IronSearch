@@ -73,8 +73,8 @@ search: Sort(ByBPM(), ByLength()) and Custom()
 
 ### Truthiness
 
-The result of your expression is always converted to a True or False value using default 'truthy-ness' behavior.\
-This is a common footgun:
+The result of your expression is always converted to a True or False value.\
+This is a common point of failure:
 
 ```text
 search: AP()
@@ -86,7 +86,7 @@ The above matches songs that have all-perfect on the highest map (probably what 
 search: AP
 ```
 
-If you forget the parentheses, the engine thinks you are just naming the command instead of actually running it, so it accidentally matches everything.
+If you forget the parentheses, the game thinks you are just naming the command instead of actually running it, so it accidentally matches everything.
 
 ![Search demo](/Resources/parenthesis.gif)
 
