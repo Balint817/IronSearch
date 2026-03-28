@@ -362,8 +362,13 @@ namespace IronSearch
         internal static readonly Regex regexBPM = new Regex(@"^[0-9,]*\.?[0-9,]+[^0-9.,][0-9,]*\.?[0-9,]+$");
 
         internal static readonly Regex regexNonNumeric = new Regex(@"[^0-9.,]");
-        public static bool DetectParseBPM(string input, out Range range, double min, double max)
+        public static bool DetectParseBPM(string input, [MaybeNullWhen(false)]out Range range, double min, double max)
         {
+            range = null;
+            if (string.IsNullOrEmpty(input))
+            {
+                return false;
+            }
             input = input.Trim();
             if (ParseRange(input, out range, min, max) ?? false)
             {
@@ -373,9 +378,16 @@ namespace IronSearch
             {
                 return false;
             }
-            return ParseRange(input.Replace(regexNonNumeric.Match(input).Value, "-"), out range, min, max) ?? false;
+            var nonNumericMatch = regexNonNumeric.Match(input).Value;
+
+            // so we don't accidentally create negative BPM numbers... This may still return problematic results if the match is "$A$B$" or something dumb like that...
+            if (input.StartsWith(nonNumericMatch) || input.EndsWith(nonNumericMatch))
+            {
+                return ParseRange(input.Replace(nonNumericMatch, ""), out range, min, max) ?? false;
+            }
+            return ParseRange(input.Replace(nonNumericMatch, "-"), out range, min, max) ?? false;
         }
-        public static bool DetectParseBPM(string input, out Range range)
+        public static bool DetectParseBPM(string input, [MaybeNullWhen(false)]out Range range)
         {
             return DetectParseBPM(input, out range, double.NegativeInfinity, double.PositiveInfinity);
         }
@@ -537,7 +549,10 @@ namespace IronSearch
                 return null;
             }
 
-            if (min > max) (max, min) = (min, max);
+            if (min > max)
+            {
+                (max, min) = (min, max);
+            }
 
             expression = expression.Replace(" ", "");
 
@@ -590,7 +605,7 @@ namespace IronSearch
                 {
                     expression = expression[1..];
 
-                    int separatorIndex = expression.IndexOf('-', 1);
+                    int separatorIndex = expression.IndexOf('-');
                     if (separatorIndex != -1)
                     {
                         var span1 = expression.AsSpan(0, separatorIndex);
@@ -643,7 +658,7 @@ namespace IronSearch
                 }
                 else
                 {
-                    int separatorIndex = expression.IndexOf('-', 1);
+                    int separatorIndex = expression.IndexOf('-');
                     if (separatorIndex != -1)
                     {
                         var span1 = expression.AsSpan(0, separatorIndex);

@@ -20,14 +20,11 @@ namespace IronSearch.Tags
         }
         internal static bool EvalBPM(MusicInfo musicInfo, Range value)
         {
-            return EvalBPM(musicInfo, value.AsMultiRange());
+                return EvalBPM(musicInfo, value.AsMultiRange());
         }
         internal static bool EvalBPM(MusicInfo musicInfo, MultiRange value)
         {
-            if (!bpmDict.ContainsKey(musicInfo.uid))
-            {
-                AddBPMInfo(musicInfo);
-            }
+            AddBPMInfo(musicInfo);
             var bpmInfo = bpmDict[musicInfo.uid];
 
             if (bpmInfo == null)
@@ -66,8 +63,8 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varKwargs);
             switch (varArgs[0])
             {
-                case string n:
-                    return EvalBPM(M.I, n);
+                case string s:
+                    return EvalBPM(M.I, s);
                 case Range r:
                     return EvalBPM(M.I, r);
                 case PythonRange pr:
