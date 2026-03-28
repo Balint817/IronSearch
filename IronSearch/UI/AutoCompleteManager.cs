@@ -234,7 +234,7 @@ namespace IronSearch.UI
             }
             var findKeyword = inputField.text;
 
-            if (findKeyword?.StartsWith(StartString) != true)
+            if (StartString is null || findKeyword?.StartsWith(StartString) != true)
             {
                 return;
             }
