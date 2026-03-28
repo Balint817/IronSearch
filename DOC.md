@@ -166,7 +166,7 @@ If you set it to an empty string, advanced search is always enabled (NOT recomme
 
 (Personally, I have it set to `::`)
 
-### `EnableSearchCaching` (default: `true`)
+### `EnablePersistentSearchCaching` (default: `true`)
 
 Enable to cache search results.
 
@@ -1070,6 +1070,17 @@ Usage:
 - `FullMultiRange()`
 
 Equivalent to the `'*'` wildcard. Matches everything.
+
+---
+
+#### `Fuzzy`/`F`
+
+Usage:
+
+- `Fuzzy(pattern, case=true/false) or Fuzzy(pattern, text, case=true/false)`
+
+The first usage returns an object which can be used to fuzzy-match text, while the latter instantly fuzzy-matches the provided text.
+The first one will have a method `.Match(text)` that returns `True` if the text matches the pattern.
 
 ---
 

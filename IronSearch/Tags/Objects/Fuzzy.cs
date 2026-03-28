@@ -35,20 +35,28 @@ namespace IronSearch.Tags
 
             ThrowIfNotMatching(varArgs, evalFuzzyArgCount);
 
-            if (varArgs.Length == 1)
+            if (varArgs[0] is string s0)
             {
-                if (varArgs[0] is string s)
+                if (string.IsNullOrEmpty(s0))
                 {
-                    return new FuzzyContains(s, caseInsensitive: !caseSensitive);
+                    throw new SearchValidationException("pattern text was empty!", "Fuzzy()");
                 }
-            }
-            else
-            {
-                if (varArgs[0] is string s0 && varArgs[1] is string s1)
+                if (s0.Length > 63)
+                {
+                    throw new SearchValidationException("pattern text is too long to support fuzzy matching!", "Fuzzy()");
+                }
+                if (varArgs.Length == 1)
+                {
+                    return new FuzzyContains(s0, caseInsensitive: !caseSensitive);
+                }
+
+                if (varArgs[1] is string s1)
                 {
                     return new FuzzyContains(s0, caseInsensitive: !caseSensitive).IsMatch(s1);
                 }
+
             }
+
             throw new SearchValidationException("Fuzzy() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex()");
         }
     }

@@ -25,6 +25,8 @@
             _charMask = BuildCharMask(_pattern);
         }
 
+        public bool Match(string text) => IsMatch(text);
+
         public bool IsMatch(string text)
         {
             if (string.IsNullOrEmpty(text))
