@@ -149,7 +149,7 @@ search: Accuracy('95-100', '?')
 
 Narrow to songs where your **top-slot** scores are 95%–100% accuracy (see `Accuracy` for wildcard rules).
 
-> **GIF:** Edit a range in the search bar and show the list narrowing (e.g. BPM sliding from `'150+'` to `'170+'`).
+![Search demo narrowing BPM](/Resources/bpm_narrowing.gif)
 
 
 ---
