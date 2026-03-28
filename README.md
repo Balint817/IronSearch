@@ -16,5 +16,5 @@ The documentation can be found [here](DOC.md).
 - The Empress of Medium Potatoes
 - The Star of Wynter
 - The Devil's Agent
-- The Hierophant 2022 & The Tower 2026
+- The Wheel of Fortune 2026
 - The Fool
