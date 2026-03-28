@@ -45,7 +45,7 @@ namespace IronSearch.UI
             int GetMatchTier(string key, string input)
             {
                 if (key.Equals(input, StringComparison.Ordinal))
-                    return 0; // best
+                    return 0;
                 if (key.Equals(input, StringComparison.OrdinalIgnoreCase))
                     return 1;
 
@@ -59,7 +59,7 @@ namespace IronSearch.UI
                 if (key.Contains(input, StringComparison.OrdinalIgnoreCase))
                     return 5;
 
-                return 6; // fallback (fuzzy)
+                return 6;
             }
             public CurrentCompleteInfo(string fullText, int startIndex, int endIndex, Dictionary<string, KeywordInfo> currentKeywords, Action<string, int> callback, Vector2 posOverride)
             {
@@ -123,7 +123,6 @@ namespace IronSearch.UI
                 CurrentDropdown = null;
             }
 
-            // Basic Levenshtein distance
             private static int LevenshteinDistance(string a, string b)
             {
                 int[,] dp = new int[a.Length + 1, b.Length + 1];
@@ -261,7 +260,7 @@ namespace IronSearch.UI
                     if (!currentKeywords.TryAdd(key, new(item.Value, 0)))
                     {
                         MelonLogger.Msg(ConsoleColor.Red, $"auto-complete item '{key}' encountered a conflict, skipped.");
-                        //continue;
+                        continue;
                     }
                 }
             }
@@ -374,18 +373,5 @@ namespace IronSearch.UI
                 AllKeywords.TryAdd(item.Key, new($"{item.Key}(", 0));
             }
         }
-
-
-
-        //private static void AutoCompleteSetField()
-        //{
-        //    var t = CurrentAutoCompleteInfo;
-        //    var currentResult = CurrentAutoCompleteInfo.GetResultByIndex(CurrentAutoCompleteInfo.CurrentMatchIndex);
-        //    SearchFocusPatch.inputField.SetText(currentResult);
-        //    SearchFocusPatch.inputField.m_CaretPosition = t.EndIndex + (currentResult.Length - t.OriginalText.Length);
-        //    SearchFocusPatch.inputField.m_CaretSelectPosition = SearchFocusPatch.inputField.m_CaretPosition;
-        //    CurrentAutoCompleteInfo = t;
-        //}
-
     }
 }

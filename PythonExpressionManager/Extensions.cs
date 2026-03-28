@@ -4,8 +4,6 @@
     {
         static Extensions()
         {
-            //var list = Script.Engine.Execute("import keyword\nkeyword.kwlist");
-            //ReservedKeywords = list.ToHashSet<string>();
 
             ReservedKeywords = new()
             {

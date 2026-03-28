@@ -76,44 +76,6 @@ namespace IronSearch
         {
             return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == shortName) != null;
         }
-
-        //no music txt: 30~35
-        //docs: 50~60
-        public static string AddBreaksPerCount(string text, int lineLength)
-        {
-            if (text is null) throw new ArgumentNullException(nameof(text));
-            if (lineLength < 1) throw new ArgumentOutOfRangeException(nameof(lineLength));
-
-            string output = "";
-            var lines = text.Split('\n');
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string line = lines[i];
-                int count = 0;
-                var words = line.Split(' ');
-                for (int j = 0; j < words.Length; j++)
-                {
-                    string word = words[j];
-                    count += word.Length;
-                    if (count > lineLength)
-                    {
-                        output += "\n";
-                        count = word.Length % lineLength;
-                    }
-                    output += word;
-                    if (j != words.Length - 1)
-                    {
-                        output += " ";
-                        count++;
-                    }
-                }
-                if (i != words.Length - 1)
-                {
-                    output += "\n";
-                }
-            }
-            return output;
-        }
         public static MultiRange Invert(this Range range)
         {
             return new MultiRange(range.InvertArray());
@@ -267,22 +229,6 @@ namespace IronSearch
                 }
             }
             return dict;
-        }
-
-
-        internal static byte[] GetRequestBytes(string uri)
-        {
-#pragma warning disable SYSLIB0014 // Type or member is obsolete
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-#pragma warning restore SYSLIB0014 // Type or member is obsolete
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            request.KeepAlive = false;
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            {
-                return ReadFully(stream);
-            }
-
         }
 
         public static byte[] ReadFully(Stream stream, int initialLength = 0)
@@ -568,7 +514,6 @@ namespace IronSearch
                 return true;
             }
 
-            // 1. Capture pipe positions
             bool hasLeadingPipe = expression.StartsWith("|");
             if (hasLeadingPipe) expression = expression[1..];
 
@@ -585,7 +530,6 @@ namespace IronSearch
             bool exclusiveStart = false;
             bool exclusiveEnd = false;
 
-            // 2. Parse the logic
             if (expression.EndsWith("+"))
             {
                 // Case: "A+" -> [A, max]
@@ -596,7 +540,7 @@ namespace IronSearch
                     return null;
                 }
                 end = max;
-                exclusiveStart = hasLeadingPipe; // Pipe at start belongs to 'start'
+                exclusiveStart = hasLeadingPipe;
                 hasTrailingPipe = false;
             }
             else
@@ -622,7 +566,6 @@ namespace IronSearch
                             }
                             end *= -1;
                             start = min;
-                            // EXCEPTION: In your ToString, |A- means A (the end) is exclusive
                             exclusiveEnd = hasLeadingPipe;
                             hasTrailingPipe = false;
                         }
@@ -674,7 +617,6 @@ namespace IronSearch
                                 return null;
                             }
                             start = min;
-                            // EXCEPTION: In your ToString, |A- means A (the end) is exclusive
                             exclusiveEnd = hasLeadingPipe;
                             hasTrailingPipe = false;
                         }
@@ -710,21 +652,18 @@ namespace IronSearch
                 }
             }
 
-            // 3. Handle potential value swaps (e.g., input "10-5")
             if (start > end)
             {
                 (start, end) = (end, start);
                 (exclusiveStart, exclusiveEnd) = (exclusiveEnd, exclusiveStart);
             }
 
-            // 4. Bounds Check
             if (!(min <= end && end <= max) || !(min <= start && start <= max))
             {
                 failureReason = $"The values ({start} to {end}) are outside the allowed range [{min}, {max}].";
                 return false;
             }
 
-            // 5. Logical validity (cannot be exclusive on a single point)
             if (start == end && (exclusiveStart || exclusiveEnd))
             {
                 failureReason = "A single value cannot use exclusive bounds (|) on the start or end.";
@@ -1011,7 +950,6 @@ namespace IronSearch
             // Combine X from caret + Y from input field bottom
             Vector3 finalWorld = new Vector3(worldX.x, bottomLeft.y, 0f);
 
-            // Camera handling
             Canvas canvas = text.canvas;
             Camera cam = null;
 
@@ -1114,7 +1052,6 @@ namespace IronSearch
             return false;
         }
 
-        // TODO: make this return a TimeSpan instead of long, and remove the necessity for Day(), etc. functions entirely.
         public static bool TryTimeStringToTimeSpan(this string s, out TimeSpan ts)
         {
             ts = TimeSpan.Zero;
@@ -1138,12 +1075,10 @@ namespace IronSearch
                 if (start == pos)
                 {
                     return false;
-                    //throw new SearchValidationException("expected time offset (integer) as 'modified' argument", "modified");
                 }
                 if (!long.TryParse(s[start..pos], out var value))
                 {
                     return false;
-                    //throw new SearchValidationException("invalid number in 'modified' argument", "modified");
                 }
                 // parse unit
                 if (pos >= s.Length)

@@ -24,7 +24,6 @@ public class SimpleDropdown : MonoBehaviour
     public static SimpleDropdown Create(IEnumerable<string> items, Action<string, int> onSelected, Vector2? topLeft = null)
     {
         var go = new GameObject("SimpleDropdown");
-        //DontDestroyOnLoad(go);
         var dropdown = go.AddComponent<SimpleDropdown>();
         dropdown.Init(items, onSelected, topLeft);
 
@@ -47,7 +46,6 @@ public class SimpleDropdown : MonoBehaviour
         }
         v.y -= Height;
 
-        // Center screen
         windowRect = new Rect(
             v.x,
             v.y,
@@ -137,11 +135,6 @@ public class SimpleDropdown : MonoBehaviour
             return;
         }
         GUI.depth = 0;
-
-        //// Dark background (optional)
-        //GUI.color = new Color(0, 0, 0, 0.6f);
-        //GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
-        //GUI.color = Color.white;
 
         var t = DrawWindow;
         windowRect = GUI.Window(windowId, windowRect, t, "");

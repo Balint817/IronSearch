@@ -280,9 +280,7 @@ namespace IronSearch
             MelonLogger.Msg("Checking user script directory...");
 
             Directory.CreateDirectory(ScriptDirectory);
-            //var templateString =
-            //    $"def {Script.OutputFunctionName}(M, T):\n" +
-            //    $"\treturn T['Custom']() and not T['Packed']()";
+
             var templateString =
                 $"def {Script.OutputFunctionName}(M, T):\n" +
                 $"\treturn T['Custom'](M,T) and not T['Packed'](M, T)";
@@ -618,7 +616,6 @@ namespace IronSearch
 
             RegisterObject("Range", BuiltIns.EvalRange);
             RegisterObject("R", BuiltIns.EvalRange);
-            // help string should be based on the range parsing in Utils.ParseRange
             RegisterHelp(new() { "Range", "R" },
                 "Usage: Range(rangeString)\n\n"
                 + "Parses a range string and returns a range object that can be used in other functions.\n"
@@ -698,7 +695,6 @@ namespace IronSearch
 
 
             RegisterScript("Exit", BuiltIns.EvalExit);
-            // short-circuits the search and returns the specified boolean value.
             RegisterHelp(new() { "Exit" },
                 "Usage: Exit(returnValue)\n\n"
                 + "Exits the search and returns the specified boolean value.\n"

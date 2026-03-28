@@ -27,7 +27,6 @@ namespace IronSearch.Tags
                     throw SearchParseException.ForRange(splitValue[0], "Accuracy()", "an accuracy percentage range");
                 }
 
-                //accRange.Update(accRange.Start / 100, accRange.End / 100);
                 return EvalAccuracy(musicInfo, accRange.AsMultiRange(), MultiRange.InvalidRange);
             }
             else if (splitValue.Length == 2)
@@ -42,15 +41,12 @@ namespace IronSearch.Tags
                     throw SearchParseException.ForRange(splitValue[0], "Accuracy()", "an accuracy percentage range");
                 }
 
-                //accRange.Update(accRange.Start / 100, accRange.End / 100);
-
                 if (!Utils.ParseRange(splitValue[1], out diffRange))
                 {
                     throw SearchParseException.ForRange(splitValue[1], "Accuracy()", "a difficulty index range");
                 }
                 if (diffRange == Range.InvalidRange)
                 {
-                    // wildcard → highest diff only
                     if (!Utils.GetAvailableMaps(musicInfo, out var maps) || !maps.Intersect(evalAccDiffs).Any())
                         return false;
 
