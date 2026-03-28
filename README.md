@@ -8,7 +8,13 @@
 [Feedback form](https://docs.google.com/forms/d/e/1FAIpQLSevUpaUqkwmkfr6L4F5Zwsc9esofrMk3-MytSN0MSmHZSZhow/viewform)
 **For reporting bugs, open a GitHub Issue! The form is only for feedback.**
 
+## Usage
+The documentation can be found [here](https://github.com/Balint817/IronSearch/blob/main/IronSearch/DOC.md).
 
 ## Credits
-- Wynter
-- 
+- The Empress of Medium Potatoes
+- The Star of Wynter
+- The Magician, X
+- The Devil's Agent
+- The Hierophant 2022 & The Tower 2026
+- The Fool
