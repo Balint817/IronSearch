@@ -1,6 +1,22 @@
-# IronSearch Advanced Search Guide (Tags + Scripts)
+# IronSearch Advanced Search Guide
 
-This is the documentation for the "advanced search" features implemented by IronSearch. The DSL is powered by the **IronPython** engine.
+This is the documentation for the "advanced search" features implemented by IronSearch.\
+For example, functions like `BPM('160-200')`. The DSL is powered by the **IronPython** engine.
+
+**Practical tip:** Typing long queries in-game may get tedious.\
+It's a good idea to put longer queries into an 'Expression' to re-use later.
+
+| Section | Contents |
+|---------|----------|
+| [§1 Quick Start](#1-quick-start) | Prefix, first examples, booleans, sorting teaser |
+| [§2 Auto-complete](#2-auto-complete-tab-suggestions) | **Tab** dropdown: when it works, keys, behavior (`AutoCompleteManager.cs`) |
+| [§3 Syntax](#3-syntax) | Truthiness, `M`, keyword args |
+| [§4 Range syntax](#4-range-syntax) | `'10+'`, `'?\|…'`, multi-ranges |
+| [§5 Settings](#5-settings) | `IronSearch.cfg`, aliases, `AutoCompleteItems` |
+| [§6 Sorting](#6-sorting-guide) | `Sorter(...)` / comparers |
+| [§7 Tag reference](#7-tag-reference) | Full tag list |
+| [§8 Advanced](#8-advanced-features) | Lambdas, `Scripts/`, config hooks |
+| [§9 Cookbook](#9-example-cookbook) | Copy-paste patterns |
 
 ---
 
@@ -55,18 +71,42 @@ search: Sort(ByBPM(), ByLength()) and Custom()
 
 ### Truthiness
 
-The result of your expression is always converted to a True or False value using default 'truthiness' behavior, so for example, if you accidentally typed `AP` instead of `AP()`, this would match every song.
+The result of your expression is always converted to a True or False value using default 'truthy-ness' behavior.\
+This is a common footgun:
+
+```text
+search: AP()
+```
+
+The above matches songs that have all-perfect on the highest map (probably what you intended).
+
+```text
+search: AP
+```
+
+The above returns the function itself, which is always "truthy", so it matches everything.
+
+> **GIF:** Optional—show a wrong query (`AP` vs `AP()`) and the result count difference.
 
 ### The implicit current-song object: `M`
 
 During evaluation, the expression has a parameter `M` which contains the objects related to the current search:
 - `M.I`, the underlying `MusicInfo`
 - `M.PS`, the PeroString object of the current search (if you have no idea what that means, you probably don't need it)
-- `M.<name>`, forwards the `name` to access the underlying `MusicInfo`
+- `M.<name>`, is a shorter way to access `M.I.<name>`
 
 Examples:
 
 - `M.uid`, `M.name`, `M.author`, `M.scene`, etc.
+
+Example filter using `M` directly:
+
+```text
+search: Custom() and 'banana' in M.author
+```
+
+Custom charts whose author string contains `banana` (case-sensitive).\
+For this example, you can use `Author('banana')` instead; `M` is for checks or logic that do not yet have a dedicated tag.
 
 ### Keyword arguments
 
@@ -107,6 +147,29 @@ Some inputs accept multi-ranges. A multi-range takes multiple ranges, and matche
 
 For example, `MR('100- 200+')` matches values lower than 100, or higher than 200.
 
+### Working examples for simple tags using ranges:
+
+```text
+search: BPM('160+')
+```
+
+BPM 160 or higher.
+
+```text
+search: Difficulty('9-11', '?')
+```
+
+Displayed difficulty 9 through 11 on the **highest** map index.
+
+```text
+search: Accuracy('95-100', '?')
+```
+
+Narrow to songs where your **top-slot** scores are 95%–100% accuracy (see `Accuracy` for wildcard rules).
+
+> **GIF:** Edit a range in the search bar and show the list narrowing (e.g. BPM sliding from `'150+'` to `'170+'`).
+
+
 ---
 
 ## 4) Settings
@@ -117,7 +180,7 @@ Settings are stored under the path: `<Muse Dash Folder>/UserData/IronSearch.cfg`
 
 The prefix that must start your search text for an advanced search to actually happen.
 
-If you set it to an empty string, advanced search is always enabled (not recommended).
+If you set it to an empty string, advanced search is always enabled (NOT recommended).
 
 (Personally, I have it set to `::`)
 
@@ -153,9 +216,9 @@ For example:
 - `TagAliases = { Title = "Name" }`
 
 This will allow you to reference the built-in "Title" tag with the name "Name". \
-Aliasing affects parsing/available keywords (autocomplete also includes aliases).
+Autocomplete also includes aliases.
 
-### `Expressions` (advanced)
+### `Expressions`
 
 A dictionary of shorthands for searches.
 
@@ -171,8 +234,24 @@ After that, you can call:
 
 - `NewCustom()`
 
+#### Expression arguments (advanced)
 
-### `AutoCompleteItems` (advanced)
+In expressions, the built-in `M` parameter gets 2 extra properties:
+
+- `M.A`, which are the 'Arguments' passed to the expression.
+- `M.K`, which are the 'Keyword arguments' passed to the expression.
+
+Expanding on the previous example:
+
+- `Expressions = { NewCustom = "Unplayed(M.A[0]) and Custom()" }`
+
+After that, you can call:
+
+- `NewCustom('?')`
+
+This will pass the `?` argument into the `Unplayed()` tag, selecting only customs that are unplayed on their highest map.
+
+### `AutoCompleteItems`
 
 Dictionary of extra autocomplete keywords.
 
@@ -184,25 +263,43 @@ Unlike an expression, does not register an entirely new tag, but simply adds an 
 
 ---
 
-## 5) Sorting Guide
+## 5) Auto-complete (Tab suggestions)
+
+IronSearch can suggest keywords while you type an advanced search.
+
+### When you can use it
+
+All of the following must be true:
+
+1. The **game search UI is open** and PopupLib is installed.
+2. The current search has to be an advanced search (starting with the configured start text).
+3. The caret position is within the search itself and not the start text.
+4. The characters immediately around the caret form a valid keyword. (e.g. cannot autocomplete `search:123` because it's just a number)
+
+### What to press
+
+| Action | Effect |
+|--------|--------|
+| **Tab** (first time) | Opens the suggestion dropdown near the caret. |
+| **Up** / **Down**, **Page Up** / **Page Down**, mouse wheel | Move the highlighted row. |
+| **Tab** again (or **click** a row) | Replaces the partial text with the selected auto-complete keyword. |
+| **Left** / **Right** arrow (or continue typing) | Close the list **without** inserting. |
+
+> **GIF:** Cursor after `search:`, press Tab, scroll with arrows, pick `BPM()`, show `search: BPM()` with caret placement.
+
+---
+
+## 6) Sorting Guide
 
 Sorting is done only when:
 
-- advanced search is enabled (prefix match), and
+- advanced search is on, and
 - parsing/evaluation did not produce an error, and
 - the expression registered at least one sorter via `Sorter(...)` / `Sort(...)`.
 
 ### The sorting call
 
-`Sorter(comparerFunction)` (alias `Sort`)
-
-The comparerFunction concept:
-
-- A comparer is a function that takes **two** `MusicInfo` objects: `A` and `B`
-- It returns an `int`:
-  - negative: `A` should come before `B`
-  - zero: equal
-  - positive: `A` should come after `B`
+`Sorter(comparer)` (alias `Sort`)
 
 You can provide built-in comparer key functions:
 
@@ -222,13 +319,13 @@ You can pass multiple comparer functions:
 search: Sorter(ByBPM(), ByName()) and Custom()
 ```
 
-Comparers are evaluated in order. The first non-zero comparison decides the ordering.
+Comparers are evaluated in order. The first non-equal comparison decides the ordering.
 
-### Reverse + priority
+### Reverse + priority (advanced)
 
 The underlying `Sorter(...)` implementation supports additional keyword arguments:
 
-- `reverse=...` (boolean-ish; negates the first non-zero comparison result)
+- `reverse=...` (True/False; negates the first non-equal comparison result)
 - `priority=...` (integer, lower number is higher priority)
 
 If there are 2 or more sorter calls with equal priority, only the last is executed. \
@@ -236,9 +333,17 @@ If there are 2 or more sorter calls with different priorities, they are executed
 
 These arguments can also be passed as positional arguments, omitting the keyword.
 
-### Custom comparers
+### Custom comparers (VERY advanced)
 
-You can pass a function created in your expression:
+You can pass a function created in your expression.
+
+The `comparer` concept:
+
+- A comparer is a function that takes **two** `MusicInfo` objects: `A` and `B`
+- It returns an `int`:
+  - negative: `A` should come **before** `B`
+  - zero: `A` is **equal** to `B`
+  - positive: `A` should come **after** `B`
 
 For example, the ByUID sorting can be re-implemented like this:
 
@@ -246,19 +351,17 @@ For example, the ByUID sorting can be re-implemented like this:
 search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
 ```
 
-Important constraints:
-
-- The function must take **exactly 2 arguments**
-- It must be callable
-- It must return an `int`
-
 ---
 
-## 6) Tag Reference
+## 7) Tag Reference
 
-This section documents **every tag** available by default.
+This section documents **every tag** available by default. But first...
 
-### 6.1 Filters (return `True`/`False`)
+#### `Help`
+
+- `Help("TagName")` prints the built-in help text for the given tag.
+
+### 7.1 Filters (returns `True`/`False`)
 
 #### `Any`
 
@@ -266,7 +369,7 @@ Usage:
 
 - `Any(text) or Any(regex)`
 
-Checks if the music matches any of:
+Checks if the music matches any of the following:
 
 - `Album`
 - `Author`
@@ -274,9 +377,13 @@ Checks if the music matches any of:
 - `Tag`
 - `Title`
 
-Notes:
+Example:
 
-- String matching is a case-insensitive "contains" check.
+```text
+search: Any('cyber')
+```
+
+Matches if `cyber` appears in album, author, designer, tag, or title text.
 
 ---
 
@@ -292,7 +399,15 @@ Notes:
 
 - Input accuracy is a **percentage** range (e.g. `90-100`).
 - The accuracy part does **not** allow wildcard `?` in the "accuracyRange" position.
-- If the map range is a wildcard `?`, the tag selects the **highest available difficulty** among 1–4.
+- If the map range is a wildcard `?`, the tag selects the **highest available map**.
+
+Example:
+
+```text
+search: Accuracy('90+', '?')
+```
+
+Matches songs where you have 90% or higher accuracy on the highest available map.
 
 ---
 
@@ -308,21 +423,37 @@ Notes:
 
 - Album names come from the game/custom album data, not necessarily matching what you see in UI.
 
+Example:
+
+```text
+search: Album('treatment')
+```
+
+Matches if `treatment` appears in album name.
+
 ---
 
 #### `AP` / `Perfect` / `AllPerfect`
 
 Usage:
 
-- `AP() or AP(difficultyRange)`
+- `AP() or AP(mapRange)`
 
-Checks if the music has **all perfect** scores in the specified difficulty range.
+Checks if the music has **all perfect** scores in the specified map range.
 
 Notes:
 
-- Difficulty range values are difficulties (1–4 in practice).
-- If you pass wildcard `?` (parsed as invalid range), the implementation selects the **highest available difficulty** among 1–4.
-- The tag requires perfect (accuracy exactly `1.0f`) for every selected difficulty.
+- If you pass wildcard `?`, the implementation selects the **highest available map**.
+  - This is the default behavior for `AP()`.
+- The tag requires perfect for every map in the selected range.
+
+Example:
+
+```text
+search: AP('3-4')
+```
+
+Matches songs where you have an AP in both the master and the hidden maps.
 
 ---
 
@@ -334,7 +465,13 @@ Usage:
 
 Checks if the music’s author matches the specified input.
 
-Also checks per-difficulty/localized authors.
+Example:
+
+```text
+search: Author('leaf')
+```
+
+Matches if `leaf` appears in the author's name.
 
 ---
 
@@ -345,6 +482,14 @@ Usage:
 - `BPM(bpmRange)`
 
 Checks if the music’s BPM is within the given BPM range.
+
+Example:
+
+```text
+search: BPM('150-200')
+```
+
+Matches if the BPM of the song is within the provided range.
 
 ---
 
@@ -361,6 +506,20 @@ Notes:
 - If `mapRange` is the wildcard `?`, it selects the **highest available map**.
 - Callback difficulty is the "difficulty the game servers use", not the displayed difficulty.
 - Callback difficulty is always an integer; string difficulty like `E` turns into -1.
+
+Examples:
+
+```text
+search: Callback('11+', '3+')
+```
+
+Matches if there's a callback difficulty of 11 or higher on master or hidden maps.
+
+```text
+search: Callback('*', '3')
+```
+
+Returns whether the map has a Master.
 
 ---
 
@@ -390,7 +549,15 @@ Usage:
 
 - `Designer(designerName) or Designer(regex)`
 
-Checks the chart’s level designer.
+Checks if the chart’s level designer matches the specified input.
+
+Example:
+
+```text
+search: Author('vig')
+```
+
+Matches if `vig` appears in the designer's name.
 
 ---
 
@@ -402,10 +569,18 @@ Usage:
 
 Checks if the music has a difficulty in the given difficulty range, optionally restricting which maps match.
 
-Important implementation detail:
+Notes:
 
-- `mapRange` set to `?` means "select the highest available map (highest map index)".
+- `mapRange` set to `?` means "select the highest available map".
 - `difficultyRange` set to wildcard `?` will match non-integer difficulties like `?` or `E`.
+
+Example:
+
+```text
+search: Difficulty('11+', '?')
+```
+
+Matches songs where the highest available map is 11 or above
 
 ---
 
@@ -432,6 +607,14 @@ Notes:
 - If `mapRange` is `'?'`, it selects the highest applicable difficulty.
 - For non-wildcard ranges, it requires full combo on every selected difficulty.
 
+Example:
+
+```text
+search: FC('?')
+```
+
+Matches songs where the highest available map has a full combo.
+
 ---
 
 #### `Hidden`/`HasHidden`
@@ -444,11 +627,11 @@ Checks whether the music has a "hidden" difficulty (difficulty 4).
 
 ---
 
-#### `Touhou`
+#### `Touhou`/`HasTouhou`
 
 Usage:
 
-- `Touhou()`/`HasTouhou`
+- `Touhou()`
 
 Checks whether the music has a "Touhou" difficulty (difficulty 5).
 
@@ -460,7 +643,7 @@ Usage:
 
 - `History()`
 
-Checks if the music is in the chart history (last played charts).
+Checks if the music is in the chart history (recently played charts in the 'History' tab).
 
 ---
 
@@ -478,6 +661,14 @@ Notes:
   - normal numeric ranges like `'180-240'` (seconds)
   - time strings like `'1m30s'`
 
+Example:
+
+```text
+search: Length('1m30s-3m')
+```
+
+Matches songs with length between 1 and a half minutes, and 3 minutes.
+
 ---
 
 #### `Modified`
@@ -488,10 +679,15 @@ Usage:
 
 Checks if the custom chart was last modified within the given time window.
 
-Time string format:
-- digits followed by units, concatenated:
-  - `s` (seconds), `m` (minutes), `h`, `d` (days), `w` (weeks)
-  - examples: `7d`, `24h`, `1h30m`
+- Accepts time ranges (like `'1h'`).
+
+Example:
+
+```text
+search: Modified('7d')
+```
+
+Matches songs that have been modified (or added) in the last 7 days.
 
 ---
 
@@ -505,8 +701,15 @@ Checks if the music is among the Nth last added custom charts.
 
 Notes:
 
-- This is based on album/chart filesystem last-write time ordering.
 - It only applies to custom charts.
+
+Example:
+
+```text
+search: New(5)
+```
+
+Returns the 5 most recently added custom charts.
 
 ---
 
@@ -520,8 +723,15 @@ Checks if the music is among the Nth first added custom charts.
 
 Notes:
 
-- This is based on album/chart filesystem last-write time ordering.
 - Only applies to custom charts.
+
+Example:
+
+```text
+search: Old(5)
+```
+
+Returns the 5 oldest custom charts.
 
 ---
 
@@ -575,11 +785,20 @@ Checks if the music is in a specific scene.
 Accepted inputs:
 
 - a scene name (case-insensitive substring match)
-- a numeric index
+- a numeric scene index
 
 Ambiguity:
 
-- If the typed scene name matches multiple known scenes, the search fails.
+- If the typed scene name matches multiple known scenes, the search short-circuits.
+
+Example:
+
+```text
+search: Scene('candy')
+```
+
+Gets the scene that matches `candy` in its name (e.g. `Candyland`),\
+and matches every song that has that scene.
 
 ---
 
@@ -605,6 +824,14 @@ Usage:
 
 Checks if the music has a "music tag" whose text matches the provided string/regex.
 
+Example:
+
+```text
+search: Tag('OST')
+```
+
+Matches songs that have a search tag that contains `OST`.
+
 ---
 
 #### `Title`
@@ -614,6 +841,14 @@ Usage:
 - `Title(title) or Title(regex)`
 
 Checks if the music’s title matches.
+
+Example:
+
+```text
+search: Title('Muse')
+```
+
+Matches songs where the title contains `Muse`.
 
 ---
 
@@ -629,9 +864,17 @@ Notes:
 
 - Wildcard `'?'` as `mapRange` selects highest applicable difficulty.
 
+Example:
+
+```text
+search: Unplayed('3')
+```
+
+Matches songs where the Master is unplayed.
+
 ---
 
-### 6.2 Sorting comparers
+### 7.2 Sorting comparers
 
 These tags return comparers that can be used inside `Sorter(...)`.
 
@@ -723,7 +966,7 @@ Usage:
 
 Returns a comparer function that sorts by UID.
 
-### 6.3 Objects
+### 7.3 Objects (advanced)
 
 ---
 
@@ -746,6 +989,16 @@ Implementation details:
   - `start=True` makes the start exclusive
 - `Range(x)` where `x` is a number makes a single-value range.
 - `Range(start, end)` where both are numbers creates an inclusive numeric range.
+
+Examples:
+
+```text
+search: R('10-12')
+```
+
+```text
+search: R(10, 12)
+```
 
 ---
 
@@ -773,7 +1026,7 @@ Usage:
 
 - `Regex(pattern)`
 
-Parses a regex pattern and returns a regex object to be used in other functions. If you have no idea what this is, you probably don't need it.
+Parses a regex pattern and returns a regex object to be used in other functions. If you have no idea what that means, you probably don't need it.
 
 Implementation note:
 
@@ -832,11 +1085,7 @@ Usage:
 
 - `InvalidRange()`
 
-Returns an invalid range.
-
-Implementation note:
-
-- Help text mentions a `',' wildcard` but the actual parser uses `'?'` to represent invalid ranges.
+Equivalent to the `'?'` wildcard. Matches nothing.
 
 ---
 
@@ -922,15 +1171,13 @@ It returns the custom chart’s last-modified time.
 
 ---
 
-### 6.4 Variables
+### 7.4 Variables (VERY advanced)
 
 Variable tags let you keep state across songs or within a song evaluation.
 
 When the search text changes and advanced search re-initializes, all variables all cleared.
 
 Local variables persist for the current song, global variables persist for the current search.
-
-So variables are not persisted across separate searches.
 
 #### `DefineVar`/`DV`
 
@@ -998,7 +1245,7 @@ Creates or overwrites a global variable value.
 
 ---
 
-### 6.5 Control-flow / debugging
+### 7.5 Control-flow / debugging (VERY advanced)
 
 #### `Exit`
 
@@ -1070,28 +1317,9 @@ So `RunOnce(...)` is best used for side effects (warming caches, precomputations
 
 ---
 
-#### `Help`
+## 8) Advanced Features
 
-- `Help("TagName")` prints the built-in help text for the given tag.
-
----
-
-## 7) Advanced Features
-
-### 7.1 Custom sorting comparers (your own `lambda A, B: ...`)
-
-You can pass any callable into `Sorter(...)` as long as it matches the comparer contract:
-
-- takes exactly 2 args (`A`, `B`) where both are `MusicInfo`
-- returns an `int` comparison result
-
-example, sort by UID:
-
-```text
-search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
-```
-
-### 7.2 The `Scripts/` directory (user-defined tags)
+### 8.1 The `Scripts/` directory (user-defined tags)
 
 User scripts live in a folder created automatically at:
 
@@ -1140,14 +1368,16 @@ The script file name must be a valid Python identifier.
 
 Reserved keywords (like `and`, `def`, `class`, `return`, etc.) are not allowed as script/tag names.
 
----
+### 8.2 Custom sorting comparers (your own `lambda A, B: ...`)
 
-### 7.3 Expressions + aliases from settings
+You can pass any callable into `Sorter(...)` as long as it matches the comparer contract:
 
-In addition to `.py` scripts, the mod can compile expression shorthands and aliases from preferences:
+- takes exactly 2 args (`A`, `B`) where both are `MusicInfo`
+- returns an `int` comparison result
 
-- `Expressions`: registers compiled expression as a callable script with `()`
-- `TagAliases`: remaps keywords to other expressions/keywords
+example, sort by UID:
 
----
+```text
+search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
+```
 

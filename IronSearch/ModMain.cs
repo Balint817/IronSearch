@@ -589,7 +589,7 @@ namespace IronSearch
             RegisterHelp(new() { "InvalidRange", "IR" },
                 "Usage: InvalidRange()\n\n"
                 + "Returns an invalid range, which matches nothing.\n"
-                + "Equivalent to the '?' wildcard. Just like the ',' wildcard, not useable everywhere."
+                + "Equivalent to the '?' wildcard. Just like the '?' wildcard, not useable everywhere."
             );
 
             RegisterObject("MultiRange", BuiltIns.EvalMultiRange);
