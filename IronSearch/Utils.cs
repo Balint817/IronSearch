@@ -957,7 +957,6 @@ namespace IronSearch
                 cam = canvas.worldCamera;
 
             var sc = RectTransformUtility.WorldToScreenPoint(cam, finalWorld);
-            Console.WriteLine(sc);
             return sc;
         }
 
@@ -982,7 +981,6 @@ namespace IronSearch
                 cam = canvas.worldCamera;
 
             var sc = RectTransformUtility.WorldToScreenPoint(cam, bottomLeft);
-            Console.WriteLine(sc);
             return sc;
         }
 
