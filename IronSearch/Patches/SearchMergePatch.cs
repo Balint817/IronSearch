@@ -33,7 +33,7 @@ namespace IronSearch.Patches
                 _langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
                 _randomDictionary.Clear();
 
-                if (SearchPatch.searchCache.TryGetValue(SearchPatch.currentSearchText!, out var cache))
+                if (SearchPatch.searchCache.TryGetValue(SearchPatch.currentSearchText!, out var cache) && !(cache.Expiration is { } exp && exp < DateTime.UtcNow))
                 {
                     if (!cache.ShouldSort)
                     {
@@ -127,10 +127,9 @@ namespace IronSearch.Patches
                         __instance.m_LevelDesignerResult.m_Unlock = m_Unlock.ToIL2CPP();
 
 
-                        if (ModMain.EnableSearchCaching)
-                        {
-                            SearchPatch.searchCache.TryAdd(SearchPatch.currentSearchText!, new SearchCache(m_lock, m_Unlock, true));
-                        }
+                        DateTime? expirationTime = ModMain.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(ModMain.MiniCacheTimeout);
+
+                        SearchPatch.searchCache.TryAdd(SearchPatch.currentSearchText!, new SearchCache(m_lock, m_Unlock, true, expirationTime));
                     }
                     catch (Exception ex)
                     {
@@ -143,15 +142,15 @@ namespace IronSearch.Patches
                 }
                 else
                 {
-                    if (ModMain.EnableSearchCaching)
-                    {
-                        SearchPatch.searchCache.TryAdd(SearchPatch.currentSearchText!,
-                            new SearchCache(
-                                __instance.m_LevelDesignerResult.m_Lock.ToSystem(),
-                                __instance.m_LevelDesignerResult.m_Unlock.ToSystem(),
-                                false
-                                ));
-                    }
+                    DateTime? expirationTime = ModMain.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(ModMain.MiniCacheTimeout);
+
+                    SearchPatch.searchCache.TryAdd(SearchPatch.currentSearchText!,
+                        new SearchCache(
+                            __instance.m_LevelDesignerResult.m_Lock.ToSystem(),
+                            __instance.m_LevelDesignerResult.m_Unlock.ToSystem(),
+                            false,
+                            expirationTime
+                            ));
                 }
 
                 

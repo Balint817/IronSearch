@@ -158,7 +158,7 @@ namespace IronSearch.Patches
 
             SearchPatch.isAdvancedSearch = true;
 
-            if (SearchPatch.searchCache.TryGetValue(SearchPatch.currentSearchText, out var cache))
+            if (SearchPatch.searchCache.TryGetValue(SearchPatch.currentSearchText, out var cache) && !(cache.Expiration is { } exp && exp < DateTime.UtcNow))
             {
                 SearchPatch.currentCache = cache;
             }

@@ -81,7 +81,7 @@ namespace IronSearch
 
         internal static MelonPreferences_Entry<bool> enableHQSpamEntry = null!; // validated
 
-        internal static MelonPreferences_Entry<bool> enableSearchCachingEntry = null!; // validated
+        internal static MelonPreferences_Entry<bool> enablePersistentSearchCachingEntry = null!; // validated
 
         internal static MelonPreferences_Entry<string> startSearchStringEntry = null!; // validated
         internal static string StartString
@@ -98,11 +98,11 @@ namespace IronSearch
                 return enableHQSpamEntry.Value;
             }
         }
-        internal static bool EnableSearchCaching
+        internal static bool EnablePersistentSearchCaching
         {
             get
             {
-                return enableSearchCachingEntry.Value;
+                return enablePersistentSearchCachingEntry.Value;
             }
         }
         internal static Dictionary<string,string> Aliases
@@ -258,7 +258,7 @@ namespace IronSearch
             category.SetFilePath("UserData/IronSearch.cfg");
 
             enableHQSpamEntry = category.CreateEntry<bool>("EnableHQSpam", false, "EnableHQSpam", "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.", validator: Validator(false));
-            enableSearchCachingEntry = category.CreateEntry<bool>("EnableSearchCaching", true, "EnableSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.", validator: Validator(false));
+            enablePersistentSearchCachingEntry = category.CreateEntry<bool>("EnablePersistentSearchCaching", true, "EnablePersistentSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.", validator: Validator(false));
             var defaultMult = 2.5;
             waitMultiplierEntry = category.CreateEntry<double>("WaitMultiplier", defaultMult, "WaitMultiplier", "\nIncreases the amount of time that must pass after search text changes before the search is refreshed.\nThe multiplier affects ONLY advanced searches, normal searches are unaffected.", validator: new WaitMultiplierValidator(defaultMult));
             startSearchStringEntry = category.CreateEntry<string>("StartSearchText", "search:", "StartSearchText", "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.", validator: Validator("search:"));
@@ -277,10 +277,6 @@ namespace IronSearch
             LoadUserScripts();
             _initStepTracker = null;
         }
-        //TODO: fuzzy search (possibly via regex?)
-        //TODO: add another version of search cache with a life-time of 0.25 seconds.
-        //This would be used for caching search results even when EnableSearchCaching is false, but the cache would only last for 0.25 seconds,
-        //so it wouldn't cause any issues with side-effect scripts, while still improving performance.
 
 
         const string scriptFolderName = "Scripts";
@@ -907,6 +903,8 @@ namespace IronSearch
         }
 
         static readonly Dictionary<string, Script> LoadedExpressions = new();
+        internal const double MiniCacheTimeout = 0.25;
+
         private static void LoadExpressions()
         {
             try

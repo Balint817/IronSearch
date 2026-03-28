@@ -8,9 +8,11 @@ namespace IronSearch.Patches
         public readonly Dictionary<string, int> Unlock = new();
         public readonly HashSet<string> PassingUids = new();
         public readonly bool ShouldSort;
+        public readonly DateTime? Expiration;
 
-        public SearchCache(IList<MusicInfo> mLock, IList<MusicInfo> mUnlock, bool sort)
+        public SearchCache(IList<MusicInfo> mLock, IList<MusicInfo> mUnlock, bool sort, DateTime? expiration = null)
         {
+            Expiration = expiration;
             ShouldSort = sort;
             for (int i = 0; i < mLock.Count; i++)
             {
