@@ -1,7 +1,7 @@
 # IronSearch Advanced Search Guide
 
 This is the documentation for the "advanced search" features implemented by IronSearch.\
-For example, functions like `BPM('160-200')`. The DSL is powered by the **IronPython** engine.
+For example, functions like `BPM('160-200')`.
 
 **Practical tip:** Typing long queries in-game may get tedious.\
 It's a good idea to put longer queries into an 'Expression' to re-use later.
@@ -26,7 +26,7 @@ It's a good idea to put longer queries into an 'Expression' to re-use later.
 
 Your search text must start with the configured prefix (default: `search:`). The mod then removes the prefix and uses the remaining text as your search expression.
 
-Example (default settings):
+Example (using default settings):
 
 ```text
 search: BPM('160-200') and Length('180+')
@@ -34,11 +34,13 @@ search: BPM('160-200') and Length('180+')
 
 (This example will search for songs that have a BPM between 160 and 200, and are longer than 180 seconds)
 
+> **GIF:** 'Hook' to quickly showcase the mod and get the user to read further.
+
 ### Basic boolean logic
 
 Use boolean operators:
 
-- `and`, `or`, `not`
+- `and`, `or`, `not` (must be lowercase)
 - parentheses for grouping
 
 Example:
@@ -84,29 +86,9 @@ The above matches songs that have all-perfect on the highest map (probably what 
 search: AP
 ```
 
-The above returns the function itself, which is always "truthy", so it matches everything.
+If you forget the parentheses, the engine thinks you are just naming the command instead of actually running it, so it accidentally matches everything.
 
 > **GIF:** Optional—show a wrong query (`AP` vs `AP()`) and the result count difference.
-
-### The implicit current-song object: `M`
-
-During evaluation, the expression has a parameter `M` which contains the objects related to the current search:
-- `M.I`, the underlying `MusicInfo`
-- `M.PS`, the PeroString object of the current search (if you have no idea what that means, you probably don't need it)
-- `M.<name>`, is a shorter way to access `M.I.<name>`
-
-Examples:
-
-- `M.uid`, `M.name`, `M.author`, `M.scene`, etc.
-
-Example filter using `M` directly:
-
-```text
-search: Custom() and 'banana' in M.author
-```
-
-Custom charts whose author string contains `banana` (case-sensitive).\
-For this example, you can use `Author('banana')` instead; `M` is for checks or logic that do not yet have a dedicated tag.
 
 ### Keyword arguments
 
@@ -308,8 +290,10 @@ You can provide built-in comparer key functions:
 Example:
 
 ```text
-search: Sorter(ByLength()) and Custom()
+search: Custom() and Sort(ByLength())
 ```
+
+> **GIF:** Show Custom filtering the selection, the Sort sorting the results.
 
 ### Multiple comparers
 
@@ -827,10 +811,10 @@ Checks if the music has a "music tag" whose text matches the provided string/reg
 Example:
 
 ```text
-search: Tag('OST')
+search: Tag('anime')
 ```
 
-Matches songs that have a search tag that contains `OST`.
+Matches songs that have a search tag that contains `anime`.
 
 ---
 
@@ -1319,7 +1303,27 @@ So `RunOnce(...)` is best used for side effects (warming caches, precomputations
 
 ## 8) Advanced Features
 
-### 8.1 The `Scripts/` directory (user-defined tags)
+### 8.1 The implicit current-song object: `M`
+
+During evaluation, the expression has a parameter `M` which contains the objects related to the current search:
+- `M.I`, the underlying `MusicInfo`
+- `M.PS`, the PeroString object of the current search (if you have no idea what that means, you probably don't need it)
+- `M.<name>`, is a shorter way to access `M.I.<name>`
+
+Examples:
+
+- `M.uid`, `M.name`, `M.author`, `M.scene`, etc.
+
+Example filter using `M` directly:
+
+```text
+search: Custom() and 'banana' in M.author
+```
+
+Custom charts whose author string contains `banana` (case-sensitive).\
+For this example, you can use `Author('banana')` instead; `M` is for checks or logic that do not yet have a dedicated tag.
+
+### 8.2 The `Scripts/` directory (user-defined tags)
 
 User scripts live in a folder created automatically at:
 
@@ -1368,7 +1372,7 @@ The script file name must be a valid Python identifier.
 
 Reserved keywords (like `and`, `def`, `class`, `return`, etc.) are not allowed as script/tag names.
 
-### 8.2 Custom sorting comparers (your own `lambda A, B: ...`)
+### 8.3 Custom sorting comparers (your own `lambda A, B: ...`)
 
 You can pass any callable into `Sorter(...)` as long as it matches the comparer contract:
 
@@ -1381,3 +1385,26 @@ example, sort by UID:
 search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
 ```
 
+## 9) Example cookbook
+
+Short patterns you can copy, then edit. Prefix is assumed to be present.
+
+| Goal | Expression |
+|------|----------------|
+| Customs only | `Custom()` |
+| Official charts only | `not Custom()` |
+| Folder customs | `Custom() and not Packed()` |
+| Has hidden or touhou| `Hidden() or Touhou()` |
+| Never played (any diff) | `Unplayed()` |
+| Never played on top chart | `Unplayed('?')` |
+| FC on top chart | `FullCombo('?')` |
+| Streamer-safe only | `Streamer()` |
+| Recently added | `Modified('7d')` |
+| Text search | `Any('text')` |
+| High intensity | `BPM('180+') and Length("120+")` |
+| Challenge | `Difficulty('11+', '?') and Unplayed('?')` |
+| Non-website customs | `Custom() and not Online()` |
+| Favorites, shuffled | `Sort(ByRandom()) and Favorite()` |
+| Oldest customs | `Sort(ByModified()) and Custom()` |
+
+Final Pro-Tip: If you find yourself using one of these constantly, consider adding it to your Expressions in IronSearch.cfg config so you can just type that instead!
