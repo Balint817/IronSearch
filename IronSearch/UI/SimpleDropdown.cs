@@ -43,10 +43,9 @@ public class SimpleDropdown : MonoBehaviour
 
         if (topLeft is not { } v)
         {
-            v = new((Screen.width / 2f) - width, (Screen.height / 2f) - Height);
+            v = new((Screen.width / 2f) - width/2, (Screen.height / 2f) + Height/2);
         }
-        v.x += width / 2;
-        v.y += Height / 2;
+        v.y -= Height;
 
         // Center screen
         windowRect = new Rect(
