@@ -990,6 +990,17 @@ namespace IronSearch
             {
                 return false;
             }
+            if (s.EndsWith("+"))
+            {
+                if (!TryTimeStringToTimeSpan(s[..^1], out var ts))
+                {
+                    return false;
+                }
+                var secs = ts.TotalSeconds;
+                r = new Range(secs - 0.5, double.PositiveInfinity);
+                return true;
+            }
+
             var split = s.Split('-');
             if (split.Length == 1)
             {
@@ -1011,7 +1022,15 @@ namespace IronSearch
                     return false;
                 }
                 var start = ts.TotalSeconds;
-                if (!TryTimeStringToTimeSpan(split[0], out ts))
+                if (split[1].Length == 0)
+                {
+                    r = new Range(double.NegativeInfinity, start+0.5)
+                    {
+                        ExclusiveEnd = true
+                    };
+                    return true;
+                }
+                if (!TryTimeStringToTimeSpan(split[1], out ts))
                 {
                     return false;
                 }
