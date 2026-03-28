@@ -122,51 +122,38 @@ namespace IronSearch.Patches
             }
             return musicInfo1.GetLocal(_langIndex).name.CompareTo(musicInfo2.GetLocal(_langIndex).name);
         }
-        internal static int SortByAccuracy(MusicInfo musicInfo1, MusicInfo musicInfo2)
+
+        internal static int SortByAccuracy(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
-            {
                 throw new SearchCallNotAllowed("ByAccuracy()()");
-            }
-            var hasMaps1 = Utils.GetAvailableMaps(musicInfo1, out var availableMaps1);
-            var hasMaps2 = Utils.GetAvailableMaps(musicInfo2, out var availableMaps2);
 
-            if (!hasMaps1)
+            var acc1 = GetMaxAccuracy(m1);
+            var acc2 = GetMaxAccuracy(m2);
+
+            return acc1.CompareTo(acc2);
+        }
+
+        private static float GetMaxAccuracy(MusicInfo musicInfo)
+        {
+            if (!Utils.GetAvailableMaps(musicInfo, out var maps))
+                return float.MinValue;
+
+            float max = float.MinValue;
+
+            foreach (var map in maps)
             {
-                if (!hasMaps2)
-                {
-                    return 0;
-                }
-                return -1;
-            }
-            else if (!hasMaps2)
-            {
-                return 1;
+                string uid = musicInfo.uid + "_" + map;
+
+                var score = RefreshPatch.highScores
+                    .Where(x => x.Uid == uid)
+                    .MaxByOrDefault(x => x.Accuracy, null);
+
+                if (score != null && score.Accuracy > max)
+                    max = score.Accuracy;
             }
 
-            foreach (var i in availableMaps1.Intersect(availableMaps2).OrderByDescending(x => x))
-            {
-                string s1 = musicInfo1.uid + "_" + i;
-                string s2 = musicInfo2.uid + "_" + i;
-                var score1 = RefreshPatch.highScores.Where(x => x.Uid == s1).MaxByOrDefault(x => x.Accuracy, null);
-                if (score1 == null)
-                {
-                    continue;
-                }
-                var score2 = RefreshPatch.highScores.Where(x => x.Uid == s1).MaxByOrDefault(x => x.Accuracy, null);
-                if (score2 == null)
-                {
-                    continue;
-                }
-                var acc1 = score1.Accuracy;
-                var acc2 = score2.Accuracy;
-                int result = acc1.CompareTo(acc2);
-                if (result != 0)
-                {
-                    return result;
-                }
-            }
-            return 0;
+            return max;
         }
 
         public static int SortByBPM(MusicInfo musicInfo1, MusicInfo musicInfo2)
@@ -277,48 +264,32 @@ namespace IronSearch.Patches
             return length1.CompareTo(length2);
 
         }
-        public static int SortByDifficulty(MusicInfo musicInfo1, MusicInfo musicInfo2)
+        public static int SortByDifficulty(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
-            {
                 throw new SearchCallNotAllowed("ByDifficulty()()");
-            }
-            var hasMaps1 = Utils.GetAvailableMaps(musicInfo1, out var availableMaps1);
-            var hasMaps2 = Utils.GetAvailableMaps(musicInfo2, out var availableMaps2);
 
-            if (!hasMaps1)
+            var max1 = GetMaxDifficulty(m1);
+            var max2 = GetMaxDifficulty(m2);
+
+            return max1.CompareTo(max2);
+        }
+
+        private static int GetMaxDifficulty(MusicInfo musicInfo)
+        {
+            if (!Utils.GetAvailableMaps(musicInfo, out var maps))
+                return int.MinValue;
+
+            int max = int.MinValue;
+
+            foreach (var map in maps)
             {
-                if (!hasMaps2)
-                {
-                    return 0;
-                }
-                return -1;
-            }
-            else if (!hasMaps2)
-            {
-                return 1;
+                var str = musicInfo.GetMusicLevelStringByDiff(map, false);
+                if (Utils.TryParseInt(str, out var val) && val > max)
+                    max = val;
             }
 
-            var difficulties1 = availableMaps1.Select(x => musicInfo1.GetMusicLevelStringByDiff(x, false)).Where(x => x.TryParseInt(out var t)).Select(x => int.Parse(x)).ToArray();
-            var difficulties2 = availableMaps2.Select(x => musicInfo2.GetMusicLevelStringByDiff(x, false)).Where(x => x.TryParseInt(out var t)).Select(x => int.Parse(x)).ToArray();
-
-            if (!difficulties1.Any())
-            {
-                if (!difficulties2.Any())
-                {
-                    return 0;
-                }
-                return -1;
-            }
-            else if (!difficulties2.Any())
-            {
-                return 1;
-            }
-            var result = difficulties1.OrderByDescending(x => x).Zip(difficulties2.OrderByDescending(x => x), (x, y) => x.CompareTo(y)).FirstOrDefault(x => x != 0);
-
-            return result == 0
-                ? difficulties1.Length.CompareTo(difficulties2.Length)
-                : result;
+            return max;
         }
 
         internal static List<SorterInfo> _activeSorters = new();
