@@ -1,4 +1,5 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Compression;
 using System.Net;
@@ -8,6 +9,7 @@ using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
 using Il2CppPeroTools2.PeroString;
 using IronPython.Runtime;
@@ -16,12 +18,11 @@ using IronSearch.Tags;
 using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using UnityEngine.UI;
+using PythonExpressionManager;
 using UnityEngine;
+using UnityEngine.UI;
 using ArgumentException = System.ArgumentException;
 using Range = IronSearch.Records.Range;
-using PythonExpressionManager;
-using System.Diagnostics.CodeAnalysis;
 
 namespace IronSearch
 {
@@ -975,27 +976,76 @@ namespace IronSearch
         {
             return new StackTrace(true).ToString();
         }
-
         public static Vector2 GetCaretVectorPosition(this InputField inputField)
         {
-            Text text = inputField.textComponent;
-            int caretIndex = inputField.caretPosition;
+            if (inputField == null || inputField.textComponent == null)
+                return GetFallback(inputField);
 
+            var text = inputField.textComponent;
             var gen = text.cachedTextGenerator;
-            if (gen.characterCount == 0)
+
+            float x;
+
+            if (gen != null && gen.characterCountVisible > 0 && inputField.caretPosition > 0)
+            {
+                int index = Mathf.Clamp(inputField.caretPosition - 1, 0, gen.characterCountVisible - 1);
+                var ch = gen.characters[index];
+
+                x = ch.cursorPos.x + ch.charWidth;
+            }
+            else
+            {
+                x = 0f;
+            }
+
+            // Convert X from local text space → world
+            Vector3 worldX = text.rectTransform.TransformPoint(new Vector3(x, 0f, 0f));
+
+            // Get bottom-left of input field (for Y)
+            RectTransform rt = inputField.GetComponent<RectTransform>();
+            Vector3[] corners = new Vector3[4];
+            rt.GetWorldCorners(corners);
+
+            Vector3 bottomLeft = corners[0];
+
+            // Combine X from caret + Y from input field bottom
+            Vector3 finalWorld = new Vector3(worldX.x, bottomLeft.y, 0f);
+
+            // Camera handling
+            Canvas canvas = text.canvas;
+            Camera cam = null;
+
+            if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                cam = canvas.worldCamera;
+
+            var sc = RectTransformUtility.WorldToScreenPoint(cam, finalWorld);
+            Console.WriteLine(sc);
+            return sc;
+        }
+
+        private static Vector2 GetFallback(InputField inputField)
+        {
+            if (inputField == null)
                 return Vector2.zero;
 
-            caretIndex = Mathf.Clamp(caretIndex, 0, gen.characterCount - 1);
+            RectTransform rt = inputField.GetComponent<RectTransform>();
+            if (rt == null)
+                return Vector2.zero;
 
-            UICharInfo charInfo = gen.characters[caretIndex];
+            Vector3[] corners = new Vector3[4];
+            rt.GetWorldCorners(corners);
 
-            Vector2 pos = charInfo.cursorPos;
+            Vector3 bottomLeft = corners[0];
 
-            Vector3 worldPos = text.transform.TransformPoint(pos);
+            Canvas canvas = inputField.GetComponentInParent<Canvas>();
+            Camera cam = null;
 
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, worldPos);
+            if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                cam = canvas.worldCamera;
 
-            return screenPos;
+            var sc = RectTransformUtility.WorldToScreenPoint(cam, bottomLeft);
+            Console.WriteLine(sc);
+            return sc;
         }
 
         public static bool TryTimeStringRangeToTimeRange(this string s, [MaybeNullWhen(false)]out Range r)
