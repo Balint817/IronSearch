@@ -16,6 +16,8 @@ public class SimpleDropdown : MonoBehaviour
     private const float width = 200f;
     private const float itemHeight = 28f;
     private const int visibleItems = 4;
+    private int windowId;
+    private GUIStyle labelStyle;
 
     private float Height => itemHeight * visibleItems + 10f;
 
@@ -27,6 +29,11 @@ public class SimpleDropdown : MonoBehaviour
         dropdown.Init(items, onSelected, topLeft);
 
         return dropdown;
+    }
+
+    public void Awake()
+    {
+        windowId = GetInstanceID();
     }
 
     private void Init(IEnumerable<string> items, Action<string, int> onSelected, Vector2? topLeft = null)
@@ -138,7 +145,7 @@ public class SimpleDropdown : MonoBehaviour
         //GUI.color = Color.white;
 
         var t = DrawWindow;
-        windowRect = GUI.Window(123456, windowRect, t, "");
+        windowRect = GUI.Window(windowId, windowRect, t, "");
     }
 
     private void DrawWindow(int id)
@@ -164,12 +171,14 @@ public class SimpleDropdown : MonoBehaviour
 
             GUI.color = Color.white;
 
-            // label
-            GUI.Label(rect, items[i], new GUIStyle(GUI.skin.label)
+
+            labelStyle ??= new GUIStyle(GUI.skin.label)
             {
                 alignment = TextAnchor.MiddleLeft,
                 padding = new RectOffset(8, 0, 0, 0)
-            });
+            };
+            // label
+            GUI.Label(rect, items[i], labelStyle);
 
             // click
             if (GUI.Button(rect, GUIContent.none, GUIStyle.none))
