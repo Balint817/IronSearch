@@ -267,7 +267,7 @@ All of the following must be true:
 | **Tab** again (or **click** a row) | Replaces the partial text with the selected auto-complete keyword. |
 | **Left** / **Right** arrow (or continue typing) | Close the list **without** inserting. |
 
-> **GIF:** Cursor after `search:`, press Tab, scroll with arrows, pick `BPM()`, show `search: BPM()` with caret placement.
+![Quick search demo using autocomplete](/Resources/autocomplete.gif)
 
 ---
 
