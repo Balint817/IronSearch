@@ -17,6 +17,10 @@ namespace IronSearch.Tags
         {
             return (EvalTag(musicInfo, re) || EvalTitle(musicInfo, re) || EvalAuthor(musicInfo, re) || EvalDesigner(musicInfo, re) || EvalAlbum(musicInfo, re));
         }
+        internal static bool EvalAny(MusicInfo musicInfo, FuzzyContains fc)
+        {
+            return (EvalTag(musicInfo, fc) || EvalTitle(musicInfo, fc) || EvalAuthor(musicInfo, fc) || EvalDesigner(musicInfo, fc) || EvalAlbum(musicInfo, fc));
+        }
         internal static bool EvalAny(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotMatching(varArgs, 1);
@@ -27,10 +31,10 @@ namespace IronSearch.Tags
                     return EvalAny(M.PS, M.I, s);
                 case Regex re:
                     return EvalAny(M.I, re);
-                default:
-                    break;
+                case FuzzyContains fc:
+                    return EvalAny(M.I, fc);
             }
-            throw new SearchWrongTypeException("a string or regular expression for the combined search", varArgs[0]?.GetType(), "Any()");
+            throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), "Any()");
         }
     }
 }

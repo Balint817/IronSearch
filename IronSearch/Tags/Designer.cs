@@ -46,6 +46,25 @@ namespace IronSearch.Tags
             return false;
         }
 
+        internal static bool EvalDesigner(MusicInfo musicInfo, FuzzyContains fc)
+        {
+            if (fc.IsMatch(musicInfo.levelDesigner ?? ""))
+            {
+                return true;
+            }
+
+            Utils.GetAvailableMaps(musicInfo, out var availableMaps);
+            foreach (var i in availableMaps)
+            {
+                if (fc.IsMatch(musicInfo.GetLevelDesignerStringByIndex(i) ?? ""))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         internal static bool EvalDesigner(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotMatching(varArgs, 1);
@@ -57,11 +76,11 @@ namespace IronSearch.Tags
                     return EvalDesigner(M.I, re);
                 case string s:
                     return EvalDesigner(M.PS, M.I, s);
-                default:
-                    break;
+                case FuzzyContains fc:
+                    return EvalDesigner(M.I, fc);
             }
 
-            throw new SearchWrongTypeException("a string or regular expression for the designer name", varArgs[0]?.GetType(), "Designer()");
+            throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), "Designer()");
         }
     }
 }

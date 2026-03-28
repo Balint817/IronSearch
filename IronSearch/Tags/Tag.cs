@@ -53,6 +53,27 @@ namespace IronSearch.Tags
             }
             return false;
         }
+        internal static bool EvalTag(MusicInfo musicInfo, FuzzyContains fc)
+        {
+            var uidToInfo = Singleton<ConfigManager>.instance
+                .GetConfigObject<DBConfigMusicSearchTag>(0).m_Dictionary;
+
+            if (uidToInfo.ContainsKey(musicInfo.uid))
+            {
+                var tags = uidToInfo[musicInfo.uid]?.tag;
+                if (tags != null)
+                {
+                    foreach (var tag in tags)
+                    {
+                        if (fc.IsMatch(tag ?? ""))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
 
         internal static bool EvalTag(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
@@ -63,13 +84,13 @@ namespace IronSearch.Tags
             {
                 case Regex re:
                     return EvalTag(M.I, re);
+                case FuzzyContains fc:
+                    return EvalTag(M.I, fc);
                 case string s:
                     return EvalTag(M.PS, M.I, s);
-                default:
-                    break;
             }
 
-            throw new SearchWrongTypeException("a string or regular expression for the tag text", varArgs[0]?.GetType(), "Tag()");
+            throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), "Tag()");
         }
     }
 }

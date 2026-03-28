@@ -581,6 +581,13 @@ namespace IronSearch
                 + "Returns a full multi-range, which matches everything. Equivalent to the wildcard '*'"
             );
 
+            RegisterObject("Fuzzy", BuiltIns.EvalFuzzy);
+            RegisterObject("F", BuiltIns.EvalFuzzy);
+            RegisterHelp(new() { "Fuzzy", "F" },
+                "Usage: Fuzzy(pattern, case=true/false) or Fuzzy(pattern, text, case=true/false)\n\n"
+                + "The first usage returns an object which can be used to fuzzy-match text, while the latter instantly fuzzy-matches the provided text."
+            );
+
             RegisterObject("GetBPM", BuiltIns.EvalGetBPM);
             RegisterHelp(new() { "GetBPM" },
                 "Usage: GetBPM()\n\n"

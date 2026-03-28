@@ -7,26 +7,15 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        static readonly Range evalRegexArgCount = new(1, 2);
-        internal static dynamic EvalRegex(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
+        static readonly Range evalFuzzyArgCount = new(1, 2);
+        internal static dynamic EvalFuzzy(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            var flags = RegexOptions.CultureInvariant
-                | RegexOptions.IgnoreCase;
-            ThrowIfNotMatching(varArgs, evalRegexArgCount);
-
+            bool caseSensitive = true;
             if (varKwargs.ContainsKey("case"))
             {
                 if (varKwargs["case"] is bool b)
                 {
-                    if (b)
-                    {
-                        //default behavior
-                        flags &= ~RegexOptions.IgnoreCase;
-                    }
-                    else
-                    {
-                        //flags |= RegexOptions.IgnoreCase;
-                    }
+                    caseSensitive = b;
                 }
                 else
                 {
@@ -36,22 +25,31 @@ namespace IronSearch.Tags
             }
 
             ThrowIfNotEmpty(varKwargs);
+            ThrowIfEmpty(varArgs);
+
+            if (varArgs[^1] is bool b2)
+            {
+                caseSensitive = b2;
+                varArgs = varArgs[..^1];
+            }
+
+            ThrowIfNotMatching(varArgs, evalFuzzyArgCount);
 
             if (varArgs.Length == 1)
             {
                 if (varArgs[0] is string s)
                 {
-                    return new Regex(s, flags);
+                    return new FuzzyContains(s, caseInsensitive: !caseSensitive);
                 }
             }
             else
             {
                 if (varArgs[0] is string s0 && varArgs[1] is string s1)
                 {
-                    return Regex.IsMatch(s1, s0, flags);
+                    return new FuzzyContains(s0, caseInsensitive: !caseSensitive).IsMatch(s1);
                 }
             }
-            throw new SearchValidationException("Regex() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex()");
+            throw new SearchValidationException("Fuzzy() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex()");
         }
     }
 }

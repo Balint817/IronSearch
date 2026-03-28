@@ -72,6 +72,38 @@ namespace IronSearch.Tags
         }
 
 
+
+
+
+        internal static bool EvalTitle(MusicInfo musicInfo, FuzzyContains fc)
+        {
+
+            if (fc.IsMatch(musicInfo.name ?? ""))
+            {
+                return true;
+            }
+
+            if (EvalCustom(musicInfo) && EvalTitleCustom(fc, musicInfo))
+            {
+                return true;
+            }
+
+            for (int i = 1; i <= 5; i++)
+            {
+                if (fc.IsMatch(musicInfo.GetLocal(i).name ?? ""))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        internal static bool EvalTitleCustom(FuzzyContains fc, MusicInfo musicInfo)
+        {
+            return fc.IsMatch(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Info.NameRomanized ?? "");
+        }
+
+
         internal static bool EvalTitle(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotMatching(varArgs, 1);
@@ -80,12 +112,12 @@ namespace IronSearch.Tags
             {
                 case Regex re:
                     return EvalTitle(M.I, re);
+                case FuzzyContains fc:
+                    return EvalTitle(M.I, fc);
                 case string s:
                     return EvalTitle(M.PS, M.I, s);
-                default:
-                    break;
             }
-            throw new SearchWrongTypeException("a string or regular expression for the title", varArgs[0]?.GetType(), "Title()");
+            throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), "Title()");
         }
     }
 }

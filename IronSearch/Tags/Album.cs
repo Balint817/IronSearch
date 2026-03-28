@@ -33,6 +33,18 @@ namespace IronSearch.Tags
             }
             return albumNames.Any(x => value.IsMatch(x));
         }
+        internal static bool EvalAlbum(MusicInfo musicInfo, FuzzyContains value)
+        {
+            if (value is null)
+            {
+                throw new SearchValidationException("Album filter cannot be empty.", "Album()");
+            }
+            if (!BuiltIns.albumNameLists.TryGetValue(musicInfo.m_MusicExInfo.m_AlbumUidIndex, out var albumNames))
+            {
+                return false;
+            }
+            return albumNames.Any(x => value.IsMatch(x));
+        }
 
         internal static bool EvalAlbum(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
@@ -44,10 +56,10 @@ namespace IronSearch.Tags
                     return EvalAlbum(M.I, M.PS, s);
                 case Regex r:
                     return EvalAlbum(M.I, r);
-                default:
-                    break;
+                case FuzzyContains fc:
+                    return EvalAlbum(M.I, fc);
             }
-            return false;
+            throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), "Album()");
         }
     }
 }

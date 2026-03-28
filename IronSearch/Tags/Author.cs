@@ -43,6 +43,23 @@ namespace IronSearch.Tags
 
             return false;
         }
+        internal static bool EvalAuthor(MusicInfo musicInfo, FuzzyContains fc)
+        {
+            if (fc.IsMatch(musicInfo.author ?? ""))
+            {
+                return true;
+            }
+
+            for (int i = 1; i <= 5; i++)
+            {
+                if (fc.IsMatch(musicInfo.GetLocal(i).author ?? ""))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
         internal static bool EvalAuthor(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
@@ -55,11 +72,11 @@ namespace IronSearch.Tags
                     return EvalAuthor(M.I, re);
                 case string s:
                     return EvalAuthor(M.PS, M.I, s);
-                default:
-                    break;
+                case FuzzyContains fc:
+                    return EvalAuthor(M.I, fc);
             }
 
-            throw new SearchWrongTypeException("a string or regular expression for the author", varArgs[0]?.GetType(), "Author()");
+            throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), "Author()");
         }
     }
 }
