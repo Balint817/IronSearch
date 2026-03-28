@@ -166,6 +166,16 @@ If you set it to an empty string, advanced search is always enabled (NOT recomme
 
 (Personally, I have it set to `::`)
 
+### `EnableSearchCaching` (default: `true`)
+
+Enable to cache search results.
+
+For some reason, the game often refreshes the search results multiple times in a row, refreshes them when you open the search UI (without the search text changing), etc...\
+This can cause a lot of lag if your search expression is complex (and/or has sorting) and has to be re-evaluated multiple times.\
+For this reason, this setting is enabled by default, and it caches the results of searches.
+
+If you plan to use advanced features with side-effects, this may interfere with the expected behavior. Otherwise, it's generally recommended to keep this enabled to avoid random long freezes.
+
 ### `WaitMultiplier` (default: `2.5`)
 
 How much more time to wait before re-loading search results. This only affects advanced search, normal search is unaffected.
