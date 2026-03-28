@@ -261,7 +261,7 @@ namespace IronSearch
             enableSearchCachingEntry = category.CreateEntry<bool>("EnableSearchCaching", true, "EnableSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.", validator: Validator(false));
             var defaultMult = 2.5;
             waitMultiplierEntry = category.CreateEntry<double>("WaitMultiplier", defaultMult, "WaitMultiplier", "\nIncreases the amount of time that must pass after search text changes before the search is refreshed.\nThe multiplier affects ONLY advanced searches, normal searches are unaffected.", validator: new WaitMultiplierValidator(defaultMult));
-            startSearchStringEntry = category.CreateEntry<string>("StartSearchText", "search:", "StartSearchText", "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.", validator: Validator(false));
+            startSearchStringEntry = category.CreateEntry<string>("StartSearchText", "search:", "StartSearchText", "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.", validator: Validator("search:"));
 
             if (startSearchStringEntry.Value == null)
             {
