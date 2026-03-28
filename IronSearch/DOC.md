@@ -9,10 +9,10 @@ It's a good idea to put longer queries into an 'Expression' to re-use later.
 | Section | Contents |
 |---------|----------|
 | [§1 Quick Start](#1-quick-start) | Prefix, first examples, booleans, sorting teaser |
-| [§2 Auto-complete](#2-auto-complete-tab-suggestions) | **Tab** dropdown: when it works, keys, behavior (`AutoCompleteManager.cs`) |
-| [§3 Syntax](#3-syntax) | Truthiness, `M`, keyword args |
-| [§4 Range syntax](#4-range-syntax) | `'10+'`, `'?\|…'`, multi-ranges |
-| [§5 Settings](#5-settings) | `IronSearch.cfg`, aliases, `AutoCompleteItems` |
+| [§2 Syntax](#2-syntax) | Truthiness, `M`, keyword args |
+| [§3 Range syntax](#3-range-syntax) | `'10+'`, `'?\|…'`, multi-ranges |
+| [§4 Settings](#4-settings) | `IronSearch.cfg`, aliases, `AutoCompleteItems` |
+| [§5 Auto-complete](#5-auto-complete-tab-suggestions) | **Tab** dropdown: when it works, keys, behavior (`AutoCompleteManager.cs`) |
 | [§6 Sorting](#6-sorting-guide) | `Sorter(...)` / comparers |
 | [§7 Tag reference](#7-tag-reference) | Full tag list |
 | [§8 Advanced](#8-advanced-features) | Lambdas, `Scripts/`, config hooks |
