@@ -98,7 +98,7 @@ Many tags accept "range strings" (e.g. BPM ranges, difficulty ranges, etc.).
 Notes about `?`:
 
 - By default, `'?'` is an invalid range that **normally matches nothing**.
-- However, several tags interpret `'?'` specially as "select the highest available difficulty/level"
+- However, several tags interpret `'?'` specially as "select the highest available map"
 - Which tags do this is implemented per-tag (see reference below or the Help text).
 
 ### Multi-range strings (OR of multiple ranges)
@@ -258,8 +258,6 @@ Important constraints:
 
 This section documents **every tag** available by default.
 
-If a tag is **not** registered in `ModMain.LoadUserScripts()` (so you may not be able to type it by default), it is explicitly noted.
-
 ### 6.1 Filters (return `True`/`False`)
 
 #### `Any`
@@ -286,15 +284,15 @@ Notes:
 
 Usage:
 
-- `Accuracy(accuracyRange) or Accuracy(accuracyRange, levelRange)`
+- `Accuracy(accuracyRange) or Accuracy(accuracyRange, mapRange)`
 
-Checks if the music has scores in the specified accuracy range, optionally restricting to specific difficulty levels.
+Checks if the music has scores in the specified accuracy range, optionally restricting to specific maps.
 
 Notes:
 
-- Input accuracy is a **percentage** range (e.g. `90-100`), but internally it is converted to `0.90-1.00`.
+- Input accuracy is a **percentage** range (e.g. `90-100`).
 - The accuracy part does **not** allow wildcard `?` in the "accuracyRange" position.
-- If the difficulty/level range is wildcard `?`, the tag selects the **highest available difficulty** among 1–4.
+- If the map range is a wildcard `?`, the tag selects the **highest available difficulty** among 1–4.
 
 ---
 
@@ -354,13 +352,13 @@ Checks if the music’s BPM is within the given BPM range.
 
 Usage:
 
-- `Callback(callbackRange) or Callback(callbackRange, levelRange)`
+- `Callback(callbackRange) or Callback(callbackRange, mapRange)`
 
 Checks if the music has a callback difficulty that matches the provided range.
 
 Notes:
 
-- If `levelRange` is wildcard `?`, it selects the **highest available level**.
+- If `mapRange` is the wildcard `?`, it selects the **highest available map**.
 - Callback difficulty is the "difficulty the game servers use", not the displayed difficulty.
 - Callback difficulty is always an integer; string difficulty like `E` turns into -1.
 
@@ -400,13 +398,13 @@ Checks the chart’s level designer.
 
 Usage:
 
-- `Difficulty(difficultyRange, levelRange)`
+- `Difficulty(difficultyRange, mapRange)`
 
-Checks if the music has a difficulty in the given difficulty range, optionally restricting which levels match.
+Checks if the music has a difficulty in the given difficulty range, optionally restricting which maps match.
 
 Important implementation detail:
 
-- `levelRange` set to `?` means "select the highest available level (highest map index)".
+- `mapRange` set to `?` means "select the highest available map (highest map index)".
 - `difficultyRange` set to wildcard `?` will match non-integer difficulties like `?` or `E`.
 
 ---
@@ -425,13 +423,13 @@ Checks if the music is in your favorites list.
 
 Usage:
 
-- `FullCombo() or FullCombo(levelRange)`
+- `FullCombo() or FullCombo(mapRange)`
 
 Checks full combo status.
 
 Notes:
 
-- If `levelRange='?'`, it selects the highest applicable difficulty.
+- If `mapRange` is `'?'`, it selects the highest applicable difficulty.
 - For non-wildcard ranges, it requires full combo on every selected difficulty.
 
 ---
@@ -623,13 +621,13 @@ Checks if the music’s title matches.
 
 Usage:
 
-- `Unplayed() or Unplayed(levelRange)`
+- `Unplayed() or Unplayed(mapRange)`
 
-Checks whether the music has not been played, or (optionally) not played on specified difficulty levels.
+Checks whether the music has not been played, or (optionally) not played on specified difficulty maps.
 
 Notes:
 
-- Wildcard `levelRange='?'` selects highest applicable difficulty.
+- Wildcard `'?'` as `mapRange` selects highest applicable difficulty.
 
 ---
 
