@@ -371,7 +371,7 @@ namespace IronSearch.UI
         {
             foreach (var item in ModMain.ScriptManager.ScriptExecutor.RegisteredKeys)
             {
-                AllKeywords.Add(item.Key, new($"{item.Key}()", 0));
+                AllKeywords.TryAdd(item.Key, new($"{item.Key}(", 0));
             }
         }
 

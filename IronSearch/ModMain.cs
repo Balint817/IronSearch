@@ -854,7 +854,7 @@ namespace IronSearch
                         var script = ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(LoadExpression(kv.Value)));
                         LoadedExpressions.Add(key, script);
                         ScriptManager.ScriptExecutor.RegisterScript(key, script);
-                        AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
+                        AutoCompleteManager.AllKeywords.TryAdd(key, new($"{key}(", 0));
                     }
                     catch (Exception ex)
                     {
@@ -898,7 +898,7 @@ namespace IronSearch
                         var key = item.Key;
                         var value = item.Value;
                         executor.RegisterAlias(key, value);
-                        AutoCompleteManager.AllKeywords.Add(key, new($"{key}()", 0));
+                        AutoCompleteManager.AllKeywords.TryAdd(key, new($"{key}(", 0));
                     }
                     catch (Exception ex)
                     {
