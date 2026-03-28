@@ -293,7 +293,7 @@ Example:
 search: Custom() and Sort(ByLength())
 ```
 
-> **GIF:** Show Custom filtering the selection, the Sort sorting the results.
+![Sorting demo](/Resources/sorting.gif)
 
 ### Multiple comparers
 
