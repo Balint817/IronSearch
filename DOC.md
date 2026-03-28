@@ -88,7 +88,7 @@ search: AP
 
 If you forget the parentheses, the engine thinks you are just naming the command instead of actually running it, so it accidentally matches everything.
 
-> **GIF:** Optional—show a wrong query (`AP` vs `AP()`) and the result count difference.
+![Search demo](/Resources/parenthesis.gif)
 
 ### Keyword arguments
 
