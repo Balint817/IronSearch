@@ -1108,5 +1108,9 @@ namespace IronSearch
             return true;
             
         }
+
+
+        //TODO: romanized contains check method for Korean/Japanese/Chinese names
+        //Romanization.NET or Kawazu maybe?
     }
 }
