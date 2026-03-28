@@ -12,7 +12,7 @@ namespace IronSearch.Patches
     internal static class SearchPatch
     {
 
-        internal static CompiledScript? tagGroups { get; set; }
+        internal static CompiledScript? compiledScript { get; set; }
 
         internal static bool? isAdvancedSearch = false;
 
@@ -31,7 +31,7 @@ namespace IronSearch.Patches
                 case false:
                     return false;
                 case true:
-                    if (tagGroups == null)
+                    if (compiledScript == null)
                     {
                         return __result = false;
                     }
@@ -40,7 +40,7 @@ namespace IronSearch.Patches
 
             __result = false;
 
-            if (tagGroups is null)
+            if (compiledScript is null)
             {
                 __result = false;
                 return false;
@@ -50,7 +50,7 @@ namespace IronSearch.Patches
             {
                 var task = Task.Run(() =>
                     ModMain.ScriptManager.ScriptExecutor.Evaluate(
-                        new SearchArgument(musicInfo, peroString), tagGroups)
+                        new SearchArgument(musicInfo, peroString), compiledScript)
                 );
                 if (task.Wait(TimeSpan.FromSeconds(10)))
                 {

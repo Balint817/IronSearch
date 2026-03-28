@@ -153,7 +153,7 @@ namespace IronSearch.Patches
                 return;
             }
 
-            SearchPatch.tagGroups = parseResult;
+            SearchPatch.compiledScript = parseResult;
             history = DataHelper.history.ToSystem();
             highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToList();
             fullCombos = DataHelper.fullComboMusic.ToSystem();
@@ -252,7 +252,7 @@ namespace IronSearch.Patches
 
         private static void NullifyAdvancedSearch()
         {
-            SearchPatch.tagGroups = null!;
+            SearchPatch.compiledScript = null!;
         }
     }
 }
