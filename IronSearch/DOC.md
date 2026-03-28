@@ -1,6 +1,6 @@
 # IronSearch Advanced Search Guide (Tags + Scripts)
 
-This is the documentation for the "advanced search" features implemented by IronSearch. It is powered by **IronPython** engine.
+This is the documentation for the "advanced search" features implemented by IronSearch. The DSL is powered by the **IronPython** engine.
 
 ---
 
