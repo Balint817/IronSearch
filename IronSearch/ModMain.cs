@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Net;
+using System.Runtime.CompilerServices;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
@@ -15,6 +16,48 @@ using PythonExpressionManager;
 
 namespace IronSearch
 {
+    public class GenericValidator<T> : MelonLoader.Preferences.ValueValidator
+    {
+        public T DefaultValue { get; }
+        public GenericValidator(T defaultValue)
+        {
+            DefaultValue = defaultValue ?? throw new NullReferenceException();
+        }
+        public override object EnsureValid(object value)
+        {
+            if (value is not T)
+            {
+                return DefaultValue!;
+            }
+            return value;
+        }
+
+        public override bool IsValid(object value)
+        {
+            return value is T;
+        }
+    }
+    public class WaitMultiplierValidator : MelonLoader.Preferences.ValueValidator
+    {
+        public double DefaultValue { get; }
+        public WaitMultiplierValidator(double defaultValue)
+        {
+            DefaultValue = defaultValue;
+        }
+        public override object EnsureValid(object value)
+        {
+            if (value is not double d || d < 1)
+            {
+                return DefaultValue!;
+            }
+            return value;
+        }
+
+        public override bool IsValid(object value)
+        {
+            return value is double;
+        }
+    }
     public partial class ModMain : MelonMod
     {
         static bool? _initStepTracker = null;
@@ -28,19 +71,19 @@ namespace IronSearch
         internal static Dictionary<string, bool> _hqChartDict = new();
         public static ReadOnlyDictionary<string, bool> HQChartDict => new(_hqChartDict);
 
-        internal static MelonPreferences_Entry<Dictionary<string, string>> expressionEntry = null!;
+        internal static MelonPreferences_Entry<Dictionary<string, string>> expressionEntry = null!; // validated
 
-        internal static MelonPreferences_Entry<Dictionary<string, string>> aliasEntry = null!;
+        internal static MelonPreferences_Entry<Dictionary<string, string>> aliasEntry = null!; // validated
 
-        internal static MelonPreferences_Entry<Dictionary<string, string>> autoCompleteItemsEntry = null!;
+        internal static MelonPreferences_Entry<Dictionary<string, string>> autoCompleteItemsEntry = null!; // validated
 
         internal static MelonPreferences_Entry<double> waitMultiplierEntry = null!;
 
-        internal static MelonPreferences_Entry<bool> enableHQSpamEntry = null!;
+        internal static MelonPreferences_Entry<bool> enableHQSpamEntry = null!; // validated
 
-        internal static MelonPreferences_Entry<bool> enableSearchCachingEntry = null!;
+        internal static MelonPreferences_Entry<bool> enableSearchCachingEntry = null!; // validated
 
-        internal static MelonPreferences_Entry<string> startSearchStringEntry = null!;
+        internal static MelonPreferences_Entry<string> startSearchStringEntry = null!; // validated
         internal static string StartString
         {
             get
@@ -129,6 +172,11 @@ namespace IronSearch
             }
         }
 
+        public static GenericValidator<T> Validator<T>(T defaultValue)
+        {
+            return new GenericValidator<T>(defaultValue);
+        }
+
         internal static bool UISystemLoaded { get; private set; }
 
         internal static bool IsFirstLengthCacheBuild { get; private set; } = true;
@@ -209,10 +257,11 @@ namespace IronSearch
             var category = MelonPreferences.CreateCategory("IronSearch");
             category.SetFilePath("UserData/IronSearch.cfg");
 
-            enableHQSpamEntry = category.CreateEntry<bool>("EnableHQSpam", false, "EnableHQSpam", "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.");
-            enableSearchCachingEntry = category.CreateEntry<bool>("EnableSearchCaching", true, "EnableSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.");
-            waitMultiplierEntry = category.CreateEntry<double>("WaitMultiplier", 2.5, "WaitMultiplier", "\nIncreases the amount of time that must pass after search text changes before the search is refreshed.\nThe multiplier affects ONLY advanced searches, normal searches are unaffected.");
-            startSearchStringEntry = category.CreateEntry<string>("StartSearchText", "search:", "StartSearchText", "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.");
+            enableHQSpamEntry = category.CreateEntry<bool>("EnableHQSpam", false, "EnableHQSpam", "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.", validator: Validator(false));
+            enableSearchCachingEntry = category.CreateEntry<bool>("EnableSearchCaching", true, "EnableSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.", validator: Validator(false));
+            var defaultMult = 2.5;
+            waitMultiplierEntry = category.CreateEntry<double>("WaitMultiplier", defaultMult, "WaitMultiplier", "\nIncreases the amount of time that must pass after search text changes before the search is refreshed.\nThe multiplier affects ONLY advanced searches, normal searches are unaffected.", validator: new WaitMultiplierValidator(defaultMult));
+            startSearchStringEntry = category.CreateEntry<string>("StartSearchText", "search:", "StartSearchText", "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.", validator: Validator(false));
 
             if (startSearchStringEntry.Value == null)
             {
@@ -228,7 +277,7 @@ namespace IronSearch
             LoadUserScripts();
             _initStepTracker = null;
         }
-        //TODO: disallow a WaitMultiplier smaller than 1.
+        //TODO: fuzzy search (possibly via regex?)
         //TODO: add another version of search cache with a life-time of 0.25 seconds.
         //This would be used for caching search results even when EnableSearchCaching is false, but the cache would only last for 0.25 seconds,
         //so it wouldn't cause any issues with side-effect scripts, while still improving performance.
@@ -822,11 +871,12 @@ namespace IronSearch
             ScriptManager.DefaultPriority = (int)Priorities.Expression;
 
             MelonLogger.Msg("Loading expressions...");
-            expressionEntry = category.CreateEntry<Dictionary<string, string>>("Expressions", new()
+            var expressionDefault = new Dictionary<string,string>()
             {
                 ["NewCustom"] = "Unplayed() and Custom()",
 
-            }, "Expressions", "\nDefine shorthands for searches here.");
+            };
+            expressionEntry = category.CreateEntry("Expressions", expressionDefault, "Expressions", "\nDefine shorthands for searches here.", validator: Validator(expressionDefault));
             LoadExpressions();
 
 
@@ -834,16 +884,19 @@ namespace IronSearch
             ScriptManager.DefaultPriority = (int)Priorities.Alias;
 
             MelonLogger.Msg("Loading aliases...");
-            aliasEntry = category.CreateEntry<Dictionary<string, string>>("TagAliases", new()
+            var aliasDefault = new Dictionary<string, string>()
             {
-                ["Perfect"]= "AllPerfect"
-            }, "TagAliases", "\nDefine aliases for existing tags here.");
+                ["Perfect"] = "AllPerfect"
+            };
+            aliasEntry = category.CreateEntry("TagAliases", aliasDefault, "TagAliases", "\nDefine aliases for existing tags here.", validator: Validator(aliasDefault));
             LoadAliases();
 
+            var autocompleteDefault = new Dictionary<string, string>()
+            {
+                ["Vanilla"] = "not Custom()"
+            };
 
-            autoCompleteItemsEntry = category.CreateEntry<Dictionary<string, string>>("AutoCompleteItems", new() {
-                ["Vanilla"]="not Custom()"
-            }, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.");
+            autoCompleteItemsEntry = category.CreateEntry("AutoCompleteItems", autocompleteDefault, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.", validator: Validator(autocompleteDefault));
         }
 
         static readonly Dictionary<string, Script> LoadedExpressions = new();
