@@ -10,12 +10,11 @@
 (And currently, the "feedback form" is just a pre-release form lol)
 
 ## Usage
-The documentation can be found [here](https://github.com/Balint817/IronSearch/blob/main/IronSearch/DOC.md).
+The documentation can be found [here](DOC.md).
 
 ## Credits
 - The Empress of Medium Potatoes
 - The Star of Wynter
-- The Magician, X
 - The Devil's Agent
 - The Hierophant 2022 & The Tower 2026
 - The Fool
