@@ -107,11 +107,6 @@ namespace IronSearch
                 GlobalDataBase.s_DbMusicTag.m_FindKeyword = value;
             }
         }
-
-        internal static readonly string Separator = "--------------------------------";
-
-        internal static readonly List<int> DifficultyResultAll = Enumerable.Range(1,5).ToList();
-        internal static readonly List<int> DifficultyResultEmpty = new List<int>();
         public static Il2CppSystem.Collections.Generic.List<T> IL_List<T>(params T[] args)
         {
             var list = new Il2CppSystem.Collections.Generic.List<T>();
@@ -264,38 +259,6 @@ namespace IronSearch
             Array.Copy(buffer, ret, read);
             return ret;
         }
-
-
-        internal static string RequestToString(HttpWebRequest request)
-        {
-            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                return reader.ReadToEnd();
-            }
-        }
-
-        internal static HttpWebRequest GetRequestInstance(string uri)
-        {
-#pragma warning disable SYSLIB0014 // Type or member is obsolete
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-#pragma warning restore SYSLIB0014 // Type or member is obsolete
-            request.KeepAlive = false;
-            request.CookieContainer = null;
-            request.PreAuthenticate = false;
-            request.ServicePoint.UseNagleAlgorithm = false;
-            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            return request;
-        }
-
-        internal static HttpWebRequest GetRequestInstance(string uri, DateTime dt)
-        {
-            var request = GetRequestInstance(uri);
-            request.IfModifiedSince = dt;
-            return request;
-        }
-
         internal static Stream StringToStream(string s)
         {
             var stream = new MemoryStream();
@@ -338,25 +301,6 @@ namespace IronSearch
         {
             return DetectParseBPM(input, out range, double.NegativeInfinity, double.PositiveInfinity);
         }
-        public static string CreateMD5(string input)
-        {
-            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
-            {
-                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
-
-                StringBuilder sb = new System.Text.StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                {
-                    sb.Append(hashBytes[i].ToString("x2"));
-                }
-                return sb.ToString();
-            }
-        }
-        internal static string GetRequestString(string uri)
-        {
-            return RequestToString(GetRequestInstance(uri));
-        }
         internal static bool LowerContains(this PeroString peroString, string compareText, string containsText)
         {
             compareText = (compareText ?? "").ToLowerInvariant();
@@ -370,8 +314,6 @@ namespace IronSearch
         {
             return (compareText ?? "").ToLowerInvariant().Contains((containsText ?? "").ToLowerInvariant());
         }
-
-        public static readonly char[] parseSplitChars = new char[] { '-' };
         public static bool ParseRange(string expression, out Range range)
         {
             return ParseRange(expression, out range, double.NegativeInfinity, double.PositiveInfinity, out _) ?? false;
