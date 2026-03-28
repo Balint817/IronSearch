@@ -436,7 +436,7 @@ Notes:
 
 ---
 
-#### `Hidden`
+#### `Hidden`/`HasHidden`
 
 Usage:
 
@@ -450,7 +450,7 @@ Checks whether the music has a "hidden" difficulty (difficulty 4).
 
 Usage:
 
-- `Touhou()`
+- `Touhou()`/`HasTouhou`
 
 Checks whether the music has a "Touhou" difficulty (difficulty 5).
 
@@ -633,7 +633,99 @@ Notes:
 
 ---
 
-### 6.2 Objects
+### 6.2 Sorting comparers
+
+These tags return comparers that can be used inside `Sorter(...)`.
+
+#### `ByAccuracy`/`ByAcc`
+
+Usage:
+
+- `ByAccuracy()`
+
+Returns a comparer function to sort by score accuracy.
+
+---
+
+#### `ByBPM`
+
+Usage:
+
+- `ByBPM()`
+
+Returns a comparer function to sort by BPM.
+
+---
+
+#### `ByDifficulty`/`ByDiff`
+
+Usage:
+
+- `ByDifficulty()`
+
+Returns a comparer function to sort by difficulty.
+
+---
+
+#### `ByLength`
+
+Usage:
+
+- `ByLength()`
+
+Returns a comparer function to sort by chart length.
+
+---
+
+#### `ByName`
+
+Usage:
+
+- `ByName()`
+
+Returns a comparer function to sort by localized music title.
+
+---
+
+#### `ByRandom`
+
+Usage:
+
+- `ByRandom()`
+
+Returns a comparer function that sorts songs in a random order.
+
+---
+
+#### `ByModified`
+
+Usage:
+
+- `ByModified()`
+
+Returns a comparer function that sorts by custom chart "newness" index based on filesystem last write times.
+
+---
+
+#### `ByScene`
+
+Usage:
+
+- `ByScene()`
+
+Returns a comparer function that sorts by scene id string.
+
+---
+
+#### `ByUID`
+
+Usage:
+
+- `ByUID()`
+
+Returns a comparer function that sorts by UID.
+
+### 6.3 Objects
 
 ---
 
@@ -832,7 +924,7 @@ It returns the custom chart’s last-modified time.
 
 ---
 
-### 6.3 Variables
+### 6.4 Variables
 
 Variable tags let you keep state across songs or within a song evaluation.
 
@@ -908,7 +1000,7 @@ Creates or overwrites a global variable value.
 
 ---
 
-### 6.4 Control-flow / debugging
+### 6.5 Control-flow / debugging
 
 #### `Exit`
 
@@ -985,98 +1077,6 @@ So `RunOnce(...)` is best used for side effects (warming caches, precomputations
 - `Help("TagName")` prints the built-in help text for the given tag.
 
 ---
-
-### 6.5 Sorting comparers
-
-These tags return comparers that can be used inside `Sorter(...)`.
-
-#### `ByAccuracy`/`ByAcc`
-
-Usage:
-
-- `ByAccuracy()`
-
-Returns a comparer function to sort by score accuracy.
-
----
-
-#### `ByBPM`
-
-Usage:
-
-- `ByBPM()`
-
-Returns a comparer function to sort by BPM.
-
----
-
-#### `ByDifficulty`/`ByDiff`
-
-Usage:
-
-- `ByDifficulty()`
-
-Returns a comparer function to sort by difficulty.
-
----
-
-#### `ByLength`
-
-Usage:
-
-- `ByLength()`
-
-Returns a comparer function to sort by chart length.
-
----
-
-#### `ByName`
-
-Usage:
-
-- `ByName()`
-
-Returns a comparer function to sort by localized music title.
-
----
-
-#### `ByRandom`
-
-Usage:
-
-- `ByRandom()`
-
-Returns a comparer function that sorts songs in a random order.
-
----
-
-#### `ByModified`
-
-Usage:
-
-- `ByModified()`
-
-Returns a comparer function that sorts by custom chart "newness" index based on filesystem last write times.
-
----
-
-#### `ByScene`
-
-Usage:
-
-- `ByScene()`
-
-Returns a comparer function that sorts by scene id string.
-
----
-
-#### `ByUID`
-
-Usage:
-
-- `ByUID()`
-
-Returns a comparer function that sorts by UID.
 
 ## 7) Advanced Features
 

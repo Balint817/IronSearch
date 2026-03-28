@@ -397,13 +397,15 @@ namespace IronSearch
             );
 
             RegisterScript("Hidden", BuiltIns.EvalHasHidden);
-            RegisterHelp(new() { "Hidden" },
+            RegisterScript("HasHidden", BuiltIns.EvalHasHidden);
+            RegisterHelp(new() { "HasHidden", "Hidden" },
                 "Usage: Hidden()\n\n"
                 + "Checks if the music has a hidden difficulty"
             );
 
             RegisterScript("Touhou", BuiltIns.EvalHasTouhou);
-            RegisterHelp(new() { "Touhou" },
+            RegisterScript("HasTouhou", BuiltIns.EvalHasTouhou);
+            RegisterHelp(new() { "HasTouhou", "Touhou" },
                 "Usage: Touhou()\n\n"
                 + "Checks if the music has a Touhou difficulty"
             );
