@@ -228,7 +228,10 @@ namespace IronSearch
             LoadUserScripts();
             _initStepTracker = null;
         }
-
+        //TODO: disallow a WaitMultiplier smaller than 1.
+        //TODO: add another version of search cache with a life-time of 0.25 seconds.
+        //This would be used for caching search results even when EnableSearchCaching is false, but the cache would only last for 0.25 seconds,
+        //so it wouldn't cause any issues with side-effect scripts, while still improving performance.
 
 
         const string scriptFolderName = "Scripts";
