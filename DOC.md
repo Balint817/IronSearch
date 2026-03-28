@@ -34,7 +34,7 @@ search: BPM('160-200') and Length('180+')
 
 (This example will search for songs that have a BPM between 160 and 200, and are longer than 180 seconds)
 
-> **GIF:** 'Hook' to quickly showcase the mod and get the user to read further.
+![Search demo](/Resources/hook.gif)
 
 ### Basic boolean logic
 
