@@ -74,6 +74,8 @@ namespace IronSearch.Patches
 
         internal static void Prefix(string keyword)
         {
+            SearchPatch.currentSearchText = null;
+            SearchPatch.currentCache = null;
             if (ModMain.UISystemLoaded && ModMain.IsFirstLengthCacheBuild)
             {
                 ModMain.BuildCacheIfNecessary();
@@ -102,18 +104,6 @@ namespace IronSearch.Patches
             SearchPatch.searchError = null;
             BuiltIns.GlobalVariables.Clear();
             BuiltIns.LocalVariables.Clear();
-            //string text = Utils.FindKeyword;
-
-            //highScores = DataHelper.highest;
-
-            //IData:
-            //"uid" string
-            //"evaluate" int
-            //"score" int
-            //"combo" int
-            //"clear" int
-            //"accuracyStr" string
-            //"accuracy" float;
 
             if (!text.StartsWith(ModMain.StartString))
             {
@@ -121,24 +111,8 @@ namespace IronSearch.Patches
                 NullifyAdvancedSearch();
                 return;
             }
-            //MelonLogger.Msg(Utils.Separator);
 
-            //if (text.Length < SearchPatch.startString.Length + 1)
-            //{
-            //    SearchPatch.isAdvancedSearch = null;
-            //    NullifyAdvancedSearch();
-            //    MelonLogger.Msg(ConsoleColor.Red, "syntax error: advanced search was empty");
-            //    return;
-            //}
-            try
-            {
-                text = text[ModMain.StartString.Length..].Trim(' ');
-            }
-            catch (Exception)
-            {
-                MelonLogger.Msg("bruh does this rly error");
-                throw;
-            }
+            text = text[ModMain.StartString.Length..].Trim(' ');
 
             _sw.Restart();
             CompiledScript parseResult;
@@ -153,6 +127,7 @@ namespace IronSearch.Patches
                 return;
             }
 
+            SearchPatch.currentSearchText = text;
             SearchPatch.compiledScript = parseResult;
             history = DataHelper.history.ToSystem();
             highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToList();
@@ -182,6 +157,11 @@ namespace IronSearch.Patches
             //DataHelper.hides.Clear();
 
             SearchPatch.isAdvancedSearch = true;
+
+            if (SearchPatch.searchCache.TryGetValue(SearchPatch.currentSearchText, out var cache))
+            {
+                SearchPatch.currentCache = cache;
+            }
             //MelonLogger.Msg("Parsed tags: $" + string.Join(" ", SearchPatch.tagGroups.Select(x1 => string.Join("|", x1.Select(x2 => TermToString(x2))))) + '$');
         }
 

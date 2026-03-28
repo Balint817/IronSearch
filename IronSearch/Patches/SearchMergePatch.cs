@@ -4,11 +4,10 @@ using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
-using IronPython.Runtime.Operations;
-using IronPython.Runtime.Types;
 using IronSearch.Exceptions;
 using IronSearch.Records;
 using IronSearch.Tags;
+using MelonLoader;
 
 namespace IronSearch.Patches
 {
@@ -25,80 +24,146 @@ namespace IronSearch.Patches
             bool criticalFlag = true;
             try
             {
-                _langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
-                _randomDictionary.Clear();
-
                 if (SearchPatch.isAdvancedSearch != true || SearchPatch.searchError != null)
                 {
                     _activeSorters.Clear();
                     return;
                 }
 
-                if (_activeSorters.Count == 0)
+                _langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
+                _randomDictionary.Clear();
+
+                if (SearchPatch.searchCache.TryGetValue(SearchPatch.currentSearchText!, out var cache))
                 {
+                    if (!cache.ShouldSort)
+                    {
+                        return;
+                    }
+                    var buildLock = new MusicInfo[cache.Lock.Count];
+                    var buildUnlock = new MusicInfo[cache.Unlock.Count];
+
+                    List<MusicInfo> m_lock = __instance.m_LevelDesignerResult.m_Lock.ToSystem();
+                    List<MusicInfo> m_Unlock = __instance.m_LevelDesignerResult.m_Unlock.ToSystem();
+
+                    bool cacheValid = true;
+
+                    foreach (var item in m_lock)
+                    {
+                        if (!cache.Lock.TryGetValue(item.uid, out var i))
+                        {
+                            cacheValid = false;
+                            break;
+                        }
+                        buildLock[i] = item;
+                    }
+                    foreach (var item in m_Unlock)
+                    {
+                        if (!cache.Unlock.TryGetValue(item.uid, out var i))
+                        {
+                            cacheValid = false;
+                            break;
+                        }
+                        buildUnlock[i] = item;
+                    }
+
+                    if (!cacheValid)
+                    {
+                        MelonLogger.Error("Something went horribly wrong with the sorting cache! This is likely a bug in the mod.");
+                    }
+                    else
+                    {
+                        __instance.m_LevelDesignerResult.m_Lock = buildLock.Where(x => x is not null).ToIL2CPP();
+                        __instance.m_LevelDesignerResult.m_Unlock = buildUnlock.Where(x => x is not null).ToIL2CPP();
+                    }
                     return;
                 }
 
-                _activeSorters.Sort();
-                var filteredByPriority = new SortedDictionary<int, SorterInfo>();
-
-                foreach (var sorterInfo in _activeSorters)
+                if (_activeSorters.Count != 0)
                 {
-                    filteredByPriority[sorterInfo.Priority] = sorterInfo;
-                }
 
-                var sorterInfos = filteredByPriority.Values.ToList();
+                    _activeSorters.Sort();
+                    var filteredByPriority = new SortedDictionary<int, SorterInfo>();
 
-                Comparison<MusicInfo> comparer = (MusicInfo musicInfo1, MusicInfo musicInfo2) =>
-                {
-                    foreach (var sorterInfo in sorterInfos)
+                    foreach (var sorterInfo in _activeSorters)
                     {
-                        foreach (var processor in sorterInfo.Comparers)
+                        filteredByPriority[sorterInfo.Priority] = sorterInfo;
+                    }
+
+                    var sorterInfos = filteredByPriority.Values.ToList();
+
+                    Comparison<MusicInfo> comparer = (MusicInfo musicInfo1, MusicInfo musicInfo2) =>
+                    {
+                        foreach (var sorterInfo in sorterInfos)
                         {
-                            var t = processor(musicInfo1, musicInfo2);
-                            if (t is not int result)
+                            foreach (var processor in sorterInfo.Comparers)
                             {
-                                throw new InvalidCastException($"expected an integer as comparison result, got '{(t is null ? "null" : t.GetType().Name)}'");
-                            }
-                            if (result != 0)
-                            {
-                                if (sorterInfo.Reverse)
+                                var t = processor(musicInfo1, musicInfo2);
+                                if (t is not int result)
                                 {
-                                    return -result;
+                                    throw new InvalidCastException($"expected an integer as comparison result, got '{(t is null ? "null" : t.GetType().Name)}'");
                                 }
-                                return result;
+                                if (result != 0)
+                                {
+                                    if (sorterInfo.Reverse)
+                                    {
+                                        return -result;
+                                    }
+                                    return result;
+                                }
                             }
                         }
+                        return 0;
+                    };
+
+                    List<MusicInfo> m_lock = __instance.m_LevelDesignerResult.m_Lock.ToSystem();
+                    List<MusicInfo> m_Unlock = __instance.m_LevelDesignerResult.m_Unlock.ToSystem();
+
+                    try
+                    {
+                        m_lock.Sort(comparer);
+                        m_Unlock.Sort(comparer);
+
+                        __instance.m_LevelDesignerResult.m_Lock = m_lock.ToIL2CPP();
+                        __instance.m_LevelDesignerResult.m_Unlock = m_Unlock.ToIL2CPP();
+
+
+                        if (ModMain.EnableSearchCaching)
+                        {
+                            SearchPatch.searchCache.TryAdd(SearchPatch.currentSearchText!, new SearchCache(m_lock, m_Unlock, true));
+                        }
                     }
-                    return 0;
-                };
-
-                List<MusicInfo> m_lock = __instance.m_LevelDesignerResult.m_Lock.ToSystem();
-                List<MusicInfo> m_unlock = __instance.m_LevelDesignerResult.m_Unlock.ToSystem();
-
-                try
-                {
-                    m_lock.Sort(comparer);
-                    m_unlock.Sort(comparer);
+                    catch (Exception ex)
+                    {
+                        criticalFlag = false;
+                        var s = "An error occured and sorting failed. This is likely a mistake in the search.";
+                        ShowText.ShowInfo(s);
+                        MelonLogger.Msg(ConsoleColor.Red, s);
+                        throw;
+                    }
                 }
-                catch (Exception)
+                else
                 {
-                    criticalFlag = false;
-                    ShowText.ShowInfo("An error occured and sorting failed. This is likely a mistake in the search.");
-                    throw;
+                    if (ModMain.EnableSearchCaching)
+                    {
+                        SearchPatch.searchCache.TryAdd(SearchPatch.currentSearchText!,
+                            new SearchCache(
+                                __instance.m_LevelDesignerResult.m_Lock.ToSystem(),
+                                __instance.m_LevelDesignerResult.m_Unlock.ToSystem(),
+                                false
+                                ));
+                    }
                 }
 
-                __instance.m_LevelDesignerResult.m_Lock = m_lock.ToIL2CPP();
-                __instance.m_LevelDesignerResult.m_Unlock = m_unlock.ToIL2CPP();
+                
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 if (criticalFlag)
                 {
                     ShowText.ShowInfo("A critical error occured and sorting failed. This is likely a bug in the mod.");
                 }
-                throw;
+                MelonLogger.Msg(ConsoleColor.Red, ex);
             }
             finally
             {

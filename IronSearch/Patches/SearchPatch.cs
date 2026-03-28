@@ -12,11 +12,15 @@ namespace IronSearch.Patches
     internal static class SearchPatch
     {
 
+        internal static string? currentSearchText { get; set; }
         internal static CompiledScript? compiledScript { get; set; }
 
         internal static bool? isAdvancedSearch = false;
 
         internal static SearchResponse? searchError = null;
+        internal static SearchCache? currentCache;
+        internal static readonly Dictionary<string, SearchCache> searchCache = new();
+
         internal static bool Prefix(ref bool __result, PeroString peroString, MusicInfo musicInfo, string containsText)
         {
             if (searchError != null)
@@ -48,18 +52,25 @@ namespace IronSearch.Patches
 
             try
             {
-                var task = Task.Run(() =>
-                    ModMain.ScriptManager.ScriptExecutor.Evaluate(
-                        new SearchArgument(musicInfo, peroString), compiledScript)
-                );
-                if (task.Wait(TimeSpan.FromSeconds(10)))
+                if (currentCache is not null)
                 {
-                    __result = task.GetAwaiter().GetResult();
+                    __result = currentCache.PassingUids.Contains(musicInfo.uid);
                 }
                 else
                 {
-                    searchError = new SearchResponse("The search timed out.", SearchResponse.Type.TimeoutError);
-                    return false;
+                    var task = Task.Run(() =>
+                        ModMain.ScriptManager.ScriptExecutor.Evaluate(
+                            new SearchArgument(musicInfo, peroString), compiledScript)
+                    );
+                    if (task.Wait(TimeSpan.FromSeconds(10)))
+                    {
+                        __result = task.GetAwaiter().GetResult();
+                    }
+                    else
+                    {
+                        searchError = new SearchResponse("The search timed out.", SearchResponse.Type.TimeoutError);
+                        return false;
+                    }
                 }
             }
             catch (Exception ex)

@@ -32,11 +32,13 @@ namespace IronSearch
 
         internal static MelonPreferences_Entry<Dictionary<string, string>> aliasEntry = null!;
 
-        internal static MelonPreferences_Entry<Dictionary<string, string>> autoCompleteItems = null!;
+        internal static MelonPreferences_Entry<Dictionary<string, string>> autoCompleteItemsEntry = null!;
 
         internal static MelonPreferences_Entry<double> waitMultiplierEntry = null!;
 
-        internal static MelonPreferences_Entry<bool> enableHQSpam = null!;
+        internal static MelonPreferences_Entry<bool> enableHQSpamEntry = null!;
+
+        internal static MelonPreferences_Entry<bool> enableSearchCachingEntry = null!;
 
         internal static MelonPreferences_Entry<string> startSearchStringEntry = null!;
         internal static string StartString
@@ -50,7 +52,14 @@ namespace IronSearch
         {
             get
             {
-                return enableHQSpam.Value;
+                return enableHQSpamEntry.Value;
+            }
+        }
+        internal static bool EnableSearchCaching
+        {
+            get
+            {
+                return enableSearchCachingEntry.Value;
             }
         }
         internal static Dictionary<string,string> Aliases
@@ -64,7 +73,7 @@ namespace IronSearch
         {
             get
             {
-                return autoCompleteItems.Value;
+                return autoCompleteItemsEntry.Value;
             }
         }
         internal static Dictionary<string, string> ExpressionEntry
@@ -200,7 +209,8 @@ namespace IronSearch
             var category = MelonPreferences.CreateCategory("IronSearch");
             category.SetFilePath("UserData/IronSearch.cfg");
 
-            enableHQSpam = category.CreateEntry<bool>("EnableHQSpam", false, "EnableHQSpam", "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.");
+            enableHQSpamEntry = category.CreateEntry<bool>("EnableHQSpam", false, "EnableHQSpam", "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.");
+            enableSearchCachingEntry = category.CreateEntry<bool>("EnableSearchCaching", true, "EnableSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.");
             waitMultiplierEntry = category.CreateEntry<double>("WaitMultiplier", 2.5, "WaitMultiplier", "\nIncreases the amount of time that must pass after search text changes before the search is refreshed.\nThe multiplier affects ONLY advanced searches, normal searches are unaffected.");
             startSearchStringEntry = category.CreateEntry<string>("StartSearchText", "search:", "StartSearchText", "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.");
 
@@ -828,7 +838,7 @@ namespace IronSearch
             LoadAliases();
 
 
-            autoCompleteItems = category.CreateEntry<Dictionary<string, string>>("AutoCompleteItems", new() {
+            autoCompleteItemsEntry = category.CreateEntry<Dictionary<string, string>>("AutoCompleteItems", new() {
                 ["Vanilla"]="not Custom()"
             }, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.");
         }
