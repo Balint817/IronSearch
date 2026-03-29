@@ -48,7 +48,7 @@ namespace IronSearch.Tags
             ThrowIfNotMatching(varArgs, 1, "BPM()");
             ThrowIfNotEmpty(varKwargs, "BPM()");
 
-            var mr = MultiRangeArgumentParser.GetMultiRange(varArgs[0], "BPM()", false);
+            var mr = MultiRangeArgumentParser.GetMultiRange(varArgs[0], "BPM()");
             return EvalBPM(M.I, mr);
         }
     }
