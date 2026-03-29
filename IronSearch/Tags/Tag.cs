@@ -22,9 +22,12 @@ namespace IronSearch.Tags
                 {
                     foreach (var tag in tags)
                     {
-                        if (pStr.LowerContains(tag ?? "", value))
+                        foreach (var item in RomanizationHelper.GetAllRomanizations(tag))
                         {
-                            return true;
+                            if (pStr.LowerContains(item, value))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -44,9 +47,13 @@ namespace IronSearch.Tags
                 {
                     foreach (var tag in tags)
                     {
-                        if (re.IsMatch(tag ?? ""))
+
+                        foreach (var item in RomanizationHelper.GetAllRomanizations(tag))
                         {
-                            return true;
+                            if (re.IsMatch(item))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -65,9 +72,13 @@ namespace IronSearch.Tags
                 {
                     foreach (var tag in tags)
                     {
-                        if (fc.IsMatch(tag ?? ""))
+
+                        foreach (var item in RomanizationHelper.GetAllRomanizations(tag))
                         {
-                            return true;
+                            if (fc.IsMatch(item))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }

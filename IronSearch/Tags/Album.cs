@@ -19,7 +19,7 @@ namespace IronSearch.Tags
             {
                 return false;
             }
-            return albumNames.Any(x => x.LowerContains(value) || ps.LowerContains(x, value));
+            return RomanizationHelper.GetAllRomanizations(albumNames).Any(x => x.LowerContains(value) || ps.LowerContains(x, value));
         }
         internal static bool EvalAlbum(MusicInfo musicInfo, Regex value)
         {
@@ -31,7 +31,7 @@ namespace IronSearch.Tags
             {
                 return false;
             }
-            return albumNames.Any(x => value.IsMatch(x));
+            return RomanizationHelper.GetAllRomanizations(albumNames).Any(x => value.IsMatch(x));
         }
         internal static bool EvalAlbum(MusicInfo musicInfo, FuzzyContains value)
         {
@@ -43,7 +43,7 @@ namespace IronSearch.Tags
             {
                 return false;
             }
-            return albumNames.Any(x => value.IsMatch(x));
+            return RomanizationHelper.GetAllRomanizations(albumNames).Any(x => value.IsMatch(x));
         }
 
         internal static bool EvalAlbum(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

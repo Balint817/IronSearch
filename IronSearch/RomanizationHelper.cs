@@ -5,9 +5,21 @@ namespace IronSearch
 {
     public static class RomanizationHelper
     {
-        static readonly Dictionary<string, ReadOnlyCollection<string>> _cache = new();
+        static readonly Dictionary<string, ReadOnlyCollection<string>> _cache = new()
+        {
+            [""] = new(new string[] { "" }),
+        };
+        public static ReadOnlyCollection<string> GetAllRomanizations(IEnumerable<string> input)
+        {
+            return new(input.SelectMany(x => GetAllRomanizations(x)).Distinct().ToArray());
+        }
+        static readonly ReadOnlyCollection<string> _empty = new(Array.Empty<string>());
         public static ReadOnlyCollection<string> GetAllRomanizations(string input)
         {
+            if (input is null)
+            {
+                return _empty;
+            }
             if (_cache.TryGetValue(input, out var cached))
                 return cached;
 

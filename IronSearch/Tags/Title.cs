@@ -12,10 +12,12 @@ namespace IronSearch.Tags
 
         internal static bool EvalTitle(PeroString pStr, MusicInfo musicInfo, string value)
         {
-
-            if (pStr.LowerContains(musicInfo.name ?? "", value))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.name))
             {
-                return true;
+                if (pStr.LowerContains(item, value))
+                {
+                    return true;
+                }
             }
 
             if (EvalCustom(musicInfo) && EvalTitleCustom(pStr, musicInfo, value))
@@ -25,9 +27,12 @@ namespace IronSearch.Tags
 
             for (int i = 1; i <= 5; i++)
             {
-                if (pStr.LowerContains(musicInfo.GetLocal(i).name ?? "", value))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).name))
                 {
-                    return true;
+                    if (pStr.LowerContains(item, value))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -36,7 +41,14 @@ namespace IronSearch.Tags
 
         internal static bool EvalTitleCustom(PeroString pStr, MusicInfo musicInfo, string value)
         {
-            return pStr.LowerContains(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Info.NameRomanized ?? "", value);
+            foreach (var item in RomanizationHelper.GetAllRomanizations(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Info.NameRomanized))
+            {
+                if (pStr.LowerContains(item, value))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
 
@@ -45,10 +57,12 @@ namespace IronSearch.Tags
 
         internal static bool EvalTitle(MusicInfo musicInfo, Regex re)
         {
-
-            if (re.IsMatch(musicInfo.name ?? ""))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.name))
             {
-                return true;
+                if (re.IsMatch(item))
+                {
+                    return true;
+                }
             }
 
             if (EvalCustom(musicInfo) && EvalTitleCustom(re, musicInfo))
@@ -58,9 +72,12 @@ namespace IronSearch.Tags
 
             for (int i = 1; i <= 5; i++)
             {
-                if (re.IsMatch(musicInfo.GetLocal(i).name ?? ""))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).name ?? ""))
                 {
-                    return true;
+                    if (re.IsMatch(item))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -68,7 +85,14 @@ namespace IronSearch.Tags
         }
         internal static bool EvalTitleCustom(Regex re, MusicInfo musicInfo)
         {
-            return re.IsMatch(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Info.NameRomanized ?? "");
+            foreach (var item in RomanizationHelper.GetAllRomanizations(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Info.NameRomanized ?? ""))
+            {
+                if (re.IsMatch(item))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
 
@@ -77,10 +101,12 @@ namespace IronSearch.Tags
 
         internal static bool EvalTitle(MusicInfo musicInfo, FuzzyContains fc)
         {
-
-            if (fc.IsMatch(musicInfo.name ?? ""))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.name))
             {
-                return true;
+                if (fc.IsMatch(item))
+                {
+                    return true;
+                }
             }
 
             if (EvalCustom(musicInfo) && EvalTitleCustom(fc, musicInfo))
@@ -90,9 +116,12 @@ namespace IronSearch.Tags
 
             for (int i = 1; i <= 5; i++)
             {
-                if (fc.IsMatch(musicInfo.GetLocal(i).name ?? ""))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).name ?? ""))
                 {
-                    return true;
+                    if (fc.IsMatch(item))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -100,7 +129,13 @@ namespace IronSearch.Tags
         }
         internal static bool EvalTitleCustom(FuzzyContains fc, MusicInfo musicInfo)
         {
-            return fc.IsMatch(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Info.NameRomanized ?? "");
+            foreach (var item in RomanizationHelper.GetAllRomanizations(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Info.NameRomanized ?? ""))
+            {
+                if (fc.IsMatch(item))
+                {
+                    return true;
+                }
+            }
         }
 
 

@@ -10,17 +10,23 @@ namespace IronSearch.Tags
     {
         internal static bool EvalDesigner(PeroString pStr, MusicInfo musicInfo, string value)
         {
-            if (pStr.LowerContains(musicInfo.levelDesigner ?? "", value))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.levelDesigner))
             {
-                return true;
+                if (pStr.LowerContains(item, value))
+                {
+                    return true;
+                }
             }
 
             Utils.GetAvailableMaps(musicInfo, out var availableMaps);
             foreach (var i in availableMaps)
             {
-                if (pStr.LowerContains(musicInfo.GetLevelDesignerStringByIndex(i) ?? "", value))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i)))
                 {
-                    return true;
+                    if (pStr.LowerContains(item, value))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -29,17 +35,23 @@ namespace IronSearch.Tags
 
         internal static bool EvalDesigner(MusicInfo musicInfo, Regex re)
         {
-            if (re.IsMatch(musicInfo.levelDesigner ?? ""))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.levelDesigner))
             {
-                return true;
+                if (re.IsMatch(item))
+                {
+                    return true;
+                }
             }
 
             Utils.GetAvailableMaps(musicInfo, out var availableMaps);
             foreach (var i in availableMaps)
             {
-                if (re.IsMatch(musicInfo.GetLevelDesignerStringByIndex(i) ?? ""))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i)))
                 {
-                    return true;
+                    if (re.IsMatch(item))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -48,17 +60,23 @@ namespace IronSearch.Tags
 
         internal static bool EvalDesigner(MusicInfo musicInfo, FuzzyContains fc)
         {
-            if (fc.IsMatch(musicInfo.levelDesigner ?? ""))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.levelDesigner))
             {
-                return true;
+                if (fc.IsMatch(item))
+                {
+                    return true;
+                }
             }
 
             Utils.GetAvailableMaps(musicInfo, out var availableMaps);
             foreach (var i in availableMaps)
             {
-                if (fc.IsMatch(musicInfo.GetLevelDesignerStringByIndex(i) ?? ""))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i) ?? ""))
                 {
-                    return true;
+                     if (fc.IsMatch(item))
+                    {
+                        return true;
+                    }
                 }
             }
 

@@ -10,16 +10,23 @@ namespace IronSearch.Tags
     {
         internal static bool EvalAuthor(PeroString pStr, MusicInfo musicInfo, string value)
         {
-            if (pStr.LowerContains(musicInfo.author ?? "", value))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.author))
             {
-                return true;
+                if (pStr.LowerContains(item, value))
+                {
+                    return true;
+                }
+
             }
 
             for (int i = 1; i <= 5; i++)
             {
-                if (pStr.LowerContains(musicInfo.GetLocal(i).author ?? "", value))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).author))
                 {
-                    return true;
+                    if (pStr.LowerContains(item, value))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -28,16 +35,22 @@ namespace IronSearch.Tags
 
         internal static bool EvalAuthor(MusicInfo musicInfo, Regex re)
         {
-            if (re.IsMatch(musicInfo.author ?? ""))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.author))
             {
-                return true;
+                if (re.IsMatch(item))
+                {
+                    return true;
+                }
             }
 
             for (int i = 1; i <= 5; i++)
             {
-                if (re.IsMatch(musicInfo.GetLocal(i).author ?? ""))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).author))
                 {
-                    return true;
+                    if (re.IsMatch(item))
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -45,16 +58,22 @@ namespace IronSearch.Tags
         }
         internal static bool EvalAuthor(MusicInfo musicInfo, FuzzyContains fc)
         {
-            if (fc.IsMatch(musicInfo.author ?? ""))
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.author))
             {
-                return true;
+                if (fc.IsMatch(item))
+                {
+                    return true;
+                }
             }
 
             for (int i = 1; i <= 5; i++)
             {
-                if (fc.IsMatch(musicInfo.GetLocal(i).author ?? ""))
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).author))
                 {
-                    return true;
+                     if (fc.IsMatch(item))
+                    {
+                        return true;
+                    }
                 }
             }
 
