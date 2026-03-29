@@ -16,7 +16,7 @@ namespace IronSearch.Tags
 
                 if (varArgs.Length == 0)
                 {
-                    return GetDoubles(M.I).Any();
+                    return GetDoubles(M.I).Any(x => x.Value);
                 }
 
                 ThrowIfNotMatching(varArgs, argRange, EvaluatorNameCalled);
