@@ -11,25 +11,22 @@ namespace IronSearch.Tags
             public override string EvaluatorName => "Title";
             public override IEnumerable<string> GetStrings(MusicInfo musicInfo)
             {
-                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.name))
-                {
-                    yield return item;
-                }
+                // for some reason using yield here causes a System.AccessViolationException in GetLocal, so for now just return a list instead
+                var result = new List<string>();
+
+                result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.name));
 
                 if (EvalCustom(musicInfo))
                 {
-                    foreach (var item in GetStringsCustom_Title(musicInfo))
-                    {
-                        yield return item;
-                    }
+                    result.AddRange(GetStringsCustom_Title(musicInfo));
                 }
+
                 for (int i = 1; i <= 5; i++)
                 {
-                    foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).name))
-                    {
-                        yield return item;
-                    }
+                    result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).name));
                 }
+
+                return result;
             }
             static IEnumerable<string> GetStringsCustom_Title(MusicInfo mi)
             {

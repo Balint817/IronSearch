@@ -1,16 +1,10 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO.Compression;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using CustomAlbums.Data;
+﻿using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
+using Il2CppInterop.Runtime;
 using Il2CppPeroTools2.PeroString;
 using IronPython.Runtime;
 using IronSearch.Records;
@@ -19,6 +13,13 @@ using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PythonExpressionManager;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO.Compression;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using ArgumentException = System.ArgumentException;
@@ -124,36 +125,47 @@ namespace IronSearch
              return VariableUtils.GetResult<T>(data);
         }
 
-        public static T GetResultOrDefault<T>(this IVariable data)
+        public static T GetResultOrDefault<T>(this IVariable data, T defaultValue)
         {
             try
             {
-                return VariableUtils.GetResult<T>(data);
+                return VariableUtils.GetResult<T>(data) ?? defaultValue;
             }
             catch (Exception)
             {
-                try
-                {
-                    return (T)(object)((double)(object)default! - 1);
-                }
-                catch (Exception)
-                {
-                    return default!;
-                }
+                return defaultValue;
             }
         }
 
+        public static T GetResultViaMarshal<T>(this IVariable data, T defaultValue)
+        {
+            try
+            {
+                if (data is null)
+                {
+                    return defaultValue;
+                }
+                var obj = VariableUtils.GetResult<Il2CppSystem.Object>(data);
+
+                IntPtr rawValuePtr = IL2CPP.il2cpp_object_unbox(obj.Pointer);
+                return Marshal.PtrToStructure<T>(rawValuePtr) ?? defaultValue;
+            }
+            catch (Exception)
+            {
+                return defaultValue;
+            }
+        }
         public static Highscore ScoresToObjects(this IData data)
         {
             return new Highscore
             {
-                Uid = data.fields["uid"].GetResultOrDefault<string>(),
-                Evaluate = data.fields["evaluate"].GetResultOrDefault<int>(),
-                Score = data.fields["score"].GetResultOrDefault<int>(),
-                Combo = data.fields["combo"].GetResultOrDefault<int>(),
-                Clear = data.fields["clear"].GetResultOrDefault<int>(),
-                AccuracyStr = data.fields["accuracyStr"].GetResultOrDefault<string>(),
-                Accuracy = data.fields["accuracy"].GetResultOrDefault<float>()
+                Uid = data.fields["uid"].GetResultOrDefault<string>("?"),
+                Evaluate = data.fields["evaluate"].GetResultOrDefault<int>(-1),
+                Score = data.fields["score"].GetResultOrDefault<int>(-1),
+                Combo = data.fields["combo"].GetResultOrDefault<int>(-1),
+                Clear = data.fields["clear"].GetResultOrDefault<int>(-1),
+                AccuracyStr = data.fields["accuracyStr"].GetResultOrDefault<string>("?"),
+                Accuracy = data.fields["accuracy"].GetResultViaMarshal<float>(-1)
             };
         }
 

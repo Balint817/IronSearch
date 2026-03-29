@@ -9,18 +9,14 @@ namespace IronSearch.Tags
             public override string EvaluatorName => "Author";
             public override IEnumerable<string> GetStrings(MusicInfo musicInfo)
             {
-                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.author))
-                {
-                    yield return item;
-                }
+                var result = new List<string>();
+                result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.author));
 
                 for (int i = 1; i <= 5; i++)
                 {
-                    foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).author))
-                    {
-                        yield return item;
-                    }
+                    result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).author));
                 }
+                return result;
             }
         }
         internal static bool EvalAuthor(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

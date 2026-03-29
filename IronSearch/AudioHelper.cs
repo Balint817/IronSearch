@@ -169,7 +169,7 @@ namespace IronSearch
                 }
             }, token);
             sw.Stop();
-            MelonLogger.Msg($"Finished customs in {sw.Elapsed.TotalSeconds:F1} seconds.");
+            MelonLogger.Msg($"Finished customs calculation in {sw.Elapsed.TotalSeconds:F1} seconds.");
         }
 
         private static TimeSpan? GetCustomLength(MusicInfo musicInfo)

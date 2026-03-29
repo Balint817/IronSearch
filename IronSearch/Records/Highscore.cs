@@ -17,9 +17,19 @@ namespace IronSearch.Records
         {
             get
             {
-                _evalStr ??= EvaluateDefine.EvaluateToRecordStr(Evaluate);
+                _evalStr ??= (Evaluate == -1 ? "?" : EvaluateDefine.EvaluateToRecordStr(Evaluate));
                 return _evalStr;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"Uid: {Uid}\n" +
+                   $"Evaluate: {Evaluate} ({EvaluateStr})\n" +
+                   $"Score: {Score}\n" +
+                   $"Combo: {Combo}\n" +
+                   $"Clear: {Clear}\n" +
+                   $"Accuracy: {Accuracy} ({AccuracyStr})";
         }
     }
 
