@@ -1,40 +1,41 @@
-using System.Text.RegularExpressions;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Exceptions;
 using IronSearch.Records;
+using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
 
-        internal static bool EvalAny(PeroString pStr, MusicInfo musicInfo, string filter)
+        public class AnyEvaluator : ContainsEvaluator
         {
-            return (EvalTag(pStr, musicInfo, filter) || EvalTitle(pStr, musicInfo, filter) || EvalAuthor(pStr, musicInfo, filter) || EvalDesigner(pStr, musicInfo, filter) || EvalAlbum(musicInfo, pStr, filter));
-        }
-        internal static bool EvalAny(MusicInfo musicInfo, Regex re)
-        {
-            return (EvalTag(musicInfo, re) || EvalTitle(musicInfo, re) || EvalAuthor(musicInfo, re) || EvalDesigner(musicInfo, re) || EvalAlbum(musicInfo, re));
-        }
-        internal static bool EvalAny(MusicInfo musicInfo, FuzzyContains fc)
-        {
-            return (EvalTag(musicInfo, fc) || EvalTitle(musicInfo, fc) || EvalAuthor(musicInfo, fc) || EvalDesigner(musicInfo, fc) || EvalAlbum(musicInfo, fc));
+            public override string EvaluatorName => "Any";
+
+            public ReadOnlyCollection<ContainsEvaluator> EvaluatorInstances = new(new ContainsEvaluator[]
+            {
+                ManagedSingleton<TagEvaluator>.Instance,
+                ManagedSingleton<TitleEvaluator>.Instance,
+                ManagedSingleton<AuthorEvaluator>.Instance,
+                ManagedSingleton<DesignerEvaluator>.Instance,
+                ManagedSingleton<AlbumEvaluator>.Instance
+            });
+            public override IEnumerable<string> GetStrings(MusicInfo musicInfo)
+            {
+                foreach (var evaluator in EvaluatorInstances)
+                {
+                    foreach (var item in evaluator.GetStrings(musicInfo))
+                    {
+                        yield return item;
+                    }
+                }
+            }
         }
         internal static bool EvalAny(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1);
-            ThrowIfNotEmpty(varKwargs);
-            switch (varArgs[0])
-            {
-                case string s:
-                    return EvalAny(M.PS, M.I, s);
-                case Regex re:
-                    return EvalAny(M.I, re);
-                case FuzzyContains fc:
-                    return EvalAny(M.I, fc);
-            }
-            throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), "Any()");
+            return ManagedSingleton<AnyEvaluator>.Instance.Evaluate(M, varArgs, varKwargs);
         }
     }
 }

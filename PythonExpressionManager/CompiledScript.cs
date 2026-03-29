@@ -71,6 +71,7 @@ namespace PythonExpressionManager
             catch (Exception ex)
             {
                 ConvertException(ex);
+                throw;
             }
         }
 

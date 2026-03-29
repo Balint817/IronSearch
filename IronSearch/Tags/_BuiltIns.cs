@@ -1,6 +1,5 @@
 using IronPython.Runtime;
 using IronSearch.Exceptions;
-using IronSearch.Records;
 using PythonExpressionManager;
 using Range = IronSearch.Records.Range;
 
