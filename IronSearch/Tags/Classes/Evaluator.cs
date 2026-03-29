@@ -5,7 +5,7 @@
         public abstract class Evaluator
         {
             public abstract string EvaluatorName { get; }
-            public string EvaluatorNameCalled => EvaluatorNameCalled;
+            public string EvaluatorNameCalled => $"{EvaluatorName}()";
             public abstract bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
         }
     }
