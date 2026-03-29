@@ -1,86 +1,44 @@
-using System.Text.RegularExpressions;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Exceptions;
 using IronSearch.Records;
+using System.Text.RegularExpressions;
+using static IronPython.Modules._ast;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
+        static IEnumerable<string> GetStrings_Designer(MusicInfo musicInfo)
+        {
+
+            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.levelDesigner))
+            {
+                yield return item;
+            }
+
+            Utils.GetAvailableMaps(musicInfo, out var availableMaps);
+            foreach (var i in availableMaps)
+            {
+                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i)))
+                {
+                    yield return item;
+                }
+            }
+        }
         internal static bool EvalDesigner(PeroString pStr, MusicInfo musicInfo, string value)
         {
-            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.levelDesigner))
-            {
-                if (pStr.LowerContains(item, value))
-                {
-                    return true;
-                }
-            }
-
-            Utils.GetAvailableMaps(musicInfo, out var availableMaps);
-            foreach (var i in availableMaps)
-            {
-                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i)))
-                {
-                    if (pStr.LowerContains(item, value))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return GetStrings_Designer(musicInfo).Any(x => x.LowerContains(value) || pStr.LowerContains(x, value));
         }
 
-        internal static bool EvalDesigner(MusicInfo musicInfo, Regex re)
+        internal static bool EvalDesigner(MusicInfo musicInfo, Regex value)
         {
-            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.levelDesigner))
-            {
-                if (re.IsMatch(item))
-                {
-                    return true;
-                }
-            }
-
-            Utils.GetAvailableMaps(musicInfo, out var availableMaps);
-            foreach (var i in availableMaps)
-            {
-                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i)))
-                {
-                    if (re.IsMatch(item))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return GetStrings_Designer(musicInfo).Any(x => value.IsMatch(x));
         }
 
-        internal static bool EvalDesigner(MusicInfo musicInfo, FuzzyContains fc)
+        internal static bool EvalDesigner(MusicInfo musicInfo, FuzzyContains value)
         {
-            foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.levelDesigner))
-            {
-                if (fc.IsMatch(item))
-                {
-                    return true;
-                }
-            }
-
-            Utils.GetAvailableMaps(musicInfo, out var availableMaps);
-            foreach (var i in availableMaps)
-            {
-                foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i) ?? ""))
-                {
-                     if (fc.IsMatch(item))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return GetStrings_Designer(musicInfo).Any(x => value.IsMatch(x));
         }
 
         internal static bool EvalDesigner(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

@@ -3,47 +3,35 @@ using Il2CppPeroTools2.PeroString;
 using IronSearch.Exceptions;
 using IronSearch.Records;
 using System.Text.RegularExpressions;
+using static IronPython.Modules._ast;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
         internal static Dictionary<int, List<string>> albumNameLists { get; set; } = null!;
-        internal static bool EvalAlbum(MusicInfo musicInfo, PeroString ps, string value)
+
+        static IEnumerable<string> GetStrings_Album(MusicInfo musicInfo)
         {
-            if (string.IsNullOrEmpty(value))
+            if (BuiltIns.albumNameLists.TryGetValue(musicInfo.m_MusicExInfo.m_AlbumUidIndex, out var albumNames))
             {
-                throw new SearchValidationException("Album filter cannot be empty.", "Album()");
+                foreach (var item in RomanizationHelper.GetAllRomanizations(albumNames))
+                {
+                    yield return item;
+                }
             }
-            if (!BuiltIns.albumNameLists.TryGetValue(musicInfo.m_MusicExInfo.m_AlbumUidIndex, out var albumNames))
-            {
-                return false;
-            }
-            return RomanizationHelper.GetAllRomanizations(albumNames).Any(x => x.LowerContains(value) || ps.LowerContains(x, value));
+        }
+        internal static bool EvalAlbum(MusicInfo musicInfo, PeroString pStr, string value)
+        {
+            return GetStrings_Album(musicInfo).Any(x => x.LowerContains(value) || pStr.LowerContains(x, value));
         }
         internal static bool EvalAlbum(MusicInfo musicInfo, Regex value)
         {
-            if (value is null)
-            {
-                throw new SearchValidationException("Album filter cannot be empty.", "Album()");
-            }
-            if (!BuiltIns.albumNameLists.TryGetValue(musicInfo.m_MusicExInfo.m_AlbumUidIndex, out var albumNames))
-            {
-                return false;
-            }
-            return RomanizationHelper.GetAllRomanizations(albumNames).Any(x => value.IsMatch(x));
+            return GetStrings_Album(musicInfo).Any(x => value.IsMatch(x));
         }
         internal static bool EvalAlbum(MusicInfo musicInfo, FuzzyContains value)
         {
-            if (value is null)
-            {
-                throw new SearchValidationException("Album filter cannot be empty.", "Album()");
-            }
-            if (!BuiltIns.albumNameLists.TryGetValue(musicInfo.m_MusicExInfo.m_AlbumUidIndex, out var albumNames))
-            {
-                return false;
-            }
-            return RomanizationHelper.GetAllRomanizations(albumNames).Any(x => value.IsMatch(x));
+            return GetStrings_Album(musicInfo).Any(x => value.IsMatch(x));
         }
 
         internal static bool EvalAlbum(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
