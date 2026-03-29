@@ -31,7 +31,7 @@ namespace IronSearch.Tags
             }
             varKwargs.Remove("id");
 
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varKwargs, "LogOnce()");
 
             var sb = new StringBuilder();
             sb.Append(id);

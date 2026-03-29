@@ -7,8 +7,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalGetLength(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotEmpty(varArgs);
+            ThrowIfNotEmpty(varKwargs, "GetLength()");
+            ThrowIfNotEmpty(varArgs, "GetLength()");
 
             var l = AudioHelper.GetMusicLength(M.I);
             if (l is { } ts)

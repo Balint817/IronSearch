@@ -15,7 +15,7 @@ namespace IronSearch.Tags
     {
         internal static bool EvalSorter(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfEmpty(varArgs);
+            ThrowIfEmpty(varArgs, "Sorter()");
 
             bool reverse = false;
             int priority = 0;
@@ -34,7 +34,7 @@ namespace IronSearch.Tags
                 priority = tn;
                 varKwargs.Remove("priority");
             }
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Sorter()");
 
             var args = varArgs.ToList();
             if (args[^1] is bool b1)
@@ -58,7 +58,7 @@ namespace IronSearch.Tags
                 }
             }
 
-            ThrowIfEmpty(varArgs);
+            ThrowIfEmpty(varArgs, "Sorter()");
 
             SearchMergePatch._activeSorters.Add(new(varArgs, reverse, priority));
 

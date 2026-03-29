@@ -19,7 +19,7 @@ namespace IronSearch.Tags
         internal static Mutex helpMutex = new();
         internal static bool EvalHelp(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1);
+            ThrowIfNotMatching(varArgs, 1, "Help()");
 
             try
             {

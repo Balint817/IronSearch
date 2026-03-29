@@ -21,7 +21,7 @@ namespace IronSearch.Tags
                 separator = s;
                 varKwargs.Remove("sep");
             }
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varKwargs, "LogUnique()");
 
             var sb = new StringBuilder();
             foreach (var item in varArgs)

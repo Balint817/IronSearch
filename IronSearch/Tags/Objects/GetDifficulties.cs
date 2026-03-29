@@ -7,8 +7,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalGetDifficulties(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "GetDifficulties()");
+            ThrowIfNotEmpty(varKwargs, "GetDifficulties()");
             Utils.GetMapDifficulties(M.I, out var maps);
             var l = new PythonList();
             foreach (var map in maps)

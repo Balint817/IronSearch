@@ -8,8 +8,8 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalGetLanguageIndex(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "GetLanguage()");
+            ThrowIfNotEmpty(varKwargs, "GetLanguage()");
             return Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
         }
     }

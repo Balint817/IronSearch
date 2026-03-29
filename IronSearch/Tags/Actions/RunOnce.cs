@@ -12,8 +12,8 @@ namespace IronSearch.Tags
         internal static readonly ConcurrentDictionary<string, bool> runOnceIds = new();
         internal static bool EvalRunOnce(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotMatching(varArgs, 2);
+            ThrowIfNotEmpty(varKwargs, "RunOnce()");
+            ThrowIfNotMatching(varArgs, 2, "RunOnce()");
 
             if (!Utils.IsCallable(varArgs[0]))
             {

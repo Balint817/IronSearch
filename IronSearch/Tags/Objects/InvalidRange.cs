@@ -7,8 +7,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalInvalidRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "InvalidRange()");
+            ThrowIfNotEmpty(varKwargs, "InvalidRange()");
             return Range.InvalidRange;
         }
     }

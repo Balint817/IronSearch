@@ -7,8 +7,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalFullMultiRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "FullMultiRange()");
+            ThrowIfNotEmpty(varKwargs, "FullMultiRange()");
             return MultiRange.FullRange;
         }
     }

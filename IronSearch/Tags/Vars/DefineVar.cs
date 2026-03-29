@@ -21,8 +21,8 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalDefineVar(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 2);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotMatching(varArgs, 2, "DefineVar()");
+            ThrowIfNotEmpty(varKwargs, "DefineVar()");
 
             if (varArgs[0] is not string s)
             {

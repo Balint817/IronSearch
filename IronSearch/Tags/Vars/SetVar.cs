@@ -23,8 +23,8 @@ namespace IronSearch.Tags
         internal static readonly ConcurrentDictionary<string, Dictionary<string, dynamic>> LocalVariables = new();
         internal static dynamic EvalSetVar(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 2);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotMatching(varArgs, 2, "SetVar()");
+            ThrowIfNotEmpty(varKwargs, "SetVar()");
 
             if (varArgs[0] is not string s)
             {

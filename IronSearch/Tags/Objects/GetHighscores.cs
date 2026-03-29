@@ -8,8 +8,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalGetHighscores(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "GetHighScores()");
+            ThrowIfNotEmpty(varKwargs, "GetHighScores()");
             var l = new PythonList();
             foreach (var item in RefreshPatch.highScores)
             {

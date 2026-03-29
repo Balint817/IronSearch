@@ -17,7 +17,7 @@ public class SimpleDropdown : MonoBehaviour
     private const float itemHeight = 28f;
     private const int visibleItems = 4;
     private int windowId;
-    private GUIStyle labelStyle;
+    private GUIStyle? labelStyle;
 
     private float Height => itemHeight * visibleItems + 10f;
 
