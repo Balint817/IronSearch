@@ -29,6 +29,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Romanization.NET" Version="0.9.5" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\PythonExpressionManager\PythonExpressionManager.csproj" />
   </ItemGroup>
 
