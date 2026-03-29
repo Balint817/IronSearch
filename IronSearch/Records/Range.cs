@@ -7,6 +7,18 @@ namespace IronSearch.Records
 {
     public class Range : IComparable
     {
+        public Range Copy()
+        {
+            return new Range()
+            {
+                _start = this._start,
+                _end = this._end,
+                _exclusiveEnd = this._exclusiveEnd,
+                _exclusiveStart = this._exclusiveStart,
+                IsReadonly = this.IsReadonly
+            };
+        }
+
         public static explicit operator Range(PythonRange value)
         {
             if (value == null)
@@ -288,6 +300,10 @@ namespace IronSearch.Records
 
         public bool IsOverlap(Range range)
         {
+            if (double.IsNaN(_start) || range is null || double.IsNaN(range._start))
+            {
+                return false;
+            }
             if (_end < range._start)
             {
                 return false;
@@ -364,6 +380,10 @@ namespace IronSearch.Records
                 throw new ArgumentOutOfRangeException(nameof(limit));
             }
             merge = null;
+            if (double.IsNaN(_start) || range is null || double.IsNaN(range._start))
+            {
+                return false;
+            }
             if (_end < range._start - limit)
             {
                 return false;
@@ -421,6 +441,10 @@ namespace IronSearch.Records
         public bool TryMerge(Range range, [MaybeNullWhen(false)] out Range merge)
         {
             merge = null;
+            if (double.IsNaN(_start) || range is null || double.IsNaN(range._start))
+            {
+                return false;
+            }
             if (_end < range._start)
             {
                 return false;

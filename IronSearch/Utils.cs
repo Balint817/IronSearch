@@ -893,7 +893,7 @@ namespace IronSearch
             Vector3 finalWorld = new Vector3(worldX.x, bottomLeft.y, 0f);
 
             Canvas canvas = text.canvas;
-            Camera cam = null;
+            Camera? cam = null;
 
             if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
                 cam = canvas.worldCamera;
@@ -902,7 +902,7 @@ namespace IronSearch
             return sc;
         }
 
-        private static Vector2 GetFallback(InputField inputField)
+        private static Vector2 GetFallback(InputField? inputField)
         {
             if (inputField == null)
                 return Vector2.zero;
@@ -917,7 +917,7 @@ namespace IronSearch
             Vector3 bottomLeft = corners[0];
 
             Canvas canvas = inputField.GetComponentInParent<Canvas>();
-            Camera cam = null;
+            Camera? cam = null;
 
             if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
                 cam = canvas.worldCamera;

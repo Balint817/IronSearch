@@ -131,7 +131,7 @@ namespace IronSearch.Patches
 
                         SearchPatch.searchCache.TryAdd(SearchPatch.currentSearchText!, new SearchCache(m_lock, m_Unlock, true, expirationTime));
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         criticalFlag = false;
                         var s = "An error occured and sorting failed. This is likely a mistake in the search.";

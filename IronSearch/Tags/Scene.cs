@@ -100,8 +100,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalScene(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotMatching(varArgs, 1, "Scene()");
+            ThrowIfNotEmpty(varKwargs, "Scene()");
             var arg1 = varArgs[0];
             switch (arg1)
             {

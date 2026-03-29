@@ -12,8 +12,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalHistory(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "History()");
+            ThrowIfNotEmpty(varKwargs, "History()");
             return EvalHistory(M.I);
         }
     }

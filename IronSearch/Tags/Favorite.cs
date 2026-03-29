@@ -12,8 +12,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalFavorite(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "Favorite()");
+            ThrowIfNotEmpty(varKwargs, "Favorite()");
             return EvalFavorite(M.I);
         }
     }

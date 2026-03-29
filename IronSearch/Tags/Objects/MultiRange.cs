@@ -11,38 +11,14 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalMultiRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfEmpty(varArgs, "MultiRange()");
+            ThrowIfNotEmpty(varKwargs, "MultiRange()");
 
             var multiRanges = new List<MultiRange>();
 
             for (int i = 0; i < varArgs.Length; i++)
             {
-                var arg = varArgs[i];
-                if (arg is string s)
-                {
-                    if (!Utils.ParseMultiRange(s, out var mr))
-                    {
-                        throw SearchParseException.ForMultiRange(s, "MultiRange()", "one or more ranges separated by spaces, or range objects");
-                    }
-                    multiRanges.Add(mr);
-                }
-                else if (arg is Range r)
-                {
-                    multiRanges.Add(r.AsMultiRange());
-                }
-                else if (arg is PythonRange pr)
-                {
-                    multiRanges.Add(((Range)pr).AsMultiRange());
-                }
-                else if (arg is MultiRange mr)
-                {
-                    multiRanges.Add(mr);
-                }
-                else
-                {
-                    throw new SearchWrongTypeException("a range string, range, or multi-range object", arg?.GetType(), "MultiRange()");
-                }
+                multiRanges.Add(MultiRangeArgumentParser.GetMultiRange(varArgs[i], "MultiRange()", true));
             }
             var result = new MultiRange();
             foreach (var item in multiRanges)

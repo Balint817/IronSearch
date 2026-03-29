@@ -18,8 +18,8 @@ namespace IronSearch.Tags
 
         internal static bool EvalPacked(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "Packed()");
+            ThrowIfNotEmpty(varKwargs, "Packed()");
             return EvalPacked(M.I);
         }
     }

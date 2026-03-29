@@ -18,8 +18,8 @@ namespace IronSearch.Tags
 
         internal static bool EvalRanked(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "Ranked()");
+            ThrowIfNotEmpty(varKwargs, "Ranked()");
             return EvalRanked(M.I);
         }
     }

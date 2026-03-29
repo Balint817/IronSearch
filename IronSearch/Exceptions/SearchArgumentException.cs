@@ -45,6 +45,11 @@ namespace IronSearch.Exceptions
             return new SearchArgumentException("Expected at least one positional argument.", parameterContext);
         }
 
+        public static SearchArgumentException ExpectedAtLeastNPositional(int n, string? parameterContext = null)
+        {
+            return new SearchArgumentException($"Expected at least {n} positional argument(s).", parameterContext);
+        }
+
         public static SearchArgumentException ArgumentCountNotInRange(Range expectedRange, int actualCount, string? parameterContext = null)
         {
             return new SearchArgumentException(

@@ -24,8 +24,8 @@ namespace IronSearch.Tags
                 varKwargs.Remove("case");
             }
 
-            ThrowIfNotEmpty(varKwargs);
-            ThrowIfEmpty(varArgs);
+            ThrowIfNotEmpty(varKwargs, "Fuzzy()");
+            ThrowIfEmpty(varArgs, "Fuzzy()");
 
             if (varArgs[^1] is bool b2)
             {
@@ -33,7 +33,7 @@ namespace IronSearch.Tags
                 varArgs = varArgs[..^1];
             }
 
-            ThrowIfNotMatching(varArgs, evalFuzzyArgCount);
+            ThrowIfNotMatching(varArgs, evalFuzzyArgCount, "Fuzzy()");
 
             if (varArgs[0] is string s0)
             {

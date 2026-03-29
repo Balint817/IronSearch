@@ -1,64 +1,78 @@
-using System.Numerics;
 using IronSearch.Exceptions;
-using IronSearch.Records;
+using System.Numerics;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        static readonly Range evalRandomArgCount = new(0, 1);
+        static readonly Range evalRandomArgCount = new(0, 2);
         internal static dynamic EvalRandom(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varKwargs);
-            ThrowIfNotMatching(varArgs, evalRandomArgCount);
+            ThrowIfNotEmpty(varKwargs, "Random()");
+            ThrowIfNotMatching(varArgs, 2, "Random()");
             if (varArgs.Length == 0)
             {
                 return Random.Shared.NextDouble();
             }
+
+            if (varArgs.Length == 1)
+            {
+                Range r = RangeArgumentParser.GetRange(varArgs[0], "Random()", allowTime: true);
+                if (r.Start == r.End)
+                {
+                    throw new SearchValidationException("min and max cannot be equal.", "Random()");
+                }
+                if (r.Start == double.NegativeInfinity || r.End == double.PositiveInfinity)
+                {
+                    throw new SearchValidationException("min and max cannot be infinity.", "Random()");
+                }
+
+                return UniformDouble.NextDouble(r.Start, r.End);
+            }
+
+            long start;
+
             switch (varArgs[0])
             {
                 case int n1:
-                    {
-                        if (varArgs.Length != 2 || varArgs[1] is not int n2)
-                        {
-                            throw new SearchValidationException("Random() with arguments expects two integers: min and max.", "Random()");
-                        }
-                        if (n2 < n1)
-                        {
-                            (n1, n2) = (n2, n1);
-                        }
-                        return Random.Shared.Next(n1, n2);
-                    }
-
-                case long n1:
-                    {
-                        if (varArgs.Length != 2 || varArgs[1] is not long n2)
-                        {
-                            throw new SearchValidationException("Random() with arguments expects two integers: min and max.", "Random()");
-                        }
-                        if (n2 < n1)
-                        {
-                            (n1, n2) = (n2, n1);
-                        }
-                        return Random.Shared.NextInt64(n1, n2);
-                    }
-                case BigInteger n1:
-                    {
-                        if (varArgs.Length != 2 || varArgs[1] is not BigInteger n2 || n1 > long.MaxValue || n2 > long.MaxValue)
-                        {
-                            throw new SearchValidationException("Random() with arguments expects two integers: min and max.", "Random()");
-                        }
-                        if (n2 < n1)
-                        {
-                            (n1, n2) = (n2, n1);
-                        }
-                        return Random.Shared.NextInt64((long)n1, (long)n2);
-                    }
-                default:
+                    start = n1;
                     break;
+                case long n1:
+                    start = n1;
+                    break;
+                case BigInteger n1:
+                    if (n1 > RangeArgumentParser.MaxDouble)
+                    {
+                        throw new SearchValidationException($"The value {n1} is too large to be used as a start value.", "Random()");
+                    }
+                    start = (long)n1;
+                    break;
+                default:
+                    throw new SearchWrongTypeException($"expected 2 integers", varArgs[0]?.GetType(), "Random()");
             }
-            throw new SearchValidationException("random() expects no arguments (0-1 float), or two integers/long integers for a bounded range.", "Random()");
+
+            long end;
+            switch (varArgs[0])
+            {
+                case int n1:
+                    end = n1;
+                    break;
+                case long n1:
+                    end = n1;
+                    break;
+                case BigInteger n1:
+                    if (n1 > RangeArgumentParser.MaxDouble)
+                    {
+                        throw new SearchValidationException($"The value {n1} is too large to be used as a start value.", "Random()");
+                    }
+                    end = (long)n1;
+                    break;
+                default:
+                    throw new SearchWrongTypeException($"expected 2 integers", varArgs[0]?.GetType(), "Random()");
+            }
+
+            return Random.Shared.NextInt64(start, end);
         }
     }
 }

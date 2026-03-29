@@ -11,35 +11,42 @@ namespace IronSearch.Tags
     internal delegate dynamic BuiltInObjectDelegate(SearchArgument input, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
     internal partial class BuiltIns
     {
-        internal static void ThrowIfNotEmpty(IReadOnlyDictionary<string, dynamic> d)
+        internal static void ThrowIfNotEmpty(IReadOnlyDictionary<string, dynamic> d, string parameterContext)
         {
             if (d.Count != 0)
             {
                 throw SearchArgumentException.UnexpectedKeywords(d.Keys);
             }
         }
-        internal static void ThrowIfNotEmpty(IList<dynamic> d)
+        internal static void ThrowIfNotEmpty(IList<dynamic> d, string parameterContext)
         {
             if (d.Count != 0)
             {
                 throw SearchArgumentException.UnexpectedPositionalArguments();
             }
         }
-        internal static void ThrowIfEmpty(IList<dynamic> d)
+        internal static void ThrowIfEmpty(IList<dynamic> d, string parameterContext)
         {
             if (d.Count == 0)
             {
                 throw SearchArgumentException.ExpectedAtLeastOnePositional();
             }
         }
-        internal static void ThrowIfNotMatching(IList<dynamic> d, Range r)
+        internal static void ThrowIfLess(IList<dynamic> d, int n, string parameterContext)
+        {
+            if (d.Count < n)
+            {
+                throw SearchArgumentException.ExpectedAtLeastNPositional(n);
+            }
+        }
+        internal static void ThrowIfNotMatching(IList<dynamic> d, Range r, string parameterContext)
         {
             if (!r.Contains(d.Count))
             {
                 throw SearchArgumentException.ArgumentCountNotInRange(r, d.Count);
             }
         }
-        internal static void ThrowIfNotMatching(IList<dynamic> d, int n)
+        internal static void ThrowIfNotMatching(IList<dynamic> d, int n, string parameterContext)
         {
             if (d.Count != n)
             {

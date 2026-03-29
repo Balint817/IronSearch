@@ -43,8 +43,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCinema(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "Cinema()");
+            ThrowIfNotEmpty(varKwargs, "Cinema()");
             return EvalCinema(M.I);
         }
     }

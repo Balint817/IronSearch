@@ -24,8 +24,8 @@ namespace IronSearch.Tags
         }
         internal static dynamic EvalGetModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "GetModified()");
+            ThrowIfNotEmpty(varKwargs, "GetModified()");
             return GetModified(M.I)!;
         }
     }

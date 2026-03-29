@@ -18,8 +18,8 @@ namespace IronSearch.Tags
 
         internal static bool EvalOnline(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "Online()");
+            ThrowIfNotEmpty(varKwargs, "Online()");
             return EvalOnline(M.I);
         }
     }

@@ -19,8 +19,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCustom(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs);
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varArgs, "Custom()");
+            ThrowIfNotEmpty(varKwargs, "Custom()");
             return EvalCustom(M.I);
         }
     }

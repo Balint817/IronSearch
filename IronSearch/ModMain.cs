@@ -459,6 +459,13 @@ namespace IronSearch
                 + "Checks if the music has a hidden difficulty"
             );
 
+            RegisterScript("Map", BuiltIns.EvalHasMap);
+            RegisterScript("HasMap", BuiltIns.EvalHasMap);
+            RegisterHelp(new() { "HasMap", "Map" },
+                "Usage: Map()\n\n"
+                + "Checks if the music has a specific level/map"
+            );
+
             RegisterScript("Touhou", BuiltIns.EvalHasTouhou);
             RegisterScript("HasTouhou", BuiltIns.EvalHasTouhou);
             RegisterHelp(new() { "HasTouhou", "Touhou" },

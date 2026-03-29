@@ -14,8 +14,8 @@ namespace IronSearch.Tags
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
             {
 
-                ThrowIfNotEmpty(varKwargs);
-                ThrowIfNotMatching(varArgs, 1);
+                ThrowIfNotEmpty(varKwargs, EvaluatorNameCalled);
+                ThrowIfNotMatching(varArgs, 1, EvaluatorNameCalled);
                 switch (varArgs[0])
                 {
                     case string s:
@@ -25,7 +25,7 @@ namespace IronSearch.Tags
                     case FuzzyContains fc:
                         return Evaluate(M.I, fc);
                 }
-                throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), $"{EvaluatorName}()");
+                throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), EvaluatorNameCalled);
             }
             public bool Evaluate(MusicInfo musicInfo, PeroString pStr, string value)
             {

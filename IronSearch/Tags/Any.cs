@@ -1,9 +1,5 @@
 using Il2CppAssets.Scripts.Database;
-using Il2CppPeroTools2.PeroString;
-using IronSearch.Exceptions;
-using IronSearch.Records;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 
 namespace IronSearch.Tags
 {

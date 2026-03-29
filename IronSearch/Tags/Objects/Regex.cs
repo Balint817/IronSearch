@@ -1,6 +1,5 @@
-using System.Text.RegularExpressions;
 using IronSearch.Exceptions;
-using IronSearch.Records;
+using System.Text.RegularExpressions;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
@@ -12,7 +11,7 @@ namespace IronSearch.Tags
         {
             var flags = RegexOptions.CultureInvariant
                 | RegexOptions.IgnoreCase;
-            ThrowIfNotMatching(varArgs, evalRegexArgCount);
+            ThrowIfNotMatching(varArgs, evalRegexArgCount, "Regex()");
 
             if (varKwargs.ContainsKey("case"))
             {
@@ -35,7 +34,7 @@ namespace IronSearch.Tags
                 varKwargs.Remove("case");
             }
 
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Regex()");
 
             if (varArgs.Length == 1)
             {

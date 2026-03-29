@@ -1,6 +1,4 @@
-using IronPython.Runtime;
 using IronSearch.Exceptions;
-using IronSearch.Records;
 using System.Numerics;
 using Range = IronSearch.Records.Range;
 
@@ -11,7 +9,7 @@ namespace IronSearch.Tags
         static readonly Range evalRangeArgCount = new Range(1, 2);
         internal static dynamic EvalRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, evalRangeArgCount);
+            ThrowIfNotMatching(varArgs, evalRangeArgCount, "Range()");
             bool? exclusiveStart = null;
             bool? exclusiveEnd = null;
             if (varKwargs.ContainsKey("end"))
@@ -34,84 +32,68 @@ namespace IronSearch.Tags
                 exclusiveStart = true;
                 varKwargs.Remove("start");
             }
-            ThrowIfNotEmpty(varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Range()");
 
 
             var arg0 = varArgs[0];
 
             if (varArgs.Length == 1)
             {
-                switch (arg0)
+                if (exclusiveEnd.HasValue || exclusiveStart.HasValue)
                 {
-                    case string s:
-                        if (!Utils.ParseRange(s, out var range))
-                        {
-                            throw SearchParseException.ForRange(s, "Range()", "a range string such as 1-10, 5+, or *");
-                        }
-                        if (exclusiveEnd.HasValue)
-                        {
-                            range.ExclusiveEnd = exclusiveEnd.Value;
-                        }
-                        if (exclusiveStart.HasValue)
-                        {
-                            range.ExclusiveStart = exclusiveStart.Value;
-                        }
+                    throw new SearchValidationException("'end=' and 'start=' keyword arguments are not valid when there is only 1 positional argument.", "Range()");
+                }
+                return RangeArgumentParser.GetRange(arg0, "Range()", allowTime: true);
+            }
 
-                        return range;
-                    case PythonRange pr:
-                        return (Range)pr;
-                    case Range r:
-                        return r;
-                    case int i:
-                        return new Range(i, i);
-                    case BigInteger i:
-                        return new Range((double)i, (double)i);
-                    case double i:
-                        return new Range(i, i);
-                    default:
-                        break;
-                }
-            }
-            else
+            double start;
+            double end;
+            switch (arg0)
             {
-                double start;
-                double end;
-                switch (arg0)
-                {
-                    case int i:
-                        start = i;
-                        break;
-                    case BigInteger i:
-                        start = (double)i;
-                        break;
-                    case double i:
-                        start = i;
-                        break;
-                    default:
-                        throw new SearchWrongTypeException("a number for the range start", arg0?.GetType(), "Range()");
-                }
-                var arg1 = varArgs[1];
-                switch (arg1)
-                {
-                    case int i:
-                        end = i;
-                        break;
-                    case BigInteger i:
-                        end = (double)i;
-                        break;
-                    case double i:
-                        end = i;
-                        break;
-                    default:
-                        throw new SearchWrongTypeException("a number for the range end", arg1?.GetType(), "Range()");
-                }
-                if (end < start)
-                {
-                    (start, end) = (end, start);
-                }
-                return new Range(start, end);
+                case int i:
+                    start = i;
+                    break;
+                case BigInteger i:
+                    if (i > RangeArgumentParser.MaxDouble)
+                    {
+                        throw new SearchValidationException($"The value {i} is too large to be used as a range argument.", "Range()");
+                    }
+                    start = (double)i;
+                    break;
+                case double i:
+                    start = i;
+                    break;
+                default:
+                    throw new SearchWrongTypeException("a number for the range start", arg0?.GetType(), "Range()");
             }
-            return false;
+            var arg1 = varArgs[1];
+            switch (arg1)
+            {
+                case int i:
+                    end = i;
+                    break;
+                case BigInteger i:
+                    if (i > RangeArgumentParser.MaxDouble)
+                    {
+                        throw new SearchValidationException($"The value {i} is too large to be used as a range argument.", "Range()");
+                    }
+                    end = (double)i;
+                    break;
+                case double i:
+                    end = i;
+                    break;
+                default:
+                    throw new SearchWrongTypeException("a number for the range end", arg1?.GetType(), "Range()");
+            }
+            if (end < start)
+            {
+                (start, end) = (end, start);
+            }
+            return new Range(start, end)
+            {
+                ExclusiveStart = exclusiveStart ?? false,
+                ExclusiveEnd = exclusiveEnd ?? false
+            };
         }
     }
 }
