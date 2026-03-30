@@ -13,7 +13,7 @@ namespace IronSearch.Tags
                 Utils.GetMapDifficulties(musicInfo, out var difficulties);
                 foreach (var i in availableMaps)
                 {
-                    var musicDiff = difficulties[i];
+                    var musicDiff = difficulties[i-1];
 
                     if (musicDiff.TryParseInt(out int x))
                     {
