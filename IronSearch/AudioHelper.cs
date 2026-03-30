@@ -158,14 +158,9 @@ namespace IronSearch
                     }
                     var album = allCustoms[i];
 
+                    var length = GetCustomLengthDirect(album.Uid);
 
-                    // can't start processing songs early because they don't load till the main UI?
-                    // try evil code hack™️ today!!!
-                    var musicInfo = new MusicInfo();
-                    musicInfo.uid = album.Uid;
-                    var length = GetCustomLengthDirect(musicInfo);
-
-                    CustomCache.TryAdd(musicInfo.uid, length);
+                    CustomCache.TryAdd(album.Uid, length);
                 }
             }, token);
             sw.Stop();
@@ -183,12 +178,12 @@ namespace IronSearch
                 }
                 CustomCacheTask = null!;
             }
-            return GetCustomLengthDirect(musicInfo);
+            return GetCustomLengthDirect(musicInfo.uid);
         }
 
-        private static TimeSpan? GetCustomLengthDirect(MusicInfo musicInfo)
+        private static TimeSpan? GetCustomLengthDirect(string uid)
         {
-            var album = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid);
+            var album = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == uid);
             try
             {
                 if (album.IsPackaged)
