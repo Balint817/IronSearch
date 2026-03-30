@@ -1,7 +1,6 @@
 # IronSearch
 ## Installation
-- Direct installation is not yet available, but you can clone the repository and build it locally.
-- (or, psst, you can fill out the form to get a download link for the latest stable pre-release!)
+- Currently, you must either fill out the form to get a download link, or clone the repo and build it.
 
 ## Feedback
 [Feedback form](https://docs.google.com/forms/d/e/1FAIpQLSevUpaUqkwmkfr6L4F5Zwsc9esofrMk3-MytSN0MSmHZSZhow/viewform)
