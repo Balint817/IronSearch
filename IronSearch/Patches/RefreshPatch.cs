@@ -8,11 +8,14 @@ using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
+using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
 using MelonLoader;
 using PythonExpressionManager;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using static MelonLoader.Modules.MelonModule;
 
 namespace IronSearch.Patches
 {
@@ -112,36 +115,85 @@ namespace IronSearch.Patches
                 return false;
             }
 
-            var peroBuffer = __instance.m_PeroStrings != null && __instance.m_PeroStrings.Length > 0
-                             ? __instance.m_PeroStrings[0]
-                             : new Il2CppPeroTools2.PeroString.PeroString(1000);
+            using var threadLocalPs = new ThreadLocal<PeroString>(() => new PeroString(1000));
+
+            var processorCount = Math.Clamp(
+    UnityEngine.SystemInfo.processorCount,
+    2,
+    Math.Max(allMusic.Count / 100, 4)
+);
+
+            var options = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = processorCount
+            };
+
+            var asyncResults = new ConcurrentBag<MusicInfo>();
+            var failed = false;
 
             try
             {
-                foreach (var info in allMusic)
-                {
-                    bool isMatch = ModMain.ScriptManager.ScriptExecutor.Evaluate(
-                        new SearchArgument(info, peroBuffer),
-                        compiledScript
-                    );
-
-                    if (isMatch)
+                Parallel.ForEach(
+                    Partitioner.Create(0, allMusic.Count),
+                    options,
+                    (range, state) =>
                     {
-                        __instance.musicResult.m_Unlock.Add(info);
-                    }
-                }
+                        for (int i = range.Item1; i < range.Item2; i++)
+                        {
+                            if (state.IsStopped)
+                                return;
+
+                            try
+                            {
+                                var music = allMusic[i];
+
+                                if (ModMain.ScriptManager.ScriptExecutor.Evaluate(
+                                    new SearchArgument(music, threadLocalPs.Value!),
+                                    compiledScript))
+                                {
+                                    asyncResults.Add(music);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                if (!failed)
+                                {
+                                    failed = true;
+                                    new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                }
+                                state.Stop();
+                                return;
+                            }
+                        }
+                    });
             }
             catch (Exception ex)
             {
-                isAdvancedSearch = null;
+                MelonLogger.Msg(ConsoleColor.DarkRed, $"Parallel execution failed:\n{ex}");
+            }
+
+            if (failed)
+            {
                 _sw.Stop();
-                __instance.musicResult?.m_Unlock?.Clear();
-                new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                isAdvancedSearch = null;
                 return false;
             }
 
 
+            // restore default order (for determinism)
+            var matchedUids = asyncResults.Select(x => x.uid).ToHashSet();
+
+            foreach (var item in allMusic)
+            {
+                if (matchedUids.Contains(item.uid))
+                {
+                    __instance.musicResult.m_Unlock.Add(item);
+                }
+            }
+
             _sw.Stop();
+
+
             MelonLogger.Msg($"Advanced search found {__instance.musicResult.m_Unlock.Count} songs in {_sw.Elapsed.TotalSeconds:F3}s.");
             _sw.Restart();
 
