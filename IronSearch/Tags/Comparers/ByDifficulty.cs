@@ -7,7 +7,7 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalByDifficulty(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            return (Comparison<MusicInfo>)SearchMergePatch.SortByDifficulty;
+            return (Comparison<MusicInfo>)SorterMethods.SortByDifficulty;
         }
     }
 }

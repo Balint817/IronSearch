@@ -60,7 +60,7 @@ namespace IronSearch.Tags
 
             ThrowIfEmpty(varArgs, "Sorter()");
 
-            SearchMergePatch._activeSorters.Add(new(varArgs, reverse, priority));
+            RefreshPatch._activeSorters.Add(new(varArgs, reverse, priority));
 
             return true;
         }

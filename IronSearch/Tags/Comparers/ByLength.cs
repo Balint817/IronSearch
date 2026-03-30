@@ -7,7 +7,7 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalByLength(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            return (Comparison<MusicInfo>)SearchMergePatch.SortByLength;
+            return (Comparison<MusicInfo>)SorterMethods.SortByLength;
         }
     }
 }

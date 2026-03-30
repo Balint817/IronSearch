@@ -7,7 +7,7 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalByUID(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            return (Comparison<MusicInfo>)SearchMergePatch.SortByUID;
+            return (Comparison<MusicInfo>)SorterMethods.SortByUID;
         }
     }
 }

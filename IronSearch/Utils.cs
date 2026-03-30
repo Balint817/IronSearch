@@ -664,93 +664,48 @@ namespace IronSearch
             return AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Sheets.Where(x => !string.IsNullOrEmpty(x.Value.Md5)).Select(x => x.Key).ToHashSet();
         }
 
-
-
-
-
-
-        public static bool GetMapDifficulties(MusicInfo musicInfo, out string[] availableMaps)
+        public static bool GetMapDifficulties(MusicInfo musicInfo, out string[] difficulties)
         {
-            return GetMapDifficulties(musicInfo, out availableMaps, out _);
+            difficulties = null!;
+            if (!GetAvailableMaps(musicInfo, out var availableMaps))
+            {
+                return false;
+            }
+
+            difficulties = new string[5];
+
+            if (availableMaps.Contains(1))
+                difficulties[0] = musicInfo.difficulty1;
+            if (availableMaps.Contains(2))
+                difficulties[1] = musicInfo.difficulty2;
+            if (availableMaps.Contains(3))
+                difficulties[2] = musicInfo.difficulty3;
+            if (availableMaps.Contains(4))
+                difficulties[3] = musicInfo.difficulty4;
+            if (availableMaps.Contains(5))
+                difficulties[4] = musicInfo.difficulty5;
+
+            return true;
         }
 
-        public static bool GetMapDifficulties(MusicInfo musicInfo, out string[] availableMaps, out bool isCustom)
+        public static bool GetMapCallbacks(MusicInfo musicInfo, out int[] difficulties)
         {
-            isCustom = BuiltIns.EvalCustom(musicInfo);
-            bool any = false;
-            if (isCustom)
+            difficulties = null!;
+            if (!GetAvailableMaps(musicInfo, out var availableMaps))
             {
-                availableMaps = GetCustomDifficulties(musicInfo);
+                return false;
             }
-            else
-            {
-                availableMaps = new string[5];
-                for (int i = 1; i < 6; i++)
-                {
-                    var musicDiff = musicInfo.GetMusicLevelStringByDiff(i, false);
-                    if (!(string.IsNullOrEmpty(musicDiff) || musicDiff == "0"))
-                    {
-                        availableMaps[i - 1] = musicDiff;
-                        any = true;
-                    }
-                }
-            }
-            return any;
+
+            difficulties = new int[5];
+
+            difficulties[0] = availableMaps.Contains(1) ? musicInfo.callBackDifficulty1 : int.MinValue;
+            difficulties[1] = availableMaps.Contains(2) ? musicInfo.callBackDifficulty2 : int.MinValue;
+            difficulties[2] = availableMaps.Contains(3) ? musicInfo.callBackDifficulty3 : int.MinValue;
+            difficulties[3] = availableMaps.Contains(4) ? musicInfo.callBackDifficulty4 : int.MinValue;
+            difficulties[4] = availableMaps.Contains(5) ? musicInfo.callBackDifficulty5 : int.MinValue;
+
+            return true;
         }
-
-        private static string[] GetCustomDifficulties(MusicInfo musicInfo)
-        {
-            var maps = new string[5];
-            foreach (var item in AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Sheets)
-            {
-                maps[item.Key] = musicInfo.GetMusicLevelStringByDiff(item.Key, false);
-            }
-            return maps;
-        }
-
-
-
-        public static bool GetMapCallbacks(MusicInfo musicInfo, out int[] availableMaps)
-        {
-            return GetMapCallbacks(musicInfo, out availableMaps, out _);
-        }
-
-        public static bool GetMapCallbacks(MusicInfo musicInfo, out int[] availableMaps, out bool isCustom)
-        {
-            isCustom = BuiltIns.EvalCustom(musicInfo);
-            bool any = false;
-            if (isCustom)
-            {
-                availableMaps = GetCustomCallbacks(musicInfo);
-            }
-            else
-            {
-                availableMaps = new int[5];
-                for (int i = 1; i < 6; i++)
-                {
-                    var musicDiff = musicInfo.GetCallBackMusicLevelIntByDiff(i, false);
-                    if (musicDiff != 0)
-                    {
-                        availableMaps[i - 1] = musicDiff;
-                        any = true;
-                    }
-                }
-            }
-            return any;
-        }
-
-        private static int[] GetCustomCallbacks(MusicInfo musicInfo)
-        {
-            var maps = new int[5];
-            foreach (var item in AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Sheets)
-            {
-                maps[item.Key] = musicInfo.GetCallBackMusicLevelIntByDiff(item.Key, false);
-            }
-            return maps;
-        }
-
-
-
 
 
 

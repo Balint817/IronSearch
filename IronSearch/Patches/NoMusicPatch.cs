@@ -8,19 +8,20 @@ namespace IronSearch.Patches
     {
         static bool Prefix(ref string __result)
         {
-            if (SearchPatch.isAdvancedSearch == true)
+            if (RefreshPatch.isAdvancedSearch == false)
             {
-                if (SearchPatch.searchError != null)
-                {
-                    __result = "Error; Check your console";
-                }
-                else
-                {
-                    __result = "But nobody came.";
-                }
-                return false;
+                return true;
             }
-            return true;
+
+            if (RefreshPatch.isAdvancedSearch == true)
+            {
+                __result = "But nobody came.";
+            }
+            else
+            {
+                __result = "Error; Check your console";
+            }
+            return false;
         }
     }
     [HarmonyPatch(typeof(LocalizationName), "GetSearchNameTxt")]
@@ -28,7 +29,7 @@ namespace IronSearch.Patches
     {
         static bool Prefix(ref string __result)
         {
-            if (SearchPatch.isAdvancedSearch == true)
+            if (RefreshPatch.isAdvancedSearch != false)
             {
                 __result = "Results";
                 return false;

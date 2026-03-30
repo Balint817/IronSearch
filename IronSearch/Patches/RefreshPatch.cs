@@ -1,11 +1,14 @@
 ﻿using CustomAlbums.Data;
 using CustomAlbums.Managers;
+using HarmonyLib;
 using Il2Cpp;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
+using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppAssets.Scripts.Structs.Modules;
+using Il2CppAssets.Scripts.UI.Controls;
+using Il2CppPeroPeroGames.GlobalDefines;
 using IronSearch.Records;
-using IronSearch.Tags;
 using MelonLoader;
 using PythonExpressionManager;
 using System.Collections.ObjectModel;
@@ -13,9 +16,13 @@ using System.Diagnostics;
 
 namespace IronSearch.Patches
 {
-    [HarmonyLib.HarmonyPatch(typeof(SearchResults), "RefreshData")]
+    [HarmonyPatch(typeof(SearchResults), "RefreshData")]
     internal static class RefreshPatch
     {
+
+        internal static List<SorterInfo> _activeSorters = new();
+        internal static int langIndex;
+
 
         internal static List<Highscore> highScores { get; set; } = new();
 
@@ -35,137 +42,268 @@ namespace IronSearch.Patches
         public static ReadOnlyCollection<string> Hides => hides.AsReadOnly();
         public static ReadOnlyCollection<string> Streamer => streamer.AsReadOnly();
 
+        internal static readonly Dictionary<string, SearchCache> searchCache = new();
+
+        internal static bool? isAdvancedSearch { get; private set; } = false;
+
         //Singleton<TerminalManager>
         //DBMusicTagDefine.newMusicUids;
         private static Stopwatch _sw = new();
+
         internal static void Postfix()
         {
-            if (SearchPatch.isAdvancedSearch != true)
-            {
-                return;
-            }
-
-            ////var _hides = DataHelper.hides;
-            ////foreach (var item in hides)
-            ////{
-            ////    _hides.Add(item);
-            ////}
-            BuiltIns.sortedByLastModified = null;
-            if (SearchPatch.searchError != null)
-            {
-                SearchPatch.isAdvancedSearch = false;
-                SearchPatch.searchError.PrintSearchError();
-            }
-            else
-            {
-                _sw.Stop();
-                MelonLogger.Msg($"Advanced search completed in {_sw.Elapsed.TotalSeconds:F1} seconds.");
-            }
-            if (BuiltIns.isCinemaModified)
-            {
-                BuiltIns.lastCheckedCinema = DateTime.UtcNow;
-            }
+            isAdvancedSearch = false;
         }
-
-        internal static bool FirstCall = true;
-
-        internal static void Prefix(string keyword)
+        internal static bool Prefix(SearchResults __instance, string keyword)
         {
-            SearchPatch.currentSearchText = null;
-            SearchPatch.currentCache = null;
-            if (ModMain.UISystemLoaded && ModMain.IsFirstLengthCacheBuild)
+            isAdvancedSearch = false;
+            if (string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.StartString))
             {
-                ModMain.BuildCacheIfNecessary();
-            }
-            //favorites = DataHelper.collections
-            //hiddenSongs = DataHelper.hides
-            var text = keyword;
-            if (FirstCall)
-            {
-                text = Utils.FindKeyword;
-                FirstCall = false;
-            }
-            else if (!ModMain.InitSuccessful)
-            {
-                return;
-            }
-            if (ModMain.StartString == null)
-            {
-                return;
-            }
-            ModMain.LoadAlbumNames();
-            BuiltIns.logUnique.Clear();
-            BuiltIns.logOnceIds.Clear();
-            BuiltIns.helpIds.Clear();
-            BuiltIns.helpEnabled = true;
-            SearchPatch.searchError = null;
-            BuiltIns.GlobalVariables.Clear();
-            BuiltIns.LocalVariables.Clear();
-
-            if (!text.StartsWith(ModMain.StartString))
-            {
-                SearchPatch.isAdvancedSearch = false;
-                NullifyAdvancedSearch();
-                return;
+                return true;
             }
 
-            text = text[ModMain.StartString.Length..].Trim(' ');
+            isAdvancedSearch = true;
+
+            string expression = keyword[ModMain.StartString.Length..].Trim();
+
+            __instance.musicResult.m_Unlock.Clear();
+            __instance.musicResult.m_Lock.Clear();
+            __instance.authorResult.m_Unlock.Clear();
+            __instance.authorResult.m_Lock.Clear();
+            __instance.levelDesignerResult.m_Unlock.Clear();
+            __instance.levelDesignerResult.m_Lock.Clear();
+            __instance.musicAlbumResults.Clear();
+
+            var allMusic = new Il2CppSystem.Collections.Generic.List<MusicInfo>();
+            GlobalDataBase.s_DbMusicTag.GetAllMusicInfo(allMusic);
+
+            if (ModMain.EnablePersistentSearchCaching && searchCache.TryGetValue(expression, out var cache))
+            {
+                CachedSearch(__instance, cache, allMusic);
+                return false;
+            }
+            else if (searchCache.TryGetValue(expression, out cache))
+            {
+                if (!(cache.Expiration is not { } exp || exp < DateTime.UtcNow))
+                {
+                    CachedSearch(__instance, cache, allMusic);
+                    return false;
+                }
+                else
+                {
+                    searchCache.Remove(expression);
+                }
+            }
 
             _sw.Restart();
-            CompiledScript parseResult;
+
+            PrepareSearchData();
+
+            CompiledScript compiledScript;
             try
             {
-                parseResult = ModMain.ScriptManager.ScriptExecutor.Compile(text);
+                compiledScript = ModMain.ScriptManager.ScriptExecutor.Compile(expression);
             }
             catch (Exception ex)
             {
+                isAdvancedSearch = null;
                 _sw.Stop();
                 new SearchResponse("Failed to parse search.", ex, SearchResponse.Type.ParserError).PrintSearchError();
-                return;
+                return false;
             }
 
-            SearchPatch.currentSearchText = text;
-            SearchPatch.compiledScript = parseResult;
-            history = DataHelper.history.ToSystem();
-            highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToList();
-            fullCombos = DataHelper.fullComboMusic.ToSystem();
-            favorites = DataHelper.collections.ToSystem();
-            hides = DataHelper.hides.ToSystem();
+            var peroBuffer = __instance.m_PeroStrings != null && __instance.m_PeroStrings.Length > 0
+                             ? __instance.m_PeroStrings[0]
+                             : new Il2CppPeroTools2.PeroString.PeroString(1000);
+
             try
             {
-                streamer = Singleton<AnchorModule>.instance.m_DbAnchor.m_AnchorMusicInfos.ToSystem().Keys.ToList();
-            }
-            catch (Exception)
-            {
-                streamer = new List<string>();
-            }
+                foreach (var info in allMusic)
+                {
+                    bool isMatch = ModMain.ScriptManager.ScriptExecutor.Evaluate(
+                        new SearchArgument(info, peroBuffer),
+                        compiledScript
+                    );
 
-            if (ModMain.CustomAlbumsLoaded)
-            {
-                try
-                {
-                    LoadCustomData();
-                }
-                catch (Exception ex)
-                {
-                    MelonLogger.Msg(ConsoleColor.Red, "Failed to load custom album data: " + ex);
+                    if (isMatch)
+                    {
+                        __instance.musicResult.m_Unlock.Add(info);
+                    }
                 }
             }
-            //DataHelper.hides.Clear();
-
-            SearchPatch.isAdvancedSearch = true;
-
-            if (SearchPatch.searchCache.TryGetValue(SearchPatch.currentSearchText, out var cache) && !(cache.Expiration is { } exp && exp < DateTime.UtcNow))
+            catch (Exception ex)
             {
-                SearchPatch.currentCache = cache;
+                isAdvancedSearch = null;
+                _sw.Stop();
+                __instance.musicResult?.m_Unlock?.Clear();
+                new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                return false;
             }
-            //MelonLogger.Msg("Parsed tags: $" + string.Join(" ", SearchPatch.tagGroups.Select(x1 => string.Join("|", x1.Select(x2 => TermToString(x2))))) + '$');
+
+
+            _sw.Stop();
+            MelonLogger.Msg($"Advanced search found {__instance.musicResult.m_Unlock.Count} songs in {_sw.Elapsed.TotalSeconds:F3}s.");
+            _sw.Restart();
+
+
+            SorterMethods.sortingFlag = true;
+            bool criticalFlag = true;
+            try
+            {
+                SorterMethods._randomDictionary.Clear();
+
+                if (_activeSorters.Count != 0)
+                {
+
+                    _activeSorters.Sort();
+                    var filteredByPriority = new SortedDictionary<int, SorterInfo>();
+
+                    foreach (var sorterInfo in _activeSorters)
+                    {
+                        filteredByPriority[sorterInfo.Priority] = sorterInfo;
+                    }
+
+                    var sorterInfos = filteredByPriority.Values.ToList();
+
+                    Comparison<MusicInfo> comparer = (MusicInfo musicInfo1, MusicInfo musicInfo2) =>
+                    {
+                        foreach (var sorterInfo in sorterInfos)
+                        {
+                            foreach (var processor in sorterInfo.Comparers)
+                            {
+                                var t = processor(musicInfo1, musicInfo2);
+                                if (t is not int result)
+                                {
+                                    throw new InvalidCastException($"expected an integer as comparison result, got '{(t is null ? "null" : t.GetType().Name)}'");
+                                }
+                                if (result != 0)
+                                {
+                                    if (sorterInfo.Reverse)
+                                    {
+                                        return -result;
+                                    }
+                                    return result;
+                                }
+                            }
+                        }
+                        return 0;
+                    };
+
+                    List<MusicInfo> m_Unlock = __instance.musicResult.m_Unlock.ToSystem();
+
+                    try
+                    {
+                        m_Unlock.Sort(comparer);
+
+                        __instance.musicResult.m_Unlock = m_Unlock.ToIL2CPP();
+
+
+                        DateTime? expirationTime = ModMain.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(ModMain.MiniCacheTimeout);
+
+                        searchCache.TryAdd(expression, new SearchCache(new List<MusicInfo>(), m_Unlock, true, expirationTime));
+                    }
+                    catch (Exception)
+                    {
+                        criticalFlag = false;
+                        var s = "An error occured and sorting failed. This is likely a mistake in the search.";
+                        ShowText.ShowInfo(s);
+                        MelonLogger.Msg(ConsoleColor.Red, s);
+                        throw;
+                    }
+                }
+                else
+                {
+                    DateTime? expirationTime = ModMain.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(ModMain.MiniCacheTimeout);
+
+                    searchCache.TryAdd(expression,
+                        new SearchCache(
+                            new List<MusicInfo>(),
+                            __instance.musicResult.m_Unlock.ToSystem(),
+                            false,
+                            expirationTime
+                            ));
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                if (criticalFlag)
+                {
+                    ShowText.ShowInfo("A critical error occured and sorting failed. This is likely a bug in the mod.");
+                }
+                MelonLogger.Msg(ConsoleColor.Red, ex);
+            }
+            finally
+            {
+                if (_activeSorters.Count != 0)
+                {
+                    MelonLogger.Msg($"Sorting completed in {_sw.Elapsed.TotalSeconds:F3}s.");
+                }
+                SorterMethods.sortingFlag = false;
+                _activeSorters.Clear();
+                _sw.Stop();
+            }
+
+
+            return false;
         }
 
+        static void PrintCachedSearch(SearchCache searchCache)
+        {
+            if (searchCache.Expiration.HasValue)
+            {
+                MelonLogger.Msg("Skipped double-processing search.");
+            }
+            else
+            {
+                MelonLogger.Msg("Got search results from cache.");
+            }
+        }
+        static void CachedSearch(SearchResults __instance, SearchCache cache, Il2CppSystem.Collections.Generic.List<MusicInfo> allMusic)
+        {
+            foreach (var info in allMusic)
+            {
+                if (cache.PassingUids.Contains(info.uid))
+                {
+                    __instance.musicResult.m_Unlock.Add(info);
+                }
+            }
+
+            if (!cache.ShouldSort)
+            {
+                PrintCachedSearch(cache);
+                return;
+            }
+            var buildUnlock = new MusicInfo[cache.Unlock.Count];
+
+            List<MusicInfo> m_Unlock = __instance.musicResult.m_Unlock.ToSystem();
+
+            bool cacheValid = true;
+            foreach (var item in m_Unlock)
+            {
+                if (!cache.Unlock.TryGetValue(item.uid, out var i))
+                {
+                    cacheValid = false;
+                    break;
+                }
+                buildUnlock[i] = item;
+            }
+
+            if (!cacheValid)
+            {
+                MelonLogger.Error("Something went horribly wrong with the sorting cache! This is likely a bug in the mod.");
+            }
+            else
+            {
+                __instance.musicResult.m_Unlock = buildUnlock.Where(x => x != null).ToIL2CPP();
+                PrintCachedSearch(cache);
+            }
+        }
         private static void LoadCustomData()
         {
-            var save = Utils.GetCustomAlbumsSave() as CustomAlbumsSave;
-            if (save is null)
+            if (Utils.GetCustomAlbumsSave() is not CustomAlbumsSave save)
             {
                 return;
             }
@@ -227,9 +365,29 @@ namespace IronSearch.Patches
             }
         }
 
-        private static void NullifyAdvancedSearch()
+        private static void PrepareSearchData()
         {
-            SearchPatch.compiledScript = null!;
+            
+            RefreshPatch.langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
+            RefreshPatch.history = DataHelper.history.ToSystem();
+            RefreshPatch.highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToList();
+            RefreshPatch.fullCombos = DataHelper.fullComboMusic.ToSystem();
+            RefreshPatch.favorites = DataHelper.collections.ToSystem();
+            RefreshPatch.hides = DataHelper.hides.ToSystem();
+
+            try
+            {
+                RefreshPatch.streamer = Singleton<AnchorModule>.instance.m_DbAnchor.m_AnchorMusicInfos.ToSystem().Keys.ToList();
+            }
+            catch
+            {
+                RefreshPatch.streamer = new List<string>();
+            }
+
+            if (ModMain.CustomAlbumsLoaded)
+            {
+                RefreshPatch.LoadCustomData();
+            }
         }
     }
 }

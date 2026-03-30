@@ -7,7 +7,7 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalByScene(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            return (Comparison<MusicInfo>)SearchMergePatch.SortByScene;
+            return (Comparison<MusicInfo>)SorterMethods.SortByScene;
         }
     }
 }

@@ -9,11 +9,19 @@ namespace IronSearch.Tags
             public override string EvaluatorName => "Difficulty";
             public override IEnumerable<KeyValuePair<double, double>> GetDoubles(MusicInfo musicInfo)
             {
-                Utils.GetAvailableMaps(musicInfo, out var availableMaps);
-                Utils.GetMapDifficulties(musicInfo, out var difficulties);
-                foreach (var i in availableMaps)
+                if (!Utils.GetMapDifficulties(musicInfo, out var difficulties))
                 {
-                    var musicDiff = difficulties[i-1];
+                    yield break;
+                }
+
+                for (int i = 0; i < 5; i++)
+                {
+                    var musicDiff = difficulties[i];
+                    if (musicDiff is null)
+                    {
+                        continue;
+                    }
+
 
                     if (musicDiff.TryParseInt(out int x))
                     {

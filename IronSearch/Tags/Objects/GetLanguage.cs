@@ -1,6 +1,7 @@
 ﻿using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppPeroPeroGames.GlobalDefines;
+using IronSearch.Patches;
 
 namespace IronSearch.Tags
 {
@@ -10,7 +11,7 @@ namespace IronSearch.Tags
         {
             ThrowIfNotEmpty(varArgs, "GetLanguage()");
             ThrowIfNotEmpty(varKwargs, "GetLanguage()");
-            return Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
+            return RefreshPatch.langIndex;
         }
     }
 }
