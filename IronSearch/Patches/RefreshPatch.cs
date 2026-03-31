@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Threading;
 using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using HarmonyLib;
@@ -15,6 +14,7 @@ using Il2CppInterop.Runtime;
 using Il2CppPeroPeroGames.GlobalDefines;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
+using IronSearch.Tags;
 using MelonLoader;
 using Newtonsoft.Json;
 using PythonExpressionManager;
@@ -74,6 +74,12 @@ namespace IronSearch.Patches
 
             string expression = keyword[ModMain.StartString.Length..].Trim();
 
+            BuiltIns.GlobalVariables.Clear();
+            BuiltIns.LocalVariables.Clear();
+            BuiltIns.logOnceIds.Clear();
+            BuiltIns.logUnique.Clear();
+            BuiltIns.helpIds.Clear();
+            BuiltIns.runOnceIds.Clear();
             __instance.musicResult.m_Unlock.Clear();
             __instance.musicResult.m_Lock.Clear();
             __instance.authorResult.m_Unlock.Clear();

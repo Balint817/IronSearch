@@ -978,9 +978,9 @@ Examples:
 
 Implementation details:
 
-- `Range(rangeString, start=True, end=True)` supports keyword arguments:
-  - `end=True` makes the end exclusive
-  - `start=True` makes the start exclusive
+- `Range(rangeString, start=..., end=...)` supports keyword arguments:
+  - `start=...` makes the **start** exclusive
+  - `end=...` makes the **end** exclusive
 - `Range(x)` where `x` is a number makes a single-value range.
 - `Range(start, end)` where both are numbers creates an inclusive numeric range.
 
@@ -1182,7 +1182,7 @@ Variable tags let you keep state across songs or within a song evaluation.
 
 When the search text changes and advanced search re-initializes, all variables all cleared.
 
-Local variables persist for the current song, global variables persist for the current search.
+Local variables persist per song, global variables persist for the current search.
 
 #### `DefineVar`/`DV`
 

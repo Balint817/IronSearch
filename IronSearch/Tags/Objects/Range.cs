@@ -19,7 +19,7 @@ namespace IronSearch.Tags
                     throw new SearchWrongTypeException("True or False for `end=` (exclusive end)", varKwargs["end"]?.GetType(), "Range()");
                 }
 
-                exclusiveEnd = true;
+                exclusiveEnd = b;
                 varKwargs.Remove("end");
             }
 
@@ -29,7 +29,7 @@ namespace IronSearch.Tags
                 {
                     throw new SearchWrongTypeException("True or False for `start=` (exclusive start)", varKwargs["start"]?.GetType(), "Range()");
                 }
-                exclusiveStart = true;
+                exclusiveStart = b;
                 varKwargs.Remove("start");
             }
             ThrowIfNotEmpty(varKwargs, "Range()");
