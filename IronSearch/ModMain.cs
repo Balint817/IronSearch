@@ -520,8 +520,6 @@ namespace IronSearch
                 + "This can be a normal range (in seconds), or time formatted like '1m30s'."
             );
 
-            //RegisterScript("Hide", BuiltIns.EvalHide);
-
             RegisterScript("New", BuiltIns.EvalNew);
             RegisterHelp(new() { "New" },
                 "Usage: New(topRange)\n\n"
