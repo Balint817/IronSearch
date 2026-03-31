@@ -1,4 +1,5 @@
-﻿using CustomAlbums.Managers;
+﻿using CustomAlbums.Data;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -21,7 +22,7 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCinemaInternal(MusicInfo musicInfo)
         {
-            var customInfo = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid);
+            var customInfo = (Album)ModMain.uidToAlbum[musicInfo.uid];
             if (!customInfo.IsPackaged)
             {
                 return Utils.TryParseCinemaJson(customInfo, false);

@@ -15,7 +15,7 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCustomInternal(MusicInfo musicInfo)
         {
-            return AlbumManager.LoadedAlbums.Values.Any(x => x.Uid == musicInfo.uid);
+            return ModMain.uidToAlbum.ContainsKey(musicInfo.uid);
         }
         internal static bool EvalCustom(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

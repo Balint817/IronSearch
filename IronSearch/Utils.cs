@@ -7,6 +7,7 @@ using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
 using Il2CppInterop.Runtime;
 using Il2CppPeroTools2.PeroString;
 using IronPython.Runtime;
+using IronSearch.Patches;
 using IronSearch.Records;
 using IronSearch.Tags;
 using MelonLoader;
@@ -661,7 +662,7 @@ namespace IronSearch
 
         private static HashSet<int> GetCustomMaps(MusicInfo musicInfo)
         {
-            return AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Sheets.Where(x => !string.IsNullOrEmpty(x.Value.Md5)).Select(x => x.Key).ToHashSet();
+            return ((Album)ModMain.uidToAlbum[musicInfo.uid]).Sheets.Where(x => !string.IsNullOrEmpty(x.Value.Md5)).Select(x => x.Key).ToHashSet();
         }
 
         public static bool GetMapDifficulties(MusicInfo musicInfo, out string[] difficulties)

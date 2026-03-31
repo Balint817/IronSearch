@@ -1,4 +1,7 @@
-﻿using CustomAlbums.Data;
+﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using HarmonyLib;
 using Il2Cpp;
@@ -12,10 +15,6 @@ using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
 using MelonLoader;
 using PythonExpressionManager;
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using static MelonLoader.Modules.MelonModule;
 
 namespace IronSearch.Patches
 {
@@ -29,21 +28,21 @@ namespace IronSearch.Patches
 
         internal static List<Highscore> highScores { get; set; } = new();
 
-        internal static List<string> fullCombos { get; set; } = new();
+        internal static HashSet<string> fullCombos { get; set; } = new();
 
         internal static List<string> history { get; set; } = new();
 
-        internal static List<string> favorites { get; set; } = new();
+        internal static HashSet<string> favorites { get; set; } = new();
 
-        internal static List<string> hides { get; set; } = new();
+        internal static HashSet<string> hides { get; set; } = new();
 
-        internal static List<string> streamer { get; set; } = new();
+        internal static HashSet<string> streamer { get; set; } = new();
         public static ReadOnlyCollection<Highscore> HighScores => highScores.AsReadOnly();
-        public static ReadOnlyCollection<string> FullCombos => fullCombos.AsReadOnly();
+        public static ReadOnlyCollection<string> FullCombos => fullCombos.ToList().AsReadOnly();
         public static ReadOnlyCollection<string> History => history.AsReadOnly();
-        public static ReadOnlyCollection<string> Favorites => favorites.AsReadOnly();
-        public static ReadOnlyCollection<string> Hides => hides.AsReadOnly();
-        public static ReadOnlyCollection<string> Streamer => streamer.AsReadOnly();
+        public static ReadOnlyCollection<string> Favorites => favorites.ToList().AsReadOnly();
+        public static ReadOnlyCollection<string> Hides => hides.ToList().AsReadOnly();
+        public static ReadOnlyCollection<string> Streamer => streamer.ToList().AsReadOnly();
 
         internal static readonly Dictionary<string, SearchCache> searchCache = new();
 
@@ -116,6 +115,7 @@ namespace IronSearch.Patches
             }
 
             using var threadLocalPs = new ThreadLocal<PeroString>(() => new PeroString(1000));
+            using var threadLocalArg = new ThreadLocal<SearchArgument>(() => new SearchArgument(null!, null!));
 
             var processorCount = Math.Clamp(
     UnityEngine.SystemInfo.processorCount,
@@ -147,8 +147,12 @@ namespace IronSearch.Patches
                             {
                                 var music = allMusic[i];
 
+                                var arg = threadLocalArg.Value!;
+                                arg.I = music;
+                                arg.PS = threadLocalPs.Value!;
+
                                 if (ModMain.ScriptManager.ScriptExecutor.Evaluate(
-                                    new SearchArgument(music, threadLocalPs.Value!),
+                                    arg,
                                     compiledScript))
                                 {
                                     asyncResults.Add(music);
@@ -365,26 +369,35 @@ namespace IronSearch.Patches
             }
             if (save.Collections is not null)
             {
-                favorites.AddRange(save.Collections);
+                foreach (var item in save.Collections)
+                {
+                    favorites.Add(item);
+                }
             }
             if (save.Hides is not null)
             {
-                hides.AddRange(save.Hides);
+                foreach (var item in save.Hides)
+                {
+                    hides.Add(item);
+                }
             }
 
             if (save.FullCombo is not null)
             {
-                fullCombos.AddRange(save.FullCombo.SelectMany(kv =>
+                foreach (var kv in save.FullCombo)
                 {
                     var albumName = kv.Key;
                     var album = AlbumManager.LoadedAlbums.Values.FirstOrDefault(a => a.AlbumName == albumName);
                     if (album is null)
                     {
-                        return Array.Empty<string>();
+                        continue;
                     }
                     var uidBase = album.Uid + '_';
-                    return kv.Value.Select(index => uidBase + index);
-                }));
+                    foreach (var index in kv.Value)
+                    {
+                        fullCombos.Add(uidBase + index);
+                    }
+                }
             }
 
             if (save.Highest is not null)
@@ -423,17 +436,17 @@ namespace IronSearch.Patches
             RefreshPatch.langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
             RefreshPatch.history = DataHelper.history.ToSystem();
             RefreshPatch.highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToList();
-            RefreshPatch.fullCombos = DataHelper.fullComboMusic.ToSystem();
-            RefreshPatch.favorites = DataHelper.collections.ToSystem();
-            RefreshPatch.hides = DataHelper.hides.ToSystem();
+            RefreshPatch.fullCombos = DataHelper.fullComboMusic.ToSystem().ToHashSet();
+            RefreshPatch.favorites = DataHelper.collections.ToSystem().ToHashSet();
+            RefreshPatch.hides = DataHelper.hides.ToSystem().ToHashSet();
 
             try
             {
-                RefreshPatch.streamer = Singleton<AnchorModule>.instance.m_DbAnchor.m_AnchorMusicInfos.ToSystem().Keys.ToList();
+                RefreshPatch.streamer = Singleton<AnchorModule>.instance.m_DbAnchor.m_AnchorMusicInfos.ToSystem().Keys.ToHashSet();
             }
             catch
             {
-                RefreshPatch.streamer = new List<string>();
+                RefreshPatch.streamer = new();
             }
 
             if (ModMain.CustomAlbumsLoaded)

@@ -8,8 +8,8 @@ namespace IronSearch
 {
     public class SearchArgument : DynamicObject
     {
-        public MusicInfo I { get; } = null!;
-        public PeroString PS { get; } = null!;
+        public MusicInfo I { get; internal set; } = null!;
+        public PeroString PS { get; internal set; } = null!;
 
         public SearchArgument(MusicInfo mi)
         {

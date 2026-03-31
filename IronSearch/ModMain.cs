@@ -1032,6 +1032,7 @@ namespace IronSearch
             {
                 LoadCinema();
                 AudioHelper.CustomCacheTask = AudioHelper.BuildCustomCache(AudioHelper.customCts.Token);
+                LoadAlbumDict();
             }
             LoadAlbumNames();
             try
@@ -1051,6 +1052,16 @@ namespace IronSearch
             AutoCompleteManager.AddManagerKeywords();
 
             InitSuccessful = true;
+        }
+
+        internal static Dictionary<string, object> uidToAlbum = new();
+        public static ReadOnlyDictionary<string, object> UIDToAlbum => new(uidToAlbum);
+        private void LoadAlbumDict()
+        {
+            foreach (var album in AlbumManager.LoadedAlbums.Values)
+            {
+                uidToAlbum[album.Uid] = album;
+            }
         }
     }
 }
