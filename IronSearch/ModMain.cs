@@ -441,7 +441,7 @@ namespace IronSearch
 
             RegisterScript("Clears", BuiltIns.EvalClears);
             RegisterHelp(new() { "Clears" },
-                "Usage: Clears(clearRange) or Callback(clearRange, levelRange)\n\n"
+                "Usage: Clears(clearRange) or Clears(clearRange, levelRange)\n\n"
                 + "Checks if the music has the specified number of clears on any difficulty, and optionally, specify which difficulties to match.\n"
                 + "The level range can be a range from 1-5, specifying which levels are matched, or the wildcard '?' to select the highest level."
             );
@@ -651,13 +651,9 @@ namespace IronSearch
 
             RegisterObject("GetHighscores", BuiltIns.EvalGetHighscores);
             RegisterObject("GetHighScores", BuiltIns.EvalGetHighscores);
-            RegisterObject("Highscores", BuiltIns.EvalGetHighscores);
-            RegisterObject("HighScores", BuiltIns.EvalGetHighscores);
-            RegisterObject("Highs", BuiltIns.EvalGetHighscores);
             RegisterObject("GetScores", BuiltIns.EvalGetHighscores);
-            RegisterObject("Scores", BuiltIns.EvalGetHighscores);
-            RegisterHelp(new() { "GetHighscores", "GetHighScores", "Highscores", "HighScores", "Highs", "GetScores", "Scores" },
-                "Usage: GetHighscores() or GetHighScores() or Highscores() or HighScores() or Highs()\n\n"
+            RegisterHelp(new() { "GetHighscores", "GetHighScores", "GetScores" },
+                "Usage: GetHighscores() or GetHighScores() or GetScores()\n\n"
                 + "Returns a list of the music's highscores."
             );
 
@@ -830,7 +826,6 @@ namespace IronSearch
             RegisterScript("Log", BuiltIns.EvalLog);
             RegisterHelp(new() { "Log" },
                 "Usage: Log(value)\n\n"
-                + "purposes.\n"
                 + "Logs the specified value to the console for debugging purposes.\n"
                 + "For example, Log(M.name) would log the title of each music in the search results.\n"
                 + "DISCLAIMER: It's preferred to use LogOnce (or in certain cases LogUnique) instead of Log due to practical and technical issues.\n"

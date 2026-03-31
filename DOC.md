@@ -426,7 +426,7 @@ Matches if `cyber` appears in album, author, designer, tag, or title text.
 
 ---
 
-#### `AP` / `Perfect` / `AllPerfect`
+#### `AP` / `AllPerfect`
 
 Usage:
 
@@ -552,7 +552,7 @@ Checks if the music is a custom chart.
 
 ---
 
-#### `Designer`
+#### `Designer`/`Design`/`LevelDesigner`/`LevelDesign`
 
 Usage:
 
@@ -563,7 +563,7 @@ Checks if the chart’s level designer matches the specified input.
 Example:
 
 ```text
-search: Author('vig')
+search: Designer('vig')
 ```
 
 Matches if `vig` appears in the designer's name.
@@ -625,7 +625,7 @@ Matches songs where the Master of the map has a full combo.
 
 ---
 
-#### `HasHidden`/`Hidden`
+#### `HasHidden`/`Hidden`/`HasSupreme`/`Supreme`
 
 Usage:
 
@@ -1158,7 +1158,7 @@ Returns a list of the current song’s difficulty strings.
 
 ---
 
-#### `GetHighscores`/`GetHighScores`/`Highscores`/`HighScores`/`Highs`
+#### `GetHighscores`/`GetHighScores`/`GetScores`
 
 Usage:
 
