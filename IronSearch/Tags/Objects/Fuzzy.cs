@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range = IronSearch.Records.Range;

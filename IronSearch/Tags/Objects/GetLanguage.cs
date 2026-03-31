@@ -1,7 +1,4 @@
-﻿using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
-using Il2CppPeroPeroGames.GlobalDefines;
-using IronSearch.Patches;
+﻿using IronSearch.Patches;
 
 namespace IronSearch.Tags
 {

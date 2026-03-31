@@ -1,6 +1,4 @@
-﻿using IronSearch.Records;
-
-namespace IronSearch.Tags
+﻿namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {

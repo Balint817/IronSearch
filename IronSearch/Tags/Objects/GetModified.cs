@@ -1,9 +1,5 @@
 ﻿using CustomAlbums.Data;
-using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
-using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
-using Il2CppPeroPeroGames.GlobalDefines;
 
 namespace IronSearch.Tags
 {

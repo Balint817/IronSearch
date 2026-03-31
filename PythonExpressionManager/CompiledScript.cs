@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Text;
 using IronPython.Runtime.Exceptions;
 using IronPython.Runtime.Operations;
-using Microsoft.Scripting.Hosting;
 
 namespace PythonExpressionManager
 {

@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace IronSearch.Exceptions
+﻿namespace IronSearch.Exceptions
 {
     [Serializable]
     internal class TerminateSearchException : Exception

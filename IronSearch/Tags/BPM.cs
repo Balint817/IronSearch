@@ -1,6 +1,6 @@
+using System.Collections.Concurrent;
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Records;
-using System.Collections.Concurrent;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags

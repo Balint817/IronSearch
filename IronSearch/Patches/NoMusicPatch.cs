@@ -1,7 +1,4 @@
-﻿using HarmonyLib;
-using Il2Cpp;
-
-namespace IronSearch.Patches
+﻿namespace IronSearch.Patches
 {
     //[HarmonyPatch(typeof(LocalizationName), "GetMusicTagNoMusicTxt")]
     internal class NoMusicPatch

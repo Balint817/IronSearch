@@ -1,8 +1,4 @@
-﻿using IronPython.Runtime;
-using IronPython.Runtime.Exceptions;
-using IronPython.Runtime.Operations;
-using IronPython.Runtime.Types;
-using System.Runtime.Serialization;
+﻿using IronPython.Runtime.Types;
 
 namespace PythonExpressionManager
 {

@@ -1,5 +1,4 @@
 ﻿using Il2CppAssets.Scripts.Database;
-using Il2CppPeroPeroGames.GlobalDefines;
 
 namespace IronSearch.Records
 {

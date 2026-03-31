@@ -1,13 +1,7 @@
 ﻿using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
-using Il2CppAssets.Scripts.Structs.Modules;
-using Il2CppAssets.Scripts.UI.Controls;
-using Il2CppPeroPeroGames.GlobalDefines;
 using IronSearch.Exceptions;
-using IronSearch.Records;
 using IronSearch.Tags;
-using MelonLoader;
 
 namespace IronSearch.Patches
 {

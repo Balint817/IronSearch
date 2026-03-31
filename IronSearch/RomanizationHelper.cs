@@ -1,5 +1,5 @@
-﻿using Romanization;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using Romanization;
 
 namespace IronSearch
 {

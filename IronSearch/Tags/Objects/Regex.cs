@@ -1,5 +1,5 @@
-using IronSearch.Exceptions;
 using System.Text.RegularExpressions;
+using IronSearch.Exceptions;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags

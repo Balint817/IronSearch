@@ -1,7 +1,7 @@
-﻿using IronPython.Runtime;
+﻿using System.Numerics;
+using IronPython.Runtime;
 using IronSearch.Exceptions;
 using IronSearch.Records;
-using System.Numerics;
 using Range=IronSearch.Records.Range;
 
 namespace IronSearch.Tags

@@ -1,7 +1,6 @@
-﻿using IronPython.Runtime;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using System.Transactions;
+using IronPython.Runtime;
 
 namespace IronSearch.Records
 {
