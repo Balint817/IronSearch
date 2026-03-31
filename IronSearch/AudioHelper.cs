@@ -12,7 +12,6 @@ using NAudio.Vorbis;
 using Newtonsoft.Json;
 using NLayer;
 using UnityEngine;
-using static IronPython.Modules.PythonIterTools;
 
 namespace IronSearch
 {
@@ -24,6 +23,7 @@ namespace IronSearch
 
         public static readonly ConcurrentDictionary<string, TimeSpan?> CustomCache = new();
         public static ConcurrentDictionary<string, TimeSpan>? VanillaCache { get; private set; }
+        static bool _vanillaCacheUpdated = true;
         public static void ForceBuildVanillaCache()
         {
             if (VanillaCache is not null)
@@ -33,6 +33,7 @@ namespace IronSearch
             VanillaCache ??= new();
             var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => x.albumIndex != 999 && !VanillaCache.ContainsKey(x.uid)).ToList();
             MelonLogger.Msg(ConsoleColor.Magenta, $"Need to load {allMusic.Count} items." + (allMusic.Count > 100 ? " This may take a while." : ""));
+            _vanillaCacheUpdated = allMusic.Count != 0;
             var prevRatio = -1M;
             var currentRatio = 0.0M;
 
@@ -50,6 +51,7 @@ namespace IronSearch
                     prevRatio = currentRatio;
                 }
             }
+            SaveVanillaCache();
         }
         public static TimeSpan? GetMusicLength(MusicInfo musicInfo)
         {
@@ -141,10 +143,10 @@ namespace IronSearch
         internal static CancellationTokenSource customCts = new();
         internal static async Task BuildCustomCache(CancellationToken token)
         {
-            var sw = Stopwatch.StartNew();
             MelonLogger.Msg($"Started async calculation of custom chart lengths.");
             await Task.Run(() =>
             {
+                var sw = Stopwatch.StartNew();
                 var allCustoms = AlbumManager.LoadedAlbums.Values.ToList();
                 var count = allCustoms.Count;
                 for (int i = 0; i < count; i++)
@@ -162,9 +164,9 @@ namespace IronSearch
 
                     CustomCache.TryAdd(album.Uid, length);
                 }
+                sw.Stop();
+                MelonLogger.Msg($"Finished customs calculation in {sw.Elapsed.TotalSeconds:F1} seconds.");
             }, token);
-            sw.Stop();
-            MelonLogger.Msg($"Finished customs calculation in {sw.Elapsed.TotalSeconds:F1} seconds.");
         }
 
         private static TimeSpan? GetCustomLength(MusicInfo musicInfo)
@@ -176,7 +178,14 @@ namespace IronSearch
                 {
                     MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Still need to calculate length for {(AlbumManager.LoadedAlbums.Count - CustomCache.Count)}/{AlbumManager.LoadedAlbums.Count} custom charts! Please wait.");
                 }
-                CustomCacheTask = null!;
+                try
+                {
+                    CustomCacheTask?.Dispose();
+                }
+                catch (Exception)
+                {
+                    
+                }
             }
             return GetCustomLengthDirect(musicInfo.uid);
         }
@@ -270,16 +279,16 @@ namespace IronSearch
             }
         }
 
-        internal static void SaveCache()
+        internal static async void SaveVanillaCache()
         {
-            if (VanillaCache is null)
+            if (VanillaCache is null || !_vanillaCacheUpdated)
             {
                 return;
             }
 
             var json = JsonConvert.SerializeObject(VanillaCache.ToDictionary(x => x.Key, x => x.Value.Ticks));
 
-            File.WriteAllText(AudioLengthBackupFilePath, json);
+            await File.WriteAllTextAsync(AudioLengthBackupFilePath, json);
         }
     }
 }

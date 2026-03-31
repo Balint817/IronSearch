@@ -7,10 +7,9 @@ namespace IronSearch
     public class HQLoader
     {
         private static readonly HttpClient _http = new();
-
         public static async Task<Dictionary<string, bool>> LoadHQ(CancellationToken cancellationToken = default)
         {
-            TryLoadBackup(out var result);
+            bool cacheUpdated = !TryLoadBackup(out var result);
 
             var allCharts = new List<HQChartInfo>();
 
@@ -49,11 +48,18 @@ namespace IronSearch
             {
                 foreach (var sheet in chart.sheets)
                 {
+                    if (!result.TryGetValue(sheet.hash, out var isRankedCache) || isRankedCache != chart.ranked)
+                    {
+                        cacheUpdated = true;
+                    }
                     result[sheet.hash] = chart.ranked;
                 }
             }
 
-            await CreateBackup(result);
+            if (cacheUpdated)
+            {
+                await CreateBackup(result);
+            }
 
             return result;
         }
@@ -64,21 +70,23 @@ namespace IronSearch
         {
             await File.WriteAllTextAsync(HQRankingBackupFilePath , JsonConvert.SerializeObject(result));
         }
-        public static void CreateBackupSync(Dictionary<string, bool> result)
-        {
-            File.WriteAllText(HQRankingBackupFilePath, JsonConvert.SerializeObject(result));
-        }
 
-        private static void TryLoadBackup(out Dictionary<string, bool> result)
+        private static bool TryLoadBackup(out Dictionary<string, bool> result)
         {
-            result = new();
-
             try
             {
-                result = JsonConvert.DeserializeObject<Dictionary<string,bool>>(File.ReadAllText(HQRankingBackupFile)) ?? new();
+                result = JsonConvert.DeserializeObject<Dictionary<string,bool>>(File.ReadAllText(HQRankingBackupFile))!;
+                if (result is null)
+                {
+                    result = new();
+                    return false;
+                }
+                return true;
             }
             catch (Exception)
             {
+                result = new();
+                return false;
                 // catch silently
             }
         }

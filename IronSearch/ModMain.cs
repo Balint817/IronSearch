@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Net;
-using System.Runtime.CompilerServices;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
@@ -126,11 +126,37 @@ namespace IronSearch
                 return expressionEntry.Value;
             }
         }
+
+        void DisposeAll()
+        {
+
+            cts.Cancel();
+            AudioHelper.customCts.Cancel();
+
+            try
+            {
+                AudioHelper.CustomCacheTask?.Dispose();
+            }
+            catch (Exception) {}
+            AudioHelper.CustomCacheTask = null!;
+
+            try
+            {
+                HQLoadTask?.Dispose();
+            }
+            catch (Exception) { }
+            HQLoadTask = null!;
+        }
         public override void OnApplicationQuit()
         {
+            DisposeAll();
+        }
+
+        public override void OnDeinitializeMelon()
+        {
             startSearchStringEntry.Category.SaveToFile(false);
-            HQLoader.CreateBackupSync(_hqChartDict);
-            AudioHelper.SaveCache();
+            DisposeAll();
+
         }
         public override void OnPreferencesLoaded()
         {
@@ -1037,16 +1063,24 @@ namespace IronSearch
             LoadAlbumNames();
             try
             {
-                var t = HQLoadTask.GetAwaiter().GetResult();
-                foreach (var item in t)
+                if (HQLoadTask is not null)
                 {
-                    _hqChartDict[item.Key] = item.Value;
+                    if (CustomAlbumsLoaded)
+                    {
+                        MelonLogger.Msg("Awaiting custom ranking information...");
+                        var t = HQLoadTask.GetAwaiter().GetResult();
+                        foreach (var item in t)
+                        {
+                            _hqChartDict[item.Key] = item.Value;
+                        }
+                    }
+                    HQLoadTask.Dispose();
                 }
             }
             catch (Exception ex)
             {
                 MelonLogger.Msg(System.ConsoleColor.Red, ex.ToString());
-                MelonLogger.Msg(System.ConsoleColor.DarkRed, "Failed to load custom ranking information, certain features will not work properly!");
+                MelonLogger.Msg(System.ConsoleColor.DarkRed, "Failed to load custom ranking information, online features will not work properly!");
             }
 
             AutoCompleteManager.AddManagerKeywords();

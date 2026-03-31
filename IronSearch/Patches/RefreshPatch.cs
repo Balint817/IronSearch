@@ -60,11 +60,13 @@ namespace IronSearch.Patches
         {
             isAdvancedSearch = false;
         }
+        private static bool IsFirstCall = true;
         internal static bool Prefix(SearchResults __instance, string keyword)
         {
             isAdvancedSearch = false;
-            if (string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.StartString))
+            if (IsFirstCall || string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.StartString))
             {
+                IsFirstCall = false;
                 return true;
             }
 
@@ -118,14 +120,8 @@ namespace IronSearch.Patches
                 return false;
             }
 
-            using var threadLocalPs = new ThreadLocal<PeroString>(() => new PeroString(1000));
-            using var threadLocalArg = new ThreadLocal<SearchArgument>(() => new SearchArgument(null!, null!));
-
-            using var isThreadAttached = new ThreadLocal<bool>(() =>
-            {
-                IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                return true;
-            });
+            //using var threadLocalPs = new ThreadLocal<PeroString>(() => new PeroString(1000));
+            //using var threadLocalArg = new ThreadLocal<SearchArgument>(() => new SearchArgument(null!, null!));
 
             var processorCount = Math.Clamp(
                 UnityEngine.SystemInfo.processorCount,
@@ -146,23 +142,24 @@ namespace IronSearch.Patches
                 Parallel.ForEach(
                     Partitioner.Create(0, allMusic.Count),
                     options,
-                    (range, state) =>
+                    () =>
                     {
-                        // Evaluate the ThreadLocal to ensure this specific worker thread attaches to IL2CPP
-                        _ = isThreadAttached.Value;
-
+                        // ensure this specific worker thread attaches to IL2CPP
+                        var thread = IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                        return new SearchArgument(null!, new PeroString(1000));
+                    },
+                    (range, state, arg) =>
+                    {
                         for (int i = range.Item1; i < range.Item2; i++)
                         {
                             if (state.IsStopped)
-                                return;
+                                return arg;
 
                             try
                             {
                                 var music = allMusic[i];
 
-                                var arg = threadLocalArg.Value!;
                                 arg.I = music;
-                                arg.PS = threadLocalPs.Value!;
 
                                 if (ModMain.ScriptManager.ScriptExecutor.Evaluate(arg, compiledScript))
                                 {
@@ -174,13 +171,21 @@ namespace IronSearch.Patches
                                 if (!failed)
                                 {
                                     failed = true;
+                                    MelonLogger.Msg(ex);
                                     new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
                                 }
                                 state.Stop();
-                                return;
+                                return arg;
                             }
                         }
-                    });
+                        return arg;
+                    },
+                    _ =>
+                    {
+                        // and don't forget to detach when done
+                        //IL2CPP.il2cpp_thread_detach(thread);
+                    }
+                );
             }
             catch (Exception ex)
             {

@@ -1,16 +1,9 @@
-﻿using Il2CppInterop.Runtime.Injection;
-using Ionic.BZip2;
+﻿using System.Collections.ObjectModel;
+using Il2CppInterop.Runtime.Injection;
 using IronSearch.Patches;
 using MelonLoader;
-using PopupLib;
 using PopupLib.UI;
 using PythonExpressionManager;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace IronSearch.UI

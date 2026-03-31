@@ -1,15 +1,7 @@
-﻿using Il2CppAssets.Scripts.Structs.Modules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HarmonyLib;
-using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
+﻿using HarmonyLib;
 using Il2CppAssets.Scripts.UI;
-using MelonLoader;
+using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
 using IronSearch.UI;
-using UnityEngine.UI;
 using UnityEngine;
 
 namespace IronSearch.Patches
