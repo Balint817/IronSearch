@@ -11,6 +11,7 @@ using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppAssets.Scripts.PeroTools.Managers;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
+using Il2CppInterop.Runtime;
 using Il2CppPeroPeroGames.GlobalDefines;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
@@ -120,11 +121,17 @@ namespace IronSearch.Patches
             using var threadLocalPs = new ThreadLocal<PeroString>(() => new PeroString(1000));
             using var threadLocalArg = new ThreadLocal<SearchArgument>(() => new SearchArgument(null!, null!));
 
+            using var isThreadAttached = new ThreadLocal<bool>(() =>
+            {
+                IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                return true;
+            });
+
             var processorCount = Math.Clamp(
-    UnityEngine.SystemInfo.processorCount,
-    2,
-    Math.Max(allMusic.Count / 100, 4)
-);
+                UnityEngine.SystemInfo.processorCount,
+                2,
+                Math.Max(allMusic.Count / 100, 4)
+            );
 
             var options = new ParallelOptions
             {
@@ -141,6 +148,9 @@ namespace IronSearch.Patches
                     options,
                     (range, state) =>
                     {
+                        // Evaluate the ThreadLocal to ensure this specific worker thread attaches to IL2CPP
+                        _ = isThreadAttached.Value;
+
                         for (int i = range.Item1; i < range.Item2; i++)
                         {
                             if (state.IsStopped)
@@ -154,9 +164,7 @@ namespace IronSearch.Patches
                                 arg.I = music;
                                 arg.PS = threadLocalPs.Value!;
 
-                                if (ModMain.ScriptManager.ScriptExecutor.Evaluate(
-                                    arg,
-                                    compiledScript))
+                                if (ModMain.ScriptManager.ScriptExecutor.Evaluate(arg, compiledScript))
                                 {
                                     asyncResults.Add(music);
                                 }
@@ -443,7 +451,7 @@ namespace IronSearch.Patches
                     {
                         localInfos[mi.uid] = dict = new();
                     }
-                    for (int i = 1; i < 5; i++)
+                    for (int i = 1; i <= 5; i++)
                     {
                         dict[i] = new(mi.GetLocal(i));
                     }
