@@ -15,18 +15,15 @@ namespace IronSearch.Tags
                 foreach (var diff in availableMaps)
                 {
                     string s = musicInfo.uid + "_" + diff;
-                    
-                    
-                    var t = RefreshPatch.highScores.Where(x => x.Uid == s).ToArray();
-                    if (t.Length == 0)
+
+                    if (!RefreshPatch.highScores.TryGetValue(s, out var score))
                     {
                         yield return new(diff, false);
                         continue;
+
                     }
 
-                    var maxAccuracy = t.MaxBy(x => x.Accuracy)!;
-
-                    yield return new(diff, maxAccuracy.Accuracy == 1.0f);
+                    yield return new(diff, score.Accuracy == 1.0f);
                 }
             }
         }
