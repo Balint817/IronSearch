@@ -198,7 +198,7 @@ namespace IronSearch.Patches
             _sw.Stop();
 
 
-            MelonLogger.Msg($"Advanced search found {__instance.musicResult.m_Unlock.Count} songs in {_sw.Elapsed.TotalSeconds:F3}s.");
+            MelonLogger.Msg($"Advanced search found {__instance.musicResult.m_Unlock.Count} songs in {_sw.Elapsed.TotalSeconds:F1}s.");
             _sw.Restart();
 
 
@@ -295,7 +295,7 @@ namespace IronSearch.Patches
             {
                 if (_activeSorters.Count != 0)
                 {
-                    MelonLogger.Msg($"Sorting completed in {_sw.Elapsed.TotalSeconds:F3}s.");
+                    MelonLogger.Msg($"Sorting completed in {_sw.Elapsed.TotalSeconds:F1}s.");
                 }
                 SorterMethods.sortingFlag = false;
                 _activeSorters.Clear();
