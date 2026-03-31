@@ -59,8 +59,8 @@ namespace PythonExpressionManager
             scriptBuilder.AppendLine($"{f2} = lambda {instance.BaseDictName}: (lambda {instance.ArgumentName}: {f1}({instance.ArgumentName}, **{instance.BaseDictName}))");
 
             var script = scriptBuilder.ToString();
-            var source = Script.Engine.CreateScriptSourceFromString(script, searchExpressionName, Microsoft.Scripting.SourceCodeKind.File);
-            var scope = Script.Engine.CreateScope();
+            var source = instance.Engine.CreateScriptSourceFromString(script, searchExpressionName, Microsoft.Scripting.SourceCodeKind.File);
+            var scope = instance.Engine.CreateScope();
             try
             {
                 source.Execute(scope);

@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
 
 namespace PythonExpressionManager
 {
@@ -62,7 +64,7 @@ namespace PythonExpressionManager
             }
             try
             {
-                var script = new Script(File.ReadAllText(filePath), DefaultPriority);
+                var script = new Script(ScriptExecutor.Engine, File.ReadAllText(filePath), DefaultPriority);
                 if (!ScriptExecutor.TryRegisterScript(scriptName, script))
                 {
                     return false;
@@ -128,13 +130,23 @@ namespace PythonExpressionManager
         {
             if (!disposedValue)
             {
+                if (_watcher is not null)
+                {
+                    _watcher.EnableRaisingEvents = false;
+                    _watcher.Changed -= OnChanged;
+                    _watcher.Created -= OnChanged;
+                    _watcher.Deleted -= OnChanged;
+                    _watcher.Renamed -= OnRenamed;
+                    _watcher.Dispose();
+
+                    _watcher = null!;
+                }
                 foreach (var item in _loadedScripts)
                 {
                     ScriptExecutor.RemoveScriptWithKey(item.Key, item.Value);
+                    item.Value.Dispose();
                 }
                 _loadedScripts.Clear();
-                _watcher?.Dispose();
-                _watcher = null!;
 
                 disposedValue = true;
             }

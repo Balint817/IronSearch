@@ -54,13 +54,13 @@ namespace IronSearch.Tags
             }
         }
 
-        internal static WrappedCLRDelegate WrapCommonChecks(BuiltInDelegate baseDel)
+        internal static WrappedCLRDelegate WrapCommonChecks(UserScriptManager scriptManager, BuiltInDelegate baseDel)
         {
             WrappableCLRDelegate castingDel = (input, tagDict, varArgs, varKwargs) =>
             {
                 return baseDel((SearchArgument)input, varArgs, varKwargs);
             };
-            WrappedCLRDelegate wrappedDel = ScriptExecutor.FromUnwrapped(castingDel);
+            WrappedCLRDelegate wrappedDel = scriptManager.ScriptExecutor.FromUnwrapped(castingDel);
             WrappedCLRDelegate del2 = (input, tagDict, args, kwargs) =>
             {
                 if (input is not SearchArgument SA)
@@ -92,13 +92,13 @@ namespace IronSearch.Tags
             };
             return del2;
         }
-        internal static WrappedCLRDelegate WrapCommonChecks(BuiltInObjectDelegate baseDel)
+        internal static WrappedCLRDelegate WrapCommonChecks(UserScriptManager scriptManager, BuiltInObjectDelegate baseDel)
         {
             WrappableCLRDelegate castingDel = (input, tagDict, varArgs, varKwargs) =>
             {
                 return baseDel((SearchArgument)input, varArgs, varKwargs);
             };
-            WrappedCLRDelegate wrappedDel = ScriptExecutor.FromUnwrapped(castingDel);
+            WrappedCLRDelegate wrappedDel = scriptManager.ScriptExecutor.FromUnwrapped(castingDel);
             WrappedCLRDelegate del2 = (input, tagDict, args, kwargs) =>
             {
                 if (input is not SearchArgument SA)

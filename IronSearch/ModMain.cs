@@ -145,6 +145,9 @@ namespace IronSearch
             }
             catch (Exception) { }
             HQLoadTask = null!;
+
+            ScriptManager?.Dispose();
+
         }
         public override void OnApplicationQuit()
         {
@@ -155,7 +158,6 @@ namespace IronSearch
         {
             startSearchStringEntry.Category.SaveToFile(false);
             DisposeAll();
-
         }
         public override void OnPreferencesLoaded()
         {
@@ -163,8 +165,6 @@ namespace IronSearch
             {
                 return;
             }
-            //MelonLogger.Msg(System.ConsoleColor.Magenta, "Re-loading aliases...");
-            //LoadAliases();
         }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
@@ -331,11 +331,11 @@ namespace IronSearch
 
         void RegisterScript(string key, BuiltInDelegate del)
         {
-            ScriptManager.ScriptExecutor.RegisterScript(key, ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(del)));
+            ScriptManager.ScriptExecutor.RegisterScript(key, ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(ScriptManager, del)));
         }
         void RegisterObject(string key, BuiltInObjectDelegate del)
         {
-            ScriptManager.ScriptExecutor.RegisterScript(key, ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(del)));
+            ScriptManager.ScriptExecutor.RegisterScript(key, ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(ScriptManager, del)));
         }
 
         public static void RegisterHelp(List<string> keys, string helpString)
@@ -950,7 +950,7 @@ namespace IronSearch
                     try
                     {
                         var key = kv.Key;
-                        var script = ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(LoadExpression(kv.Value)));
+                        var script = ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(LoadExpression(kv.Value)));
                         LoadedExpressions.Add(key, script);
                         ScriptManager.ScriptExecutor.RegisterScript(key, script);
                         AutoCompleteManager.AllKeywords.TryAdd(key, new($"{key}(", 0));

@@ -4,43 +4,35 @@ using Microsoft.Scripting.Hosting;
 
 namespace PythonExpressionManager
 {
-    public sealed class Script: IComparable<Script>
+    public sealed class Script: IComparable<Script>, IDisposable
     {
-        static Script()
-        {
-            Engine = Python.CreateEngine(_options);
-        }
-        public static readonly ScriptEngine Engine;
         public static readonly string OutputFunctionName = "run";
 
         /// <summary>
         /// may be <see langword="null"/> if <see cref="Function"/> is a CLR method.
         /// </summary>
-        internal readonly ScriptSource? Source;
+        internal ScriptSource? Source { get; private set; }
         /// <summary>
         /// may be <see langword="null"/> if <see cref="Function"/> is a CLR method.
         /// </summary>
-        internal readonly ScriptScope? Scope;
-        public readonly dynamic Function;
-
-        static readonly Dictionary<string, object> _options = new()
-            {
-                { "PrivateBinding", true }
-            };
+        internal ScriptScope? Scope { get; private set; }
+        public dynamic Function { get; private set; }
 
         /// <summary>
         /// Lower is higher.
         /// </summary>
         public readonly int Priority;
+        private bool disposedValue;
+
         private Script(int priority)
         {
             Priority = priority;
             Function = null!;
         }
-        public Script(string source, int priority = (int)Priorities.CustomPython): this(priority)
+        public Script(ScriptEngine engine, string source, int priority = (int)Priorities.CustomPython): this(priority)
         {
-            Scope = Engine.CreateScope();
-            Source = Engine.CreateScriptSourceFromString(source);
+            Scope = engine.CreateScope();
+            Source = engine.CreateScriptSourceFromString(source);
 
             //StartingSource.Execute(Scope);
             Source.Execute(Scope);
@@ -82,6 +74,37 @@ namespace PythonExpressionManager
                 return -1;
             }
             return Priority.CompareTo(other.Priority);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Source = null;
+                    Scope = null;
+                    Function = null!;
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~Script()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

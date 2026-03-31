@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using IronPython.Hosting;
 using IronPython.Runtime;
 using IronPython.Runtime.Operations;
+using Microsoft.Scripting.Hosting;
 
 namespace PythonExpressionManager
 {
@@ -10,31 +12,18 @@ namespace PythonExpressionManager
 
     public class ScriptExecutor
     {
-        static ScriptExecutor()
-        {
-            var engine = Script.Engine;
+        public readonly ScriptEngine Engine;
 
-            var scope = engine.CreateScope();
-
-            var script = engine.CreateScriptSourceFromString("f2 = lambda f: (lambda arg, tagDict, *args, **kwargs: f(arg, tagDict, args, kwargs))");
-
-            script.Execute(scope);
-
-            CLRScriptGenerator = scope.GetVariable("f2");
-        }
-
-
-
-        static readonly dynamic CLRScriptGenerator;
-        public static Script FromDelegate(WrappableCLRDelegate del, int priority = (int)Priorities.CustomCLR)
+        private dynamic CLRScriptGenerator;
+        public Script FromDelegate(WrappableCLRDelegate del, int priority = (int)Priorities.CustomCLR)
         {
             return new Script(CLRScriptGenerator(FromUnwrapped(del)), priority);
         }
-        public static Script FromDelegate(WrappedCLRDelegate del, int priority = (int)Priorities.CustomCLR)
+        public Script FromDelegate(WrappedCLRDelegate del, int priority = (int)Priorities.CustomCLR)
         {
             return new Script(CLRScriptGenerator(del), priority);
         }
-        public static WrappedCLRDelegate FromUnwrapped(WrappableCLRDelegate del)
+        public WrappedCLRDelegate FromUnwrapped(WrappableCLRDelegate del)
         {
             dynamic F(dynamic input, PythonDictionary tagDictBoxed, PythonTuple varArgsBoxed, PythonDictionary varKwargsBoxed)
             {
@@ -52,8 +41,26 @@ namespace PythonExpressionManager
         }
         public string ArgumentName { get; private set; }
         public string BaseDictName { get; private set; }
+
+        static readonly Dictionary<string, object> _options = new()
+            {
+                { "PrivateBinding", true }
+            };
         public ScriptExecutor(ILogger? logger = null, string argumentName = "arg", string baseDictName = "tags")
         {
+            Engine = Python.CreateEngine(_options);
+
+            var scope = Engine.CreateScope();
+
+            var script = Engine.CreateScriptSourceFromString("f2 = lambda f: (lambda arg, tagDict, *args, **kwargs: f(arg, tagDict, args, kwargs))");
+
+            script.Execute(scope);
+
+            CLRScriptGenerator = scope.GetVariable("f2");
+
+
+
+
             if (argumentName == baseDictName)
             {
                 throw new ArgumentException("argument name and base dict name cannot match");
