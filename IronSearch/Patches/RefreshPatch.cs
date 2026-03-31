@@ -13,6 +13,7 @@ using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppInterop.Runtime;
 using Il2CppPeroPeroGames.GlobalDefines;
 using Il2CppPeroTools2.PeroString;
+using IronSearch.Exceptions;
 using IronSearch.Records;
 using IronSearch.Tags;
 using MelonLoader;
@@ -192,14 +193,23 @@ namespace IronSearch.Patches
                                 }
                                 catch (Exception ex)
                                 {
-                                    if (!failed)
+                                    if (ex is TerminateSearchException ts)
                                     {
-                                        failed = true;
-                                        MelonLogger.Msg(ex);
-                                        new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                        if (ts.IsTrue)
+                                        {
+                                            asyncResults.Add(music);
+                                        }
                                     }
-                                    Volatile.Write(ref stop, 1);
-                                    break;
+                                    else
+                                    {
+                                        if (!failed)
+                                        {
+                                            failed = true;
+                                            new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                        }
+                                        Volatile.Write(ref stop, 1);
+                                        break;
+                                    }
                                 }
                             }
                         }
