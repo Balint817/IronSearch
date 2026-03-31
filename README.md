@@ -1,8 +1,8 @@
 # IronSearch
 ## Installation
-- Currently, you must either fill out the form to get a download link, or clone the repo and build it.
+- Currently, you can download the pre-release built from the Releases on the side, or build it yourself from source.
 
-## Pre-release form (has download link)
+## Pre-release form (PLEASE FILL ME)
 [I AM VERY IMPORTANT PLEASE FILL ME](https://docs.google.com/forms/d/e/1FAIpQLSevUpaUqkwmkfr6L4F5Zwsc9esofrMk3-MytSN0MSmHZSZhow/viewform)
 **For reporting bugs, open a GitHub Issue!**
 
