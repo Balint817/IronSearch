@@ -30,7 +30,7 @@ namespace IronSearch.Patches
             {
                 throw new SearchCallNotAllowed("ByName()()");
             }
-            return musicInfo1.GetLocal(RefreshPatch.langIndex).name.CompareTo(musicInfo2.GetLocal(RefreshPatch.langIndex).name);
+            return musicInfo1.GetLocalSafe(RefreshPatch.langIndex).name.CompareTo(musicInfo2.GetLocalSafe(RefreshPatch.langIndex).name);
         }
 
         internal static int SortByAccuracy(MusicInfo m1, MusicInfo m2)

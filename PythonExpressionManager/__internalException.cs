@@ -13,8 +13,7 @@ namespace PythonExpressionManager
         public readonly string _errorName;
         public readonly string _errorMessage;
         public readonly object _originalException;
-
-        public __internalException(PythonType errorType, string errorName, string errorMessage, object originalException)
+        public __internalException(PythonType errorType, string errorName, string errorMessage, object originalException): base(errorMessage, originalException as System.Exception)
         {
             this._errorType = errorType;
             this._errorName = errorName;

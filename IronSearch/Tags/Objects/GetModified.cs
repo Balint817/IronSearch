@@ -1,4 +1,5 @@
-﻿using CustomAlbums.Managers;
+﻿using CustomAlbums.Data;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
@@ -19,7 +20,7 @@ namespace IronSearch.Tags
         }
         internal static DateTime GetModifiedInternal(MusicInfo musicInfo)
         {
-            var album = AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid);
+            var album = (Album)ModMain.uidToAlbum[musicInfo.uid];
             return File.GetLastWriteTimeUtc(album.Path);
         }
         internal static dynamic EvalGetModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

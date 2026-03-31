@@ -1,4 +1,5 @@
-﻿using CustomAlbums.Managers;
+﻿using CustomAlbums.Data;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -13,7 +14,7 @@ namespace IronSearch.Tags
 
         private static bool EvalPackedInternal(MusicInfo musicInfo)
         {
-            return AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).IsPackaged;
+            return ((Album)ModMain.uidToAlbum[musicInfo.uid]).IsPackaged;
         }
 
         internal static bool EvalPacked(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

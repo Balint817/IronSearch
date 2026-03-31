@@ -708,6 +708,10 @@ namespace IronSearch
             return true;
         }
 
+        internal static LocalInfo GetLocalSafe(this MusicInfo mi, int language)
+        {
+            return RefreshPatch.localInfos[mi.uid][language];
+        }
 
 
         internal static bool TryParseCinemaJson(Album album, bool skipUnpackaged = true)

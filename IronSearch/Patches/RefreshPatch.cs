@@ -8,12 +8,14 @@ using Il2Cpp;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
+using Il2CppAssets.Scripts.PeroTools.Managers;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
 using MelonLoader;
+using Newtonsoft.Json;
 using PythonExpressionManager;
 
 namespace IronSearch.Patches
@@ -46,6 +48,7 @@ namespace IronSearch.Patches
 
         internal static readonly Dictionary<string, SearchCache> searchCache = new();
 
+        internal static readonly Dictionary<string, Dictionary<int, LocalInfo>> localInfos = new();
         internal static bool? isAdvancedSearch { get; private set; } = false;
 
         //Singleton<TerminalManager>
@@ -99,7 +102,7 @@ namespace IronSearch.Patches
 
             _sw.Restart();
 
-            PrepareSearchData();
+            PrepareSearchData(allMusic);
 
             CompiledScript compiledScript;
             try
@@ -430,9 +433,38 @@ namespace IronSearch.Patches
             }
         }
 
-        private static void PrepareSearchData()
+        private static void PrepareSearchDataFirstTime(Il2CppSystem.Collections.Generic.List<MusicInfo> allMusic)
         {
-            
+            try
+            {
+                foreach (var mi in allMusic)
+                {
+                    if (!localInfos.TryGetValue(mi.uid, out var dict))
+                    {
+                        localInfos[mi.uid] = dict = new();
+                    }
+                    for (int i = 1; i < 5; i++)
+                    {
+                        dict[i] = new(mi.GetLocal(i));
+                    }
+                }
+
+                File.WriteAllText("localInfos.json", JsonConvert.SerializeObject(localInfos));
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Msg(ex);
+            }
+        }
+
+        private static bool firstPrepare = true;
+        private static void PrepareSearchData(Il2CppSystem.Collections.Generic.List<MusicInfo> allMusic)
+        {
+            if (firstPrepare)
+            {
+                firstPrepare = false;
+                PrepareSearchDataFirstTime(allMusic);
+            }
             RefreshPatch.langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
             RefreshPatch.history = DataHelper.history.ToSystem();
             RefreshPatch.highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToList();

@@ -1,4 +1,5 @@
-﻿using CustomAlbums.Managers;
+﻿using CustomAlbums.Data;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -13,7 +14,7 @@ namespace IronSearch.Tags
 
         private static bool EvalRankedInternal(MusicInfo musicInfo)
         {
-            return AlbumManager.LoadedAlbums.Values.First(x => x.Uid == musicInfo.uid).Sheets.Values.Any(x => ModMain._hqChartDict.ContainsKey(x.Md5) && ModMain._hqChartDict[x.Md5]);
+            return ((Album)ModMain.uidToAlbum[musicInfo.uid]).Sheets.Values.Any(x => ModMain._hqChartDict.ContainsKey(x.Md5) && ModMain._hqChartDict[x.Md5]);
         }
 
         internal static bool EvalRanked(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

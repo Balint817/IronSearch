@@ -1,3 +1,4 @@
+using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
@@ -11,7 +12,6 @@ namespace IronSearch.Tags
             public override string EvaluatorName => "Title";
             public override IEnumerable<string> GetStrings(MusicInfo musicInfo)
             {
-                // for some reason using yield here causes a System.AccessViolationException in GetLocal, so for now just return a list instead
                 var result = new List<string>();
 
                 result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.name));
@@ -23,14 +23,14 @@ namespace IronSearch.Tags
 
                 for (int i = 1; i <= 5; i++)
                 {
-                    result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.GetLocal(i).name));
+                    result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.GetLocalSafe(i).name));
                 }
 
                 return result;
             }
             static IEnumerable<string> GetStringsCustom_Title(MusicInfo mi)
             {
-                return RomanizationHelper.GetAllRomanizations(AlbumManager.LoadedAlbums.Values.First(x => x.Uid == mi.uid).Info.NameRomanized);
+                return RomanizationHelper.GetAllRomanizations(((Album)ModMain.uidToAlbum[mi.uid]).Info.NameRomanized);
             }
         }
         internal static bool EvalTitle(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
