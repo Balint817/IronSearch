@@ -1,6 +1,7 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading;
 using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using HarmonyLib;
@@ -138,53 +139,85 @@ namespace IronSearch.Patches
 
             try
             {
-                Parallel.ForEach(
-                    Partitioner.Create(0, allMusic.Count),
-                    options,
-                    () =>
+                // AI FTW LETS GOOOOO
+                // IMPORTANT:
+                // Avoid attaching IL2CPP to ThreadPool threads (Parallel.ForEach) because they live for the
+                // lifetime of the process; leaking attached threads causes huge/unbounded shutdown delays.
+                // Instead, create dedicated worker threads that attach+detach deterministically.
+                var workerCount = Math.Clamp(processorCount, 1, Math.Max(1, allMusic.Count));
+                var chunkSize = (allMusic.Count + workerCount - 1) / workerCount;
+
+                int stop = 0;
+                var threads = new Thread[workerCount];
+
+                for (int w = 0; w < workerCount; w++)
+                {
+                    int start = w * chunkSize;
+                    int end = Math.Min(allMusic.Count, start + chunkSize);
+
+                    threads[w] = new Thread(() =>
                     {
-                        // ensure this specific worker thread attaches to IL2CPP
-                        var thread = IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                        return new SearchArgument(null!, new PeroString(1000));
-                    },
-                    (range, state, arg) =>
-                    {
-                        for (int i = range.Item1; i < range.Item2; i++)
+                        if (start >= end)
                         {
-                            if (state.IsStopped)
-                                return arg;
+                            return;
+                        }
 
-                            try
+                        nint threadPtr = 0;
+                        try
+                        {
+                            threadPtr = IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
+                            var arg = new SearchArgument(null!, new PeroString(1000));
+
+                            for (int i = start; i < end; i++)
                             {
+                                if (Volatile.Read(ref stop) != 0)
+                                {
+                                    break;
+                                }
+
                                 var music = allMusic[i];
-
-                                arg.I = music;
-
-                                if (ModMain.ScriptManager.ScriptExecutor.Evaluate(arg, compiledScript))
+                                try
                                 {
-                                    asyncResults.Add(music);
+                                    arg.I = music;
+                                    if (ModMain.ScriptManager.ScriptExecutor.Evaluate(arg, compiledScript))
+                                    {
+                                        asyncResults.Add(music);
+                                    }
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                if (!failed)
+                                catch (Exception ex)
                                 {
-                                    failed = true;
-                                    MelonLogger.Msg(ex);
-                                    new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                    if (!failed)
+                                    {
+                                        failed = true;
+                                        MelonLogger.Msg(ex);
+                                        new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                    }
+                                    Volatile.Write(ref stop, 1);
+                                    break;
                                 }
-                                state.Stop();
-                                return arg;
                             }
                         }
-                        return arg;
-                    },
-                    _ =>
+                        finally
+                        {
+                            if (threadPtr != 0)
+                            {
+                                // Detach on the same OS thread that attached.
+                                IL2CPP.il2cpp_thread_detach(threadPtr);
+                            }
+                        }
+                    })
                     {
-                        // and don't forget to detach when done
-                        //IL2CPP.il2cpp_thread_detach(thread);
-                    }
-                );
+                        IsBackground = true,
+                        Name = $"IronSearch.AdvSearchWorker.{w}"
+                    };
+
+                    threads[w].Start();
+                }
+
+                foreach (var t in threads)
+                {
+                    t.Join();
+                }
             }
             catch (Exception ex)
             {
