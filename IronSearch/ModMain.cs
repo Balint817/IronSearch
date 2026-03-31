@@ -479,7 +479,9 @@ namespace IronSearch
 
             RegisterScript("Hidden", BuiltIns.EvalHasHidden);
             RegisterScript("HasHidden", BuiltIns.EvalHasHidden);
-            RegisterHelp(new() { "HasHidden", "Hidden" },
+            RegisterScript("Supreme", BuiltIns.EvalHasHidden);
+            RegisterScript("HasSupreme", BuiltIns.EvalHasHidden);
+            RegisterHelp(new() { "HasHidden", "Hidden", "Supreme", "HasSupreme" },
                 "Usage: Hidden()\n\n"
                 + "Checks if the music has a hidden difficulty"
             );
