@@ -439,6 +439,13 @@ namespace IronSearch
                 + "Checks if the music is a custom chart that has a video background."
             );
 
+            RegisterScript("Clears", BuiltIns.EvalClears);
+            RegisterHelp(new() { "Clears" },
+                "Usage: Clears(clearRange) or Callback(clearRange, levelRange)\n\n"
+                + "Checks if the music has the specified number of clears on any difficulty, and optionally, specify which difficulties to match.\n"
+                + "The level range can be a range from 1-5, specifying which levels are matched, or the wildcard '?' to select the highest level."
+            );
+
             RegisterScript("Custom", BuiltIns.EvalCustom);
             RegisterHelp(new() { "Custom" },
                 "Usage: Custom()\n\n"
@@ -649,7 +656,9 @@ namespace IronSearch
             RegisterObject("Highscores", BuiltIns.EvalGetHighscores);
             RegisterObject("HighScores", BuiltIns.EvalGetHighscores);
             RegisterObject("Highs", BuiltIns.EvalGetHighscores);
-            RegisterHelp(new() { "GetHighscores", "GetHighScores", "Highscores", "HighScores", "Highs" },
+            RegisterObject("GetScores", BuiltIns.EvalGetHighscores);
+            RegisterObject("Scores", BuiltIns.EvalGetHighscores);
+            RegisterHelp(new() { "GetHighscores", "GetHighScores", "Highscores", "HighScores", "Highs", "GetScores", "Scores" },
                 "Usage: GetHighscores() or GetHighScores() or Highscores() or HighScores() or Highs()\n\n"
                 + "Returns a list of the music's highscores."
             );

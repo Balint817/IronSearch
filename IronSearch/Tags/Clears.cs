@@ -1,36 +1,36 @@
 using Il2CppAssets.Scripts.Database;
-using IronPython.Runtime;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-
-        public class AccuracyEvaluator : DifficultyArgumentEvaluator
+        public class ClearsEvaluator : DifficultyArgumentEvaluator
         {
-            public override string EvaluatorName => "Accuracy";
+            public override string EvaluatorName => "Clears";
             public override IEnumerable<KeyValuePair<double, double>> GetDoubles(MusicInfo musicInfo)
             {
                 Utils.GetAvailableMaps(musicInfo, out var availableMaps);
+
                 foreach (var diff in availableMaps)
                 {
-                    string s = musicInfo.uid + "_" + diff;
+                    var s = musicInfo.uid + "_" + diff;
 
                     if (RefreshPatch.highScores.TryGetValue(s, out var score))
                     {
-                        yield return new(diff, score.Accuracy);
+                        yield return new(diff, score.Clears);
                     }
                     else
                     {
-                        yield return new(diff, double.NaN);
+                        yield return new(diff, 0);
                     }
+
                 }
             }
         }
-        internal static bool EvalAccuracy(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
+        internal static bool EvalClears(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            return ManagedSingleton<AccuracyEvaluator>.Instance.Evaluate(M, varArgs, varKwargs);
+            return ManagedSingleton<ClearsEvaluator>.Instance.Evaluate(M, varArgs, varKwargs);
         }
     }
 }

@@ -163,7 +163,7 @@ namespace IronSearch
                 Evaluate = data.fields["evaluate"].GetResultOrDefault<int>(-1),
                 Score = data.fields["score"].GetResultOrDefault<int>(-1),
                 Combo = data.fields["combo"].GetResultOrDefault<int>(-1),
-                Clear = data.fields["clear"].GetResultOrDefault<int>(-1),
+                Clears = data.fields["clear"].GetResultOrDefault<int>(-1),
                 AccuracyStr = data.fields["accuracyStr"].GetResultOrDefault<string>("?"),
                 Accuracy = data.fields["accuracy"].GetResultViaMarshal<float>(-1)
             };

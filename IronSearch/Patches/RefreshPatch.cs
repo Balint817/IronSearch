@@ -29,7 +29,7 @@ namespace IronSearch.Patches
         internal static int langIndex;
 
 
-        internal static List<Highscore> highScores { get; set; } = new();
+        internal static Dictionary<string, Highscore> highScores { get; set; } = new();
 
         internal static HashSet<string> fullCombos { get; set; } = new();
 
@@ -40,7 +40,7 @@ namespace IronSearch.Patches
         internal static HashSet<string> hides { get; set; } = new();
 
         internal static HashSet<string> streamer { get; set; } = new();
-        public static ReadOnlyCollection<Highscore> HighScores => highScores.AsReadOnly();
+        public static ReadOnlyDictionary<string, Highscore> HighScores => new(highScores);
         public static ReadOnlyCollection<string> FullCombos => fullCombos.ToList().AsReadOnly();
         public static ReadOnlyCollection<string> History => history.AsReadOnly();
         public static ReadOnlyCollection<string> Favorites => favorites.ToList().AsReadOnly();
@@ -450,31 +450,33 @@ namespace IronSearch.Patches
 
             if (save.Highest is not null)
             {
-                highScores.AddRange(save.Highest.SelectMany(nameToScoreDict =>
+                foreach (var nameToScoreDict in save.Highest)
                 {
                     var albumName = nameToScoreDict.Key;
                     var album = AlbumManager.LoadedAlbums.Values.FirstOrDefault(a => a.AlbumName == albumName);
                     if (album is null)
                     {
-                        return Array.Empty<Highscore>();
+                        continue;
                     }
                     var uidBase = album.Uid + '_';
-                    return nameToScoreDict.Value.Select(indexToScore =>
+                    foreach (var indexToScore in nameToScoreDict.Value)
                     {
                         var score = indexToScore.Value;
-                        return new Highscore()
+
+                        var newScore = new Highscore()
                         {
                             Accuracy = score.Accuracy,
                             AccuracyStr = score.AccuracyStr,
-                            Clear = (int)score.Clear,
+                            Clears = (int)score.Clear,
                             Combo = score.Combo,
                             Evaluate = score.Evaluate,
                             Score = score.Score,
                             Uid = uidBase + indexToScore.Key,
                         };
 
-                    });
-                }));
+                        highScores.Add(newScore.Uid, newScore);
+                    }
+                }
             }
         }
 
@@ -512,7 +514,7 @@ namespace IronSearch.Patches
             }
             RefreshPatch.langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
             RefreshPatch.history = DataHelper.history.ToSystem();
-            RefreshPatch.highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToList();
+            RefreshPatch.highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToDictionary(x => x.Uid, x => x);
             RefreshPatch.fullCombos = DataHelper.fullComboMusic.ToSystem().ToHashSet();
             RefreshPatch.favorites = DataHelper.collections.ToSystem().ToHashSet();
             RefreshPatch.hides = DataHelper.hides.ToSystem().ToHashSet();

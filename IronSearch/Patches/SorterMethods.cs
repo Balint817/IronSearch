@@ -49,12 +49,10 @@ namespace IronSearch.Patches
             {
                 string uid = musicInfo.uid + "_" + map;
 
-                var score = RefreshPatch.highScores
-                    .Where(x => x.Uid == uid)
-                    .MaxByOrDefault(x => x.Accuracy, null);
-
-                if (score != null && score.Accuracy > max)
+                if (RefreshPatch.highScores.TryGetValue(uid, out var score) && score.Accuracy > max)
+                {
                     max = score.Accuracy;
+                }
             }
 
             return max;

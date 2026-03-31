@@ -8,7 +8,7 @@ namespace IronSearch.Records
         public int Evaluate { get; internal set; }
         public int Score { get; internal set; }
         public int Combo { get; internal set; }
-        public int Clear { get; internal set; }
+        public int Clears { get; internal set; }
         public string AccuracyStr { get; internal set; } = null!;
         public float Accuracy { get; internal set; }
 
@@ -28,7 +28,7 @@ namespace IronSearch.Records
                    $"Evaluate: {Evaluate} ({EvaluateStr})\n" +
                    $"Score: {Score}\n" +
                    $"Combo: {Combo}\n" +
-                   $"Clear: {Clear}\n" +
+                   $"Clears: {Clears}\n" +
                    $"Accuracy: {Accuracy} ({AccuracyStr})";
         }
     }

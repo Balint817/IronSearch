@@ -11,9 +11,13 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varArgs, "GetHighScores()");
             ThrowIfNotEmpty(varKwargs, "GetHighScores()");
             var l = new PythonList();
-            foreach (var item in RefreshPatch.highScores)
+            for (int i = 1; i <= 5; i++)
             {
-                l.Add(item);
+                var s = M.I.uid + "_" + i;
+                if (RefreshPatch.highScores.TryGetValue(s, out var score))
+                {
+                    l.Add(score);
+                }
             }
             return l;
         }
