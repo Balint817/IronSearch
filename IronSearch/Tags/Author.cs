@@ -14,7 +14,7 @@ namespace IronSearch.Tags
 
                 for (int i = 1; i <= 5; i++)
                 {
-                    result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.GetLocalSafe(i).author));
+                    result.AddRange(RomanizationHelper.GetAllRomanizations(musicInfo.GetLocalSafe(i).Author));
                 }
                 return result;
             }

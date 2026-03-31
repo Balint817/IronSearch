@@ -94,7 +94,7 @@ If you forget the parentheses, the game thinks you are just naming the command i
 
 Keyword arguments are supported, but each tag controls which keywords it accepts.
 
-For example, the `Range(...)` object allows you to specify whether the start or end should be exclusive. (`start=...`, `end=...`)
+For example, the `Range(...)` object allows you to specify whether the start or end should be exclusive. (`start=True/False`, `end=True/False`)
 
 ---
 
@@ -357,30 +357,6 @@ This section documents **every tag** available by default. But first...
 
 ### 7.1 Filters (returns `True`/`False`)
 
-#### `Any`
-
-Usage:
-
-- `Any(text) or Any(regex)`
-
-Checks if the music matches any of the following:
-
-- `Album`
-- `Author`
-- `Designer`
-- `Tag`
-- `Title`
-
-Example:
-
-```text
-search: Any('cyber')
-```
-
-Matches if `cyber` appears in album, author, designer, tag, or title text.
-
----
-
 #### `Accuracy` / `Acc`
 
 Usage:
@@ -392,16 +368,15 @@ Checks if the music has scores in the specified accuracy range, optionally restr
 Notes:
 
 - Input accuracy is a **percentage** range (e.g. `90-100`).
-- The accuracy part does **not** allow wildcard `?` in the "accuracyRange" position.
 - If the map range is a wildcard `?`, the tag selects the **highest available map**.
 
 Example:
 
 ```text
-search: Accuracy('90+', '?')
+search: Accuracy('90+', '3')
 ```
 
-Matches songs where you have 90% or higher accuracy on the highest available map.
+Matches songs where you have 90% or higher accuracy on the Master of the map.
 
 ---
 
@@ -427,6 +402,30 @@ Matches if `treatment` appears in album name.
 
 ---
 
+#### `Any`
+
+Usage:
+
+- `Any(text) or Any(regex)`
+
+Checks if the music matches any of the following:
+
+- `Album`
+- `Author`
+- `Designer`
+- `Tag`
+- `Title`
+
+Example:
+
+```text
+search: Any('cyber')
+```
+
+Matches if `cyber` appears in album, author, designer, tag, or title text.
+
+---
+
 #### `AP` / `Perfect` / `AllPerfect`
 
 Usage:
@@ -447,7 +446,7 @@ Example:
 search: AP('3-4')
 ```
 
-Matches songs where you have an AP in both the master and the hidden maps.
+Matches songs where you have an AP in either the master and the hidden maps.
 
 ---
 
@@ -483,7 +482,7 @@ Example:
 search: BPM('150-200')
 ```
 
-Matches if the BPM of the song is within the provided range.
+Matches if the BPM of the song is within the range 150-200 (inclusive).
 
 ---
 
@@ -504,16 +503,10 @@ Notes:
 Examples:
 
 ```text
-search: Callback('11+', '3+')
+search: Callback('11+', '3')
 ```
 
-Matches if there's a callback difficulty of 11 or higher on master or hidden maps.
-
-```text
-search: Callback('*', '3')
-```
-
-Returns whether the map has a Master.
+Matches if there's a callback difficulty of 11 or higher on the Master of the map.
 
 ---
 
@@ -523,7 +516,29 @@ Usage:
 
 - `Cinema()`
 
-Checks if the music is a custom chart with a video background.
+Checks if the music is a custom chart with an animated video background.
+
+---
+
+#### `Clears`
+
+Usage:
+
+- `Clears(clearRange) or Clears(clearRange, mapRange)`
+
+Checks if the music has clears in the specified range, optionally restricting to specific maps.
+
+Notes:
+
+- If the map range is a wildcard `?`, the tag selects the **highest available map**.
+
+Example:
+
+```text
+search: Clears('5+', '3')
+```
+
+Matches songs where you have 5 or more clears on the Master of the map.
 
 ---
 
@@ -571,10 +586,10 @@ Notes:
 Example:
 
 ```text
-search: Difficulty('11+', '?')
+search: Difficulty('11+', '3')
 ```
 
-Matches songs where the highest available map is 11 or above
+Matches songs where the Master of the map is difficulty 11 or higher.
 
 ---
 
@@ -599,19 +614,18 @@ Checks full combo status.
 Notes:
 
 - If `mapRange` is `'?'`, it selects the highest applicable difficulty.
-- For non-wildcard ranges, it requires full combo on every selected difficulty.
 
 Example:
 
 ```text
-search: FC('?')
+search: FC('3')
 ```
 
-Matches songs where the highest available map has a full combo.
+Matches songs where the Master of the map has a full combo.
 
 ---
 
-#### `Hidden`/`HasHidden`
+#### `HasHidden`/`Hidden`
 
 Usage:
 
@@ -621,7 +635,25 @@ Checks whether the music has a "hidden" difficulty (difficulty 4).
 
 ---
 
-#### `Touhou`/`HasTouhou`
+#### `HasMap`/`Map`
+
+Usage:
+
+- `Map(mapRange)`
+
+Checks whether the music has a map in the specified range.
+
+Example:
+
+```text
+search: Map('3')
+```
+
+Matches songs that have a Master difficulty.
+
+---
+
+#### `HasTouhou`/`Touhou`
 
 Usage:
 
@@ -783,7 +815,7 @@ Accepted inputs:
 
 Ambiguity:
 
-- If the typed scene name matches multiple known scenes, the search short-circuits.
+- If the typed scene name matches multiple known scenes, the search fails.
 
 Example:
 
@@ -852,7 +884,7 @@ Usage:
 
 - `Unplayed() or Unplayed(mapRange)`
 
-Checks whether the music has not been played, or (optionally) not played on specified difficulty maps.
+Checks whether the music has not been played, or (optionally) not played on one of the specified difficulty maps.
 
 Notes:
 
@@ -979,9 +1011,10 @@ Examples:
 Implementation details:
 
 - `Range(rangeString, start=..., end=...)` supports keyword arguments:
-  - `start=...` makes the **start** exclusive
-  - `end=...` makes the **end** exclusive
+  - `start=...` True/False, makes the **start** exclusive
+  - `end=...` True/False, makes the **end** exclusive
 - `Range(x)` where `x` is a number makes a single-value range.
+- `Range(x)` where `x` is a string parses it into a Range.
 - `Range(start, end)` where both are numbers creates an inclusive numeric range.
 
 Examples:
@@ -1038,8 +1071,9 @@ Usage:
 
 Returns:
 
-- `Random()` => random real number between `0.0` and `1.0` (float)
-- `Random(start, end)` => random integer in `[start, end)` (end exclusive)
+- `Random()` => random **real number** in `[0.0, 1.0)` (end exclusive)
+- `Random(range)` => random **real number** in `[start, end)` (end exclusive)
+- `Random(start, end)` => random **integer** in `[start, end)` (end exclusive)
 
 ---
 
@@ -1138,7 +1172,7 @@ Returns a list of `Highscore` objects.
 - `Evaluate` (int)
 - `Score` (int)
 - `Combo` (int)
-- `Clear` (int)
+- `Clears` (int)
 - `AccuracyStr` (string)
 - `Accuracy` (float)
 

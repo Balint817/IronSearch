@@ -496,7 +496,7 @@ namespace IronSearch
             RegisterScript("Map", BuiltIns.EvalHasMap);
             RegisterScript("HasMap", BuiltIns.EvalHasMap);
             RegisterHelp(new() { "HasMap", "Map" },
-                "Usage: Map()\n\n"
+                "Usage: Map(levelRange)\n\n"
                 + "Checks if the music has a specific level/map"
             );
 

@@ -4,18 +4,18 @@ namespace IronSearch.Records
 {
     public class LocalInfo
     {
-        public readonly string author;
-        public readonly string name;
+        public readonly string Author;
+        public readonly string Name;
         public LocalInfo(LocalALBUMInfo localAlbumInfo)
         {
-            name = localAlbumInfo.name ?? "";
-            author = localAlbumInfo.author ?? "";
+            Name = localAlbumInfo.name ?? "";
+            Author = localAlbumInfo.author ?? "";
         }
 
         public override string ToString()
         {
-            return $"Title: {name}\n" +
-                   $"Author: {author}\n";
+            return $"Title: {Name}\n" +
+                   $"Author: {Author}\n";
         }
     }
 

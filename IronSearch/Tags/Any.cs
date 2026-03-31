@@ -12,11 +12,11 @@ namespace IronSearch.Tags
 
             public ReadOnlyCollection<ContainsEvaluator> EvaluatorInstances = new(new ContainsEvaluator[]
             {
-                ManagedSingleton<TagEvaluator>.Instance,
-                ManagedSingleton<TitleEvaluator>.Instance,
+                ManagedSingleton<AlbumEvaluator>.Instance,
                 ManagedSingleton<AuthorEvaluator>.Instance,
                 ManagedSingleton<DesignerEvaluator>.Instance,
-                ManagedSingleton<AlbumEvaluator>.Instance
+                ManagedSingleton<TagEvaluator>.Instance,
+                ManagedSingleton<TitleEvaluator>.Instance,
             });
             public override IEnumerable<string> GetStrings(MusicInfo musicInfo)
             {
