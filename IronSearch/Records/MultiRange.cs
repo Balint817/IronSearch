@@ -24,28 +24,16 @@ namespace IronSearch.Records
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;
-            if (obj == (object)this) return true;
+            if (ReferenceEquals(this, obj)) return true;
             if (obj is not MultiRange mr) return false;
 
-            lock (this._ranges)
+            if (this._ranges.Count != mr._ranges.Count) return false;
+
+            for (int i = 0; i < this._ranges.Count; i++)
             {
-                lock (mr._ranges)
-                {
-                    if (this._ranges.Count != mr._ranges.Count) return false;
-
-                    var count = this._ranges.Count;
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        if (this._ranges[i] != mr._ranges[i])
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
+                if (this._ranges[i] != mr._ranges[i]) return false;
             }
-
+            return true;
         }
 
         public static bool operator ==(MultiRange? a, MultiRange? b)
@@ -60,14 +48,15 @@ namespace IronSearch.Records
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            var hash = new HashCode();
+            foreach (var r in _ranges)
+            {
+                hash.Add(r);
+            }
+            return hash.ToHashCode();
         }
         public MultiRange Invert()
         {
-            if (IsReadOnly)
-            {
-                return this;
-            }
             var result = new MultiRange
             {
                 _ranges = _ranges
@@ -84,26 +73,18 @@ namespace IronSearch.Records
             _ranges = _ranges.SelectMany(Utils.InvertArray).ToList();
             Resolve();
         }
-
         public MultiRange Add(params Range[] ranges)
         {
-            if (IsReadOnly)
-            {
-                return this;
-            }
+            // REMOVED: if (IsReadOnly) return this; 
             var result = new MultiRange
             {
                 _ranges = _ranges.ToList()
             };
-            result.AddSelf(ranges);
+            result.AddSelf(ranges); // result is not ReadOnly, so AddSelf will succeed
             return result;
         }
         public MultiRange Subtract(params Range[] ranges)
         {
-            if (IsReadOnly)
-            {
-                return this;
-            }
             var result = new MultiRange
             {
                 _ranges = _ranges.ToList()
@@ -123,10 +104,6 @@ namespace IronSearch.Records
         }
         public MultiRange Overlap(params Range[] ranges)
         {
-            if (IsReadOnly)
-            {
-                return this;
-            }
             var result = new MultiRange
             {
                 _ranges = _ranges.ToList()
@@ -235,28 +212,27 @@ namespace IronSearch.Records
         {
             if (IsReadOnly)
             {
-                var t = Ranges;
-                Ranges = t!;
+                Ranges ??= _ranges.AsReadOnly();
                 return;
             }
-            _ranges = _ranges.Where(x => !(x is null || x.Start is double.NaN || x.End is double.NaN)).ToList();
-            Ranges = _ranges.AsReadOnly();
-            for (int i = 0; i < _ranges.Count - 1; i++)
+
+            _ranges = _ranges.Where(x => x is not null).ToList();
+
+            if (_ranges.Count > 1)
             {
-                var range1 = _ranges[i];
-                for (int j = i + 1; j < _ranges.Count; j++)
+                _ranges.Sort(); // Sort FIRST
+                for (int i = 0; i < _ranges.Count - 1; i++)
                 {
-                    var range2 = _ranges[j];
-                    if (range1.TryMerge(range2, out var result))
+                    if (_ranges[i].TryMerge(_ranges[i + 1], out var merged))
                     {
-                        range1 = range2;
-                        _ranges.RemoveAt(j);
-                        j = i + 1;
-                    };
+                        _ranges[i] = merged;
+                        _ranges.RemoveAt(i + 1);
+                        i--; // Step back to check the newly merged range against the next one
+                    }
                 }
-                _ranges[i] = range1;
             }
-            _ranges.Sort();
+
+            Ranges = _ranges.AsReadOnly();
         }
 
         internal bool Contains(double n)
@@ -266,20 +242,12 @@ namespace IronSearch.Records
 
         public ReadOnlyCollection<Range> Ranges;
         public bool IsReadOnly { get; private init; }
-        public  MultiRange(params Range[] ranges)
+
+        public MultiRange(params Range[] ranges)
         {
             if (ranges is null || ranges.Length == 0)
             {
                 _ranges = Array.Empty<Range>().ToList();
-                Ranges = _ranges.AsReadOnly();
-                return;
-            }
-            else if (ranges.Length == 1)
-            {
-                if (ranges[0].Start is not double.NaN)
-                {
-                    _ranges.Add(ranges[0]);
-                }
                 Ranges = _ranges.AsReadOnly();
                 return;
             }

@@ -69,6 +69,10 @@ namespace IronSearch
         }
         internal static Range[] InvertArray(this Range range)
         {
+            if (double.IsNaN(range.Start))
+            {
+                return Array.Empty<Range>();
+            }
             if (range.Start == double.NegativeInfinity)
             {
                 if (range.End == double.PositiveInfinity)

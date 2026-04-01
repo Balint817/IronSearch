@@ -46,9 +46,13 @@ namespace IronSearch.Records
         }
         public MultiRange AsMultiRange()
         {
-            if (this.IsReadonly)
+            if (double.IsNaN(_start))
             {
                 return MultiRange.InvalidRange;
+            }
+            if (double.IsNegativeInfinity(_start) && double.IsPositiveInfinity(_end))
+            {
+                return MultiRange.FullRange;
             }
             return new MultiRange(this);
         }
@@ -68,12 +72,17 @@ namespace IronSearch.Records
         }
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            if (double.IsNaN(_start) || double.IsNaN(_end))
+            {
+                // All NaN ranges are identical
+                return HashCode.Combine(double.NaN, double.NaN, false, false);
+            }
+            return HashCode.Combine(_start, _end, ExclusiveStart, ExclusiveEnd);
         }
         public int CompareTo(object? obj)
         {
             var range = (Range?)obj;
-            if (range == null)
+            if (range is null)
             {
                 return 1;
             }
@@ -131,34 +140,19 @@ namespace IronSearch.Records
 
         public bool ExclusiveStart
         {
-            get
-            {
-                return _start is double.NegativeInfinity
-                    ? _exclusiveStart = false
-                    : _exclusiveStart;
-            }
+            get => _start == double.NegativeInfinity ? false : _exclusiveStart;
             set
             {
-                if (!IsReadonly)
-                {
-                    _exclusiveStart = value;
-                }
+                if (!IsReadonly) _exclusiveStart = value;
             }
         }
+
         public bool ExclusiveEnd
         {
-            get
-            {
-                return _end is double.PositiveInfinity
-                    ? _exclusiveEnd = false
-                    : _exclusiveEnd;
-            }
+            get => _end == double.PositiveInfinity ? false : _exclusiveEnd;
             set
             {
-                if (!IsReadonly)
-                {
-                    _exclusiveEnd = value;
-                }
+                if (!IsReadonly) _exclusiveEnd = value;
             }
         }
 
@@ -344,9 +338,14 @@ namespace IronSearch.Records
                 startFlag = range.ExclusiveStart;
                 start = range._start;
             }
-            else
+            else if (range._start < _start)
             {
                 startFlag = ExclusiveStart;
+                start = _start;
+            }
+            else
+            {
+                startFlag = ExclusiveStart || range.ExclusiveStart;
                 start = _start;
             }
 
@@ -358,9 +357,14 @@ namespace IronSearch.Records
                 endFlag = range.ExclusiveEnd;
                 end = range._end;
             }
-            else
+            else if (range._end > _end)
             {
                 endFlag = ExclusiveEnd;
+                end = _end;
+            }
+            else
+            {
+                endFlag = ExclusiveEnd || range.ExclusiveEnd;
                 end = _end;
             }
 
@@ -409,9 +413,14 @@ namespace IronSearch.Records
                 startFlag = range.ExclusiveStart;
                 start = range._start;
             }
-            else
+            else if (range._start > _start)
             {
                 startFlag = ExclusiveStart;
+                start = _start;
+            }
+            else
+            {
+                startFlag = ExclusiveStart && range.ExclusiveStart;
                 start = _start;
             }
 
@@ -423,9 +432,14 @@ namespace IronSearch.Records
                 endFlag = range.ExclusiveEnd;
                 end = range._end;
             }
-            else
+            else if (range._end < _end)
             {
                 endFlag = ExclusiveEnd;
+                end = _end;
+            }
+            else
+            {
+                endFlag = ExclusiveEnd && range.ExclusiveEnd;
                 end = _end;
             }
 
@@ -470,9 +484,14 @@ namespace IronSearch.Records
                 startFlag = range.ExclusiveStart;
                 start = range._start;
             }
-            else
+            else if (range._start > _start)
             {
                 startFlag = ExclusiveStart;
+                start = _start;
+            }
+            else
+            {
+                startFlag = ExclusiveStart && range.ExclusiveStart;
                 start = _start;
             }
 
@@ -484,9 +503,14 @@ namespace IronSearch.Records
                 endFlag = range.ExclusiveEnd;
                 end = range._end;
             }
-            else
+            else if (range._end < _end)
             {
                 endFlag = ExclusiveEnd;
+                end = _end;
+            }
+            else
+            {
+                endFlag = ExclusiveEnd && range.ExclusiveEnd;
                 end = _end;
             }
 

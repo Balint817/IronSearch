@@ -48,7 +48,6 @@ namespace IronSearch.Tags
                     }
                     if (mr0 == MultiRange.InvalidRange)
                     {
-                        Console.WriteLine("invalid range");
                         if (!AllowInvalid0)
                         {
                             throw new SearchValidationException("wildcard '?' is not valid in this context", EvaluatorNameCalled);
