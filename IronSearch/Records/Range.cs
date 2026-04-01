@@ -46,14 +46,6 @@ namespace IronSearch.Records
         }
         public MultiRange AsMultiRange()
         {
-            if (double.IsNaN(_start))
-            {
-                return MultiRange.InvalidRange;
-            }
-            if (double.IsNegativeInfinity(_start) && double.IsPositiveInfinity(_end))
-            {
-                return MultiRange.FullRange;
-            }
             return new MultiRange(this);
         }
         public static bool operator ==(Range? a, Range? b)

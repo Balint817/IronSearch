@@ -156,26 +156,14 @@ namespace IronSearch.Records
 
         public MultiRange Add(MultiRange multiRange)
         {
-            if (IsReadOnly)
-            {
-                return this;
-            }
             return Add(multiRange._ranges.ToArray());
         }
         public MultiRange Subtract(MultiRange multiRange)
         {
-            if (IsReadOnly)
-            {
-                return this;
-            }
             return Subtract(multiRange._ranges.ToArray());
         }
         public MultiRange Overlap(MultiRange multiRange)
         {
-            if (IsReadOnly)
-            {
-                return this;
-            }
             return Overlap(multiRange._ranges.ToArray());
         }
         public void AddSelf(MultiRange multiRange)
