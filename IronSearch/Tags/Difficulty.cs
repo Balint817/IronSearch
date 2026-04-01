@@ -7,7 +7,8 @@ namespace IronSearch.Tags
         public class DifficultyEvaluator : DifficultyArgumentEvaluator
         {
             public override string EvaluatorName => "Difficulty";
-            public override IEnumerable<KeyValuePair<double, double>> GetDoubles(MusicInfo musicInfo)
+            public override bool AllowInvalid0 => true;
+            public override IEnumerable<KeyValuePair<double, double>> GetPairs(MusicInfo musicInfo)
             {
                 if (!Utils.GetMapDifficulties(musicInfo, out var difficulties))
                 {

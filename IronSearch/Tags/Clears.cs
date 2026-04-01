@@ -8,7 +8,8 @@ namespace IronSearch.Tags
         public class ClearsEvaluator : DifficultyArgumentEvaluator
         {
             public override string EvaluatorName => "Clears";
-            public override IEnumerable<KeyValuePair<double, double>> GetDoubles(MusicInfo musicInfo)
+            public override bool AllowInvalid0 => false;
+            public override IEnumerable<KeyValuePair<double, double>> GetPairs(MusicInfo musicInfo)
             {
                 Utils.GetAvailableMaps(musicInfo, out var availableMaps);
 

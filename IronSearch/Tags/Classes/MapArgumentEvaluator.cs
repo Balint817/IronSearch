@@ -9,14 +9,14 @@ namespace IronSearch.Tags
         internal abstract class MapArgumentEvaluator : Evaluator
         {
             static readonly Range argRange = new(0,1); // just for the error message, realistically not needed;
-            public abstract IEnumerable<KeyValuePair<double, bool>> GetDoubles(MusicInfo musicInfo);
+            public abstract IEnumerable<KeyValuePair<double, bool>> GetPairs(MusicInfo musicInfo);
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
             {
                 ThrowIfNotEmpty(varKwargs, EvaluatorNameCalled);
 
                 if (varArgs.Length == 0)
                 {
-                    return GetDoubles(M.I).Any(x => x.Value);
+                    return GetPairs(M.I).Any(x => x.Value);
                 }
 
                 ThrowIfNotMatching(varArgs, argRange, EvaluatorNameCalled);
@@ -24,14 +24,14 @@ namespace IronSearch.Tags
                 MultiRange mr0 = MultiRangeArgumentParser.GetMultiRange(varArgs[0], EvaluatorNameCalled);
                 if (mr0 == MultiRange.InvalidRange)
                 {
-                    var arr = GetDoubles(M.I).ToArray();
+                    var arr = GetPairs(M.I).ToArray();
                     if (arr.Length == 0)
                     {
                         return false;
                     }
                     return arr.MaxBy(x => x.Key).Value;
                 }
-                return GetDoubles(M.I).Any(x => x.Value && mr0.Contains(x.Key));
+                return GetPairs(M.I).Any(x => x.Value && mr0.Contains(x.Key));
             }
         }
     }

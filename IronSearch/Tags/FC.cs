@@ -9,7 +9,7 @@ namespace IronSearch.Tags
         public class FCEvaluator : MapArgumentEvaluator
         {
             public override string EvaluatorName => "FC";
-            public override IEnumerable<KeyValuePair<double, bool>> GetDoubles(MusicInfo musicInfo)
+            public override IEnumerable<KeyValuePair<double, bool>> GetPairs(MusicInfo musicInfo)
             {
                 Utils.GetAvailableMaps(musicInfo, out var availableMaps);
                 foreach (var diff in availableMaps)
