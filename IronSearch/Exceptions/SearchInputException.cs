@@ -36,7 +36,7 @@ namespace IronSearch.Exceptions
         public override string ToString()
         {
             var sb = new System.Text.StringBuilder();
-            sb.Append("Error:")
+            sb.Append("Error in ")
                 .Append(ParameterContext)
                 .Append('(');
 
@@ -127,7 +127,7 @@ namespace IronSearch.Exceptions
                     }
                     return $"<function {JsonConvert.SerializeObject(pf.__name__)}>";
                 case Range or MultiRange:
-                    return arg.ToString();
+                    return '"' + arg.ToString() + '"';
                 case Highscore:
                     return "Score(...)";
                 case LocalInfo:
