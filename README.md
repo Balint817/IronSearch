@@ -12,6 +12,7 @@ It includes a variety of filters and sorting options to help you find the perfec
 
 ## Feedback form
 Soon.
+**For reporting bugs, open a GitHub Issue instead!**
 
 ## Usage
 The documentation can be found [here](DOC.md).
