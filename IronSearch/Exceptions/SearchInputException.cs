@@ -19,6 +19,10 @@ namespace IronSearch.Exceptions
 
         public override string ToString()
         {
+            if (ParameterContext is not null)
+            {
+                return $"Error in {ParameterContext}: " + Message;
+            }
             return "Error: " + Message;
         }
     }
