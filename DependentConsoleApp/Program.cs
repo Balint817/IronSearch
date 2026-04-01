@@ -6,9 +6,6 @@ namespace DependentConsoleApp
     {
         static void Main(string[] args)
         {
-            //var tag1 = new Script(
-            //    "def run(arg, tagDict):\n" +
-            //    "\treturn arg.Foo");
 
             //var tag2 = new Script(
             //    "def run(arg, tagDict):\n" +
@@ -31,18 +28,26 @@ namespace DependentConsoleApp
 
             var userScriptManager = new UserScriptManager("scripts", executor, (int)Priorities.UserScript);
 
+            var tag1 = new Script(executor.Engine,
+                "def run(arg, tagDict):\n"
+                + "\timport clr\n"
+                + "\timport System\n"
+                + "\traise System.Exception('asd')\n"
+                );
+
+            executor.RegisterScript("foo", tag1);
             //executor.RegisterScript("foobar", tag4);
 
 
             var fooBars = new List<FooBar>() { new() { Foo = false, Bar = false }, new() { Foo = true, Bar = false }, new() { Foo = false, Bar = true }, new() { Foo = true, Bar = true } };
 
-            var compiled = executor.Compile("[i for i in 1]");
+            var compiled = executor.Compile("foo()");
 
             foreach (var fooBar in fooBars)
             {
                 try
                 {
-                    Console.WriteLine(fooBar);
+                    //Console.WriteLine(fooBar);
                     Console.WriteLine(executor.Evaluate(fooBar, compiled));
                     Console.WriteLine("-------------------");
                 }
@@ -50,13 +55,18 @@ namespace DependentConsoleApp
                 {
                     try
                     {
-                        CompiledScript.ConvertException(ex);
+                        CompiledScript.TryConvertException(ex, executor.Engine);
+                        //CompiledScript.TryConvertException(ex, executor.Engine);
                     }
                     catch (Exception ex2)
                     {
-                        Console.WriteLine(ex2.GetType());
+                        Console.WriteLine(1);
                         Console.WriteLine(ex2.Message);
+                        break;
                     }
+                    Console.WriteLine(2);
+                    Console.WriteLine(ex);
+                    throw;
                 }
                 break;
             }

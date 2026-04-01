@@ -47,21 +47,7 @@ namespace IronSearch
                         MelonLogger.Msg(ConsoleColor.Red, response.Exception.Message);
                         break;
                     default:
-                        try
-                        {
-                            CompiledScript.ConvertException(response.Exception);
-                        }
-                        catch (Exception ex)
-                        {
-                            if (ex is PythonException pe)
-                            {
-                                MelonLogger.Msg(ConsoleColor.Red, ex.Message);
-                            }
-                            else
-                            {
-                                MelonLogger.Msg(ConsoleColor.Red, ex);
-                            }
-                        }
+                        MelonLogger.Msg(ConsoleColor.Red, response.Exception);
                         break;
                 }
             }

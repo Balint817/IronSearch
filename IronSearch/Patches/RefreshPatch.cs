@@ -205,7 +205,17 @@ namespace IronSearch.Patches
                                         if (!failed)
                                         {
                                             failed = true;
-                                            new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                            try
+                                            {
+                                                if (!CompiledScript.TryConvertException(ex))
+                                                {
+                                                    throw;
+                                                }
+                                            }
+                                            catch (Exception ex2)
+                                            {
+                                                new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                            }
                                         }
                                         Volatile.Write(ref stop, 1);
                                         break;
