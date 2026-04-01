@@ -108,13 +108,9 @@ namespace PythonExpressionManager
                         var formatted = exceptionOperations.FormatException(wrappedEx);
                         if (!string.IsNullOrEmpty(formatted))
                         {
-
-
-
-                            var formatSplit = formatted.Split(':', 2);
-                            if (formatSplit.Length == 2 && !formatSplit[0].Contains("Exception", StringComparison.Ordinal))
+                            var formatSplit = formatted.Split('\n');
+                            if (!formatSplit.Any(x => x.Split(":", 2) is string[] t && t.Length == 2 && t[0].Contains("Exception")))
                             {
-                                formatSplit = formatted.Split('\n');
                                 var sb = new StringBuilder();
                                 int i = 0;
                                 if (formatSplit[0].StartsWith("Traceback (most recent call last):", StringComparison.Ordinal))
@@ -130,29 +126,9 @@ namespace PythonExpressionManager
                                     sb.AppendLine(formatSplit[i]);
                                 }
 
-
-
-                                // Split the C# stack trace into lines
-                                var traceLines = wrappedEx.StackTrace?.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-                                // Filter out the DLR and IronPython internal execution noise
-                                var cleanTraceLines = traceLines?.Where(line =>
-                                    !line.Contains("Microsoft.Scripting") &&
-                                    !line.Contains("IronPython") &&
-                                    !line.Contains("System.Dynamic.UpdateDelegates") &&
-                                    !line.Contains("System.Runtime.CompilerServices.TaskAwaiter")
-                                )?.ToList() ?? new();
-
-                                // If there's anything left after filtering, it's your C# code
-                                if (cleanTraceLines.Any())
+                                if (wrappedEx.TryGetNativeTrace(out var nativeTrace))
                                 {
-                                    var sep = "\n  ";
-
-                                    var s = "\n--- Native .NET Stack Trace (for debugging) ---"
-                                        + sep
-                                        + string.Join(sep, cleanTraceLines);
-
-                                    sb.Append(s);
+                                    sb.AppendLine(nativeTrace);
                                 }
 
                                 throw new PythonException(sb.ToString());

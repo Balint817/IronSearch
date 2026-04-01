@@ -1,4 +1,6 @@
-﻿namespace PythonExpressionManager
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace PythonExpressionManager
 {
     public static class Extensions
     {
@@ -49,6 +51,58 @@
             return key.IsValidVariableName()
                 && (instance.ArgumentName != key)
                 && (instance.BaseDictName != key);
+        }
+        public static bool TryGetNativeTrace(this Exception wrappedEx, [MaybeNullWhen(false)]out string trace)
+        {
+            trace = null;
+            if (wrappedEx is null || wrappedEx.StackTrace is null)
+            {
+                return false;
+            }
+            var traceLines = wrappedEx.StackTrace.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+
+            // Filter out the DLR and IronPython internal execution noise
+            var cleanTraceLines = traceLines?.Where(line =>
+                !line.Contains("Microsoft.Scripting") &&
+                !line.Contains("IronPython.") &&
+                !line.Contains("System.Dynamic.UpdateDelegates") &&
+                !line.Contains("System.Runtime.CompilerServices.TaskAwaiter")
+            )?.ToList() ?? new();
+
+            // If there's anything left after filtering, it's your C# code
+            if (!cleanTraceLines.Any())
+            {
+                return false;
+            }
+
+            var sep = "\n  ";
+
+            trace = "\n--- Native .NET Stack Trace (for debugging) ---"
+                + sep
+                + string.Join(sep, cleanTraceLines);
+
+            return true;
+        }
+        public static string? ToFilteredTrace(this Exception wrappedEx)
+        {
+            if (wrappedEx is null || wrappedEx.StackTrace is null)
+            {
+                return wrappedEx?.ToString();
+            }
+            var traceLines = wrappedEx.ToString().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Filter out the DLR and IronPython internal execution noise
+            var cleanTraceLines = traceLines?.Where(line =>
+                !line.Contains("Microsoft.Scripting") &&
+                !line.Contains("IronPython.") &&
+                !line.Contains("System.Dynamic.UpdateDelegates") &&
+                !line.Contains("System.Runtime.CompilerServices.TaskAwaiter")
+            )?.ToList() ?? new();
+
+            var result = string.Join("\n", cleanTraceLines);
+
+            return result;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using PythonExpressionManager;
+﻿using IronPython.Runtime;
+using PythonExpressionManager;
 
 namespace DependentConsoleApp
 {
@@ -16,13 +17,12 @@ namespace DependentConsoleApp
             //    "\treturn tagDict['foo']() and tagDict['bar']()");
 
 
-            //WrappedCLRDelegate del = (dynamic input, PythonDictionary tagDict, PythonTuple args, PythonDictionary kwargs) =>
-            //{
-            //    FooBar foobar = input;
-            //    return foobar.Bar && foobar.Foo;
-            //};
-
-            //var tag4 = ScriptExecutor.FromDelegate(del);
+            WrappedCLRDelegate del = (dynamic input, PythonDictionary tagDict, PythonTuple args, PythonDictionary kwargs) =>
+            {
+                throw new Exception("foobar");
+                //FooBar foobar = input;
+                //return foobar.Bar && foobar.Foo;
+            };
 
             var executor = new ScriptExecutor();
 
@@ -35,8 +35,10 @@ namespace DependentConsoleApp
                 + "\traise System.Exception('asd')\n"
                 );
 
+            var tag4 = executor.FromDelegate(del);
+
             executor.RegisterScript("foo", tag1);
-            //executor.RegisterScript("foobar", tag4);
+            executor.RegisterScript("foobar", tag4);
 
 
             var fooBars = new List<FooBar>() { new() { Foo = false, Bar = false }, new() { Foo = true, Bar = false }, new() { Foo = false, Bar = true }, new() { Foo = true, Bar = true } };
@@ -65,8 +67,11 @@ namespace DependentConsoleApp
                         break;
                     }
                     Console.WriteLine(2);
+                    Console.WriteLine(ex.GetType());
                     Console.WriteLine(ex);
-                    throw;
+
+                    Console.WriteLine();
+                    break;
                 }
                 break;
             }
