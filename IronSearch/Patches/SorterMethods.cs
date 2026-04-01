@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using IronSearch.Exceptions;
 using IronSearch.Tags;
@@ -14,7 +14,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new SearchCallNotAllowed("ByUID()()");
+                throw new SearchCallNotAllowed("ByUID()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
             return musicInfo1.uid.CompareTo(musicInfo2.uid);
         }
@@ -22,7 +22,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new SearchCallNotAllowed("ByName()()");
+                throw new SearchCallNotAllowed("ByName()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
             return musicInfo1.GetLocalSafe(RefreshPatch.langIndex).Name.CompareTo(musicInfo2.GetLocalSafe(RefreshPatch.langIndex).Name);
         }
@@ -30,7 +30,7 @@ namespace IronSearch.Patches
         internal static int SortByAccuracy(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
-                throw new SearchCallNotAllowed("ByAccuracy()()");
+                throw new SearchCallNotAllowed("ByAccuracy()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
 
             var acc1 = GetMaxAccuracy(m1);
             var acc2 = GetMaxAccuracy(m2);
@@ -62,7 +62,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new SearchCallNotAllowed("ByBPM()()");
+                throw new SearchCallNotAllowed("ByBPM()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
             if (!BuiltIns.bpmDict.ContainsKey(musicInfo1.uid))
             {
@@ -90,7 +90,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new SearchCallNotAllowed("ByRandom()()");
+                throw new SearchCallNotAllowed("ByRandom()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
             if (musicInfo1.uid == musicInfo2.uid)
             {
@@ -116,7 +116,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new SearchCallNotAllowed("ByModified()()");
+                throw new SearchCallNotAllowed("ByModified()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
             BuiltIns.InitNewIfNeeded();
             var idx1 = BuiltIns.sortedByLastModified!.IndexOf(musicInfo1.uid);
@@ -136,7 +136,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new SearchCallNotAllowed("ByScene()()");
+                throw new SearchCallNotAllowed("ByScene()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
             return musicInfo1.scene.CompareTo(musicInfo2.scene);
         }
@@ -144,7 +144,7 @@ namespace IronSearch.Patches
         {
             if (!sortingFlag)
             {
-                throw new SearchCallNotAllowed("ByLength()()");
+                throw new SearchCallNotAllowed("ByLength()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
             var length1null = AudioHelper.GetMusicLength(musicInfo1);
             var length2null = AudioHelper.GetMusicLength(musicInfo2);
@@ -169,7 +169,7 @@ namespace IronSearch.Patches
         public static int SortByCallback(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
-                throw new SearchCallNotAllowed("ByDifficulty()()");
+                throw new SearchCallNotAllowed("ByDifficulty()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
 
             var max1 = GetMaxCallback(m1);
             var max2 = GetMaxCallback(m2);
@@ -187,7 +187,7 @@ namespace IronSearch.Patches
         public static int SortByDifficulty(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
-                throw new SearchCallNotAllowed("ByDifficulty()()");
+                throw new SearchCallNotAllowed("ByDifficulty()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
 
             var max1 = GetMaxDifficulty(m1);
             var max2 = GetMaxDifficulty(m2);

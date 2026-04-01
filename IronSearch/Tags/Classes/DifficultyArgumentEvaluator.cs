@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronSearch.Exceptions;
 using IronSearch.Records;
 using Range= IronSearch.Records.Range;
@@ -15,11 +15,11 @@ namespace IronSearch.Tags
             public abstract bool AllowInvalid0 { get; }
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
             {
-                ThrowIfNotEmpty(varKwargs, EvaluatorNameCalled);
-                ThrowIfEmpty(varArgs, EvaluatorNameCalled);
+                ThrowIfNotEmpty(varKwargs, EvaluatorName, varArgs, varKwargs);
+                ThrowIfEmpty(varArgs, EvaluatorName, varArgs, varKwargs);
 
 
-                MultiRange mr0 = MultiRangeArgumentParser.GetMultiRange(varArgs[0], EvaluatorNameCalled);
+                MultiRange mr0 = MultiRangeArgumentParser.GetMultiRange(varArgs[0], EvaluatorName, varArgs, varKwargs);
 
                 if (varArgs.Length == 1)
                 {
@@ -27,17 +27,17 @@ namespace IronSearch.Tags
                     {
                         if (!AllowInvalid0)
                         {
-                            throw new SearchValidationException("wildcard '?' is not valid in this context", EvaluatorNameCalled);
+                            throw new SearchValidationException("wildcard '?' is not valid in this context", EvaluatorName, varArgs, varKwargs);
                         }
                         return GetPairs(M.I).Any(kv => double.IsNaN(kv.Value));
                     }
                     return GetPairs(M.I).Any(kv => mr0.Contains(kv.Value));
                 }
-                MultiRange mr1 = MultiRangeArgumentParser.GetMultiRange(varArgs[1], EvaluatorNameCalled);
+                MultiRange mr1 = MultiRangeArgumentParser.GetMultiRange(varArgs[1], EvaluatorName, varArgs, varKwargs);
 
                 varArgs = varArgs[2..];
 
-                ThrowIfNotMatching(varArgs, argRange, EvaluatorNameCalled);
+                ThrowIfNotMatching(varArgs, argRange, EvaluatorName, varArgs, varKwargs);
 
                 if (mr1 == MultiRange.InvalidRange)
                 {
@@ -50,7 +50,7 @@ namespace IronSearch.Tags
                     {
                         if (!AllowInvalid0)
                         {
-                            throw new SearchValidationException("wildcard '?' is not valid in this context", EvaluatorNameCalled);
+                            throw new SearchValidationException("wildcard '?' is not valid in this context", EvaluatorName, varArgs, varKwargs);
                         }
                         return double.IsNaN(arr.MaxBy(x => x.Key).Value);
                     }
@@ -61,7 +61,7 @@ namespace IronSearch.Tags
                 {
                     if (!AllowInvalid0)
                     {
-                        throw new SearchValidationException("wildcard '?' is not valid in this context", EvaluatorNameCalled);
+                        throw new SearchValidationException("wildcard '?' is not valid in this context", EvaluatorName, varArgs, varKwargs);
                     }
                     return GetPairs(M.I).Where(kv => mr1.Contains(kv.Key)).Any(kv => double.IsNaN(kv.Value));
                 }

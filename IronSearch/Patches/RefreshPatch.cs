@@ -214,7 +214,7 @@ namespace IronSearch.Patches
                                             }
                                             catch (Exception ex2)
                                             {
-                                                new SearchResponse(ex, SearchResponse.Type.RuntimeError).PrintSearchError();
+                                                new SearchResponse(ex2, SearchResponse.Type.RuntimeError).PrintSearchError();
                                             }
                                         }
                                         Volatile.Write(ref stop, 1);

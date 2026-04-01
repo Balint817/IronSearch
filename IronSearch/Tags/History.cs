@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -12,8 +12,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalHistory(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "History()");
-            ThrowIfNotEmpty(varKwargs, "History()");
+            ThrowIfNotEmpty(varArgs, "History", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "History", varArgs, varKwargs);
             return EvalHistory(M.I);
         }
     }

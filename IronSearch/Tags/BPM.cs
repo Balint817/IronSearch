@@ -45,10 +45,10 @@ namespace IronSearch.Tags
 
         internal static bool EvalBPM(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1, "BPM()");
-            ThrowIfNotEmpty(varKwargs, "BPM()");
+            ThrowIfNotMatching(varArgs, 1, "BPM", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "BPM", varArgs, varKwargs);
 
-            var mr = MultiRangeArgumentParser.GetMultiRange(varArgs[0], "BPM()");
+            var mr = MultiRangeArgumentParser.GetMultiRange(varArgs[0], "BPM", varArgs, varKwargs);
             return EvalBPM(M.I, mr);
         }
     }

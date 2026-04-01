@@ -46,25 +46,25 @@ namespace IronSearch.Tags
             {"jade_temple", "12"},
         };
 
-        internal static bool EvalScene(MusicInfo musicInfo, string value)
+        internal static bool EvalScene(MusicInfo musicInfo, string value, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             value = value.Trim(' ');
             string sceneFilter = null!;
             switch (value.Length)
             {
                 case 0:
-                    throw new SearchValidationException("Scene filter cannot be empty.", "Scene()");
+                    throw new SearchValidationException("Scene filter cannot be empty.", "Scene", varArgs, varKwargs);
                 case 1:
                     if (!char.IsDigit(value[0]))
                     {
-                        throw new SearchValidationException("For a one-character scene filter, use a single digit (1–9).", "Scene()");
+                        throw new SearchValidationException("For a one-character scene filter, use a single digit (1–9).", "Scene", varArgs, varKwargs);
                     }
                     sceneFilter = '0' + value;
                     break;
                 case 2:
                     if (!value.All(x => char.IsDigit(x)))
                     {
-                        throw new SearchValidationException("For a two-character scene filter, use two digits (e.g. 01).", "Scene()");
+                        throw new SearchValidationException("For a two-character scene filter, use two digits (e.g. 01).", "Scene", varArgs, varKwargs);
                     }
                     sceneFilter = value;
                     break;
@@ -79,11 +79,11 @@ namespace IronSearch.Tags
                         .GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.ToArray());
                     if (matches.Count > 1)
                     {
-                        throw new SearchValidationException($"Scene filter \"{value}\" matches more than one scene name; be more specific.", "Scene()");
+                        throw new SearchValidationException($"Scene filter \"{value}\" matches more than one scene name; be more specific.", "Scene", varArgs, varKwargs);
                     }
                     else if (matches.Count < 1)
                     {
-                        throw new SearchValidationException($"No scene matches \"{value}\".", "Scene()");
+                        throw new SearchValidationException($"No scene matches \"{value}\".", "Scene", varArgs, varKwargs);
                     }
                     sceneFilter = matches.Keys.First();
                     break;
@@ -94,23 +94,23 @@ namespace IronSearch.Tags
             }
             return false;
         }
-        internal static bool EvalScene(MusicInfo musicInfo, int value)
+        internal static bool EvalScene(MusicInfo musicInfo, int value, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            return EvalScene(musicInfo, value.ToString());
+            return EvalScene(musicInfo, value.ToString(), varArgs, varKwargs);
         }
         internal static bool EvalScene(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1, "Scene()");
-            ThrowIfNotEmpty(varKwargs, "Scene()");
+            ThrowIfNotMatching(varArgs, 1, "Scene", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Scene", varArgs, varKwargs);
             var arg1 = varArgs[0];
             switch (arg1)
             {
                 case int n:
-                    return EvalScene(M.I, n);
+                    return EvalScene(M.I, n, varArgs, varKwargs);
                 case string s:
-                    return EvalScene(M.I, s);
+                    return EvalScene(M.I, s, varArgs, varKwargs);
             }
-            throw new SearchWrongTypeException("a scene name, numeric ID, or string digits", arg1?.GetType(), "Scene()");
+            throw new SearchWrongTypeException("a scene name, numeric ID, or string digits", arg1?.GetType(), "Scene", varArgs, varKwargs);
 
         }
     }

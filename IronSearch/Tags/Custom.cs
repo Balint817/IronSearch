@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
 {
@@ -18,8 +18,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCustom(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "Custom()");
-            ThrowIfNotEmpty(varKwargs, "Custom()");
+            ThrowIfNotEmpty(varArgs, "Custom", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Custom", varArgs, varKwargs);
             return EvalCustom(M.I);
         }
     }

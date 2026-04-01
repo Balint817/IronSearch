@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -12,8 +12,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalFavorite(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "Favorite()");
-            ThrowIfNotEmpty(varKwargs, "Favorite()");
+            ThrowIfNotEmpty(varArgs, "Favorite", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Favorite", varArgs, varKwargs);
             return EvalFavorite(M.I);
         }
     }

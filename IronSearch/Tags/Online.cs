@@ -1,4 +1,4 @@
-﻿using CustomAlbums.Data;
+using CustomAlbums.Data;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -18,8 +18,8 @@ namespace IronSearch.Tags
 
         internal static bool EvalOnline(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "Online()");
-            ThrowIfNotEmpty(varKwargs, "Online()");
+            ThrowIfNotEmpty(varArgs, "Online", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Online", varArgs, varKwargs);
             return EvalOnline(M.I);
         }
     }

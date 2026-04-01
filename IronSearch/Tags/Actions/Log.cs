@@ -13,12 +13,12 @@ namespace IronSearch.Tags
             {
                 if (varKwargs["sep"] is not string s)
                 {
-                    throw new SearchWrongTypeException("a string for `sep=`", varKwargs["sep"]?.GetType(), "Log()");
+                    throw new SearchWrongTypeException("a string for `sep=`", varKwargs["sep"]?.GetType(), "Log", varArgs, varKwargs);
                 }
                 separator = s;
                 varKwargs.Remove("sep");
             }
-            ThrowIfNotEmpty(varKwargs, "Log()");
+            ThrowIfNotEmpty(varKwargs, "Log", varArgs, varKwargs);
 
             var sb = new StringBuilder();
             foreach (var item in varArgs)

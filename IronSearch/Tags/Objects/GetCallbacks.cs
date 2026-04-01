@@ -1,4 +1,4 @@
-﻿using IronPython.Runtime;
+using IronPython.Runtime;
 
 namespace IronSearch.Tags
 {
@@ -7,8 +7,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalGetCallbacks(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "GetCallbacks()");
-            ThrowIfNotEmpty(varKwargs, "GetCallbacks()");
+            ThrowIfNotEmpty(varArgs, "GetCallbacks", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "GetCallbacks", varArgs, varKwargs);
             Utils.GetMapCallbacks(M.I, out var maps);
             var l = new PythonList();
             foreach (var map in maps)

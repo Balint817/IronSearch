@@ -8,8 +8,8 @@ namespace IronSearch.Exceptions
         public string ReferenceName { get; }
         public ReferenceKind Kind { get; }
 
-        public SearchReferenceException(string referenceName, ReferenceKind kind, string? parameterContext = null)
-            : base(BuildMessage(referenceName, kind), parameterContext)
+        public SearchReferenceException(string referenceName, ReferenceKind kind, string parameterContext, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
+            : base(BuildMessage(referenceName, kind), parameterContext, varArgs, varKwargs)
         {
             ReferenceName = referenceName;
             Kind = kind;

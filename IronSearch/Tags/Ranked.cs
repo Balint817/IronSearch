@@ -1,4 +1,4 @@
-﻿using CustomAlbums.Data;
+using CustomAlbums.Data;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -18,8 +18,8 @@ namespace IronSearch.Tags
 
         internal static bool EvalRanked(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "Ranked()");
-            ThrowIfNotEmpty(varKwargs, "Ranked()");
+            ThrowIfNotEmpty(varArgs, "Ranked", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Ranked", varArgs, varKwargs);
             return EvalRanked(M.I);
         }
     }

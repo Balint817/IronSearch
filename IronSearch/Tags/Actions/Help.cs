@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Numerics;
 using System.Text;
 using IronPython.Runtime;
@@ -18,7 +18,7 @@ namespace IronSearch.Tags
         internal static Mutex helpMutex = new();
         internal static bool EvalHelp(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1, "Help()");
+            ThrowIfNotMatching(varArgs, 1, "Help", varArgs, varKwargs);
 
             try
             {

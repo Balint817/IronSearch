@@ -2,9 +2,9 @@
 {
     public class FuzzyContains
     {
-        private readonly string _pattern;
-        private readonly bool _caseInsensitive;
-        private readonly int _maxDistance;
+        public readonly string Pattern;
+        public readonly bool CaseInsensitive;
+        public readonly int MaxDistance;
         private readonly Dictionary<char, ulong> _charMask;
 
         public FuzzyContains(string containsText, int maxDistance = 2, bool caseInsensitive = true)
@@ -15,14 +15,14 @@
             if (containsText.Length > 63)
                 throw new ArgumentException("Pattern too long for this implementation (max 63 chars)");
 
-            _caseInsensitive = caseInsensitive;
-            _pattern = containsText;
-            if (_caseInsensitive)
+            CaseInsensitive = caseInsensitive;
+            Pattern = containsText;
+            if (CaseInsensitive)
             {
-                _pattern = containsText.ToLowerInvariant();
+                Pattern = containsText.ToLowerInvariant();
             }
-            _maxDistance = maxDistance;
-            _charMask = BuildCharMask(_pattern);
+            MaxDistance = maxDistance;
+            _charMask = BuildCharMask(Pattern);
         }
 
         public bool Match(string text) => IsMatch(text);
@@ -31,16 +31,16 @@
         {
             if (string.IsNullOrEmpty(text))
                 return false;
-            if (_caseInsensitive)
+            if (CaseInsensitive)
             {
                 text = text.ToLowerInvariant();
             }
 
-            int m = _pattern.Length;
+            int m = Pattern.Length;
 
             // R[d] = bit masks for distance d
-            ulong[] R = new ulong[_maxDistance + 1];
-            for (int i = 0; i <= _maxDistance; i++)
+            ulong[] R = new ulong[MaxDistance + 1];
+            for (int i = 0; i <= MaxDistance; i++)
                 R[i] = ~1UL;
 
             foreach (char c in text)
@@ -54,7 +54,7 @@
                 // Exact match (distance 0)
                 R[0] = ((R[0] << 1) | 1UL) & charMask;
 
-                for (int d = 1; d <= _maxDistance; d++)
+                for (int d = 1; d <= MaxDistance; d++)
                 {
                     ulong temp = R[d];
 
@@ -67,7 +67,7 @@
                 }
 
                 // Check match at last bit
-                if ((R[_maxDistance] & (1UL << m)) == 0)
+                if ((R[MaxDistance] & (1UL << m)) == 0)
                     return true;
             }
 

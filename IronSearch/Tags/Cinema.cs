@@ -1,4 +1,4 @@
-﻿using CustomAlbums.Data;
+using CustomAlbums.Data;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -43,8 +43,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCinema(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "Cinema()");
-            ThrowIfNotEmpty(varKwargs, "Cinema()");
+            ThrowIfNotEmpty(varArgs, "Cinema", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Cinema", varArgs, varKwargs);
             return EvalCinema(M.I);
         }
     }

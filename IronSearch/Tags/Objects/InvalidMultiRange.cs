@@ -1,4 +1,4 @@
-﻿using IronSearch.Records;
+using IronSearch.Records;
 
 namespace IronSearch.Tags
 {
@@ -7,8 +7,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalInvalidMultiRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "InvalidMultiRange()");
-            ThrowIfNotEmpty(varKwargs, "InvalidMultiRange()");
+            ThrowIfNotEmpty(varArgs, "InvalidMultiRange", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "InvalidMultiRange", varArgs, varKwargs);
             return MultiRange.InvalidRange;
         }
     }

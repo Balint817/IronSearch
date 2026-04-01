@@ -6,12 +6,12 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalGetVar(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1, "GetVar()");
-            ThrowIfNotEmpty(varKwargs, "GetVar()");
+            ThrowIfNotMatching(varArgs, 1, "GetVar", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "GetVar", varArgs, varKwargs);
 
             if (varArgs[0] is not string s)
             {
-                throw new SearchWrongTypeException("a string variable name", varArgs[0]?.GetType(), "GetVar()");
+                throw new SearchWrongTypeException("a string variable name", varArgs[0]?.GetType(), "GetVar", varArgs, varKwargs);
             }
             LocalVariables.TryAdd(M.I.uid, new());
 
@@ -21,7 +21,7 @@ namespace IronSearch.Tags
             {
                 return v;
             }
-            throw new SearchReferenceException(s, SearchReferenceException.ReferenceKind.Local, "GetVar()");
+            throw new SearchReferenceException(s, SearchReferenceException.ReferenceKind.Local, "GetVar", varArgs, varKwargs);
         }
     }
 }

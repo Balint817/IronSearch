@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using IronPython.Runtime;
 using IronSearch.Exceptions;
 using IronSearch.Records;
@@ -11,7 +11,7 @@ namespace IronSearch.Tags
         internal static class MultiRangeArgumentParser
         {
             public static readonly BigInteger MaxDouble = (BigInteger)double.MaxValue;
-            public static MultiRange GetMultiRange(dynamic arg, string parameterContext, bool allowTime = false)
+            public static MultiRange GetMultiRange(dynamic arg, string parameterContext, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs, bool allowTime = false)
             {
                 switch (arg)
                 {
@@ -24,7 +24,7 @@ namespace IronSearch.Tags
                     case BigInteger n:
                         if (n > MaxDouble)
                         {
-                            throw new SearchValidationException($"The value {n} is too large to be used as a range argument.", parameterContext);
+                            throw new SearchValidationException($"The value {n} is too large to be used as a range argument.", parameterContext, varArgs, varKwargs);
                         }
                         return new MultiRange(new Range((double)n, (double)n));
                     case string s:
@@ -34,7 +34,7 @@ namespace IronSearch.Tags
                             {
                                 return time.AsMultiRange();
                             }
-                            throw SearchParseException.ForRange(s, parameterContext, null);
+                            throw SearchParseException.ForRange(s, parameterContext, varArgs, varKwargs, null);
                         }
                         return range;
                     case Range r:
@@ -44,7 +44,7 @@ namespace IronSearch.Tags
                     case MultiRange mr:
                         return mr.Add();
                     default:
-                        throw new SearchWrongTypeException("an integer, a string range, range, or multi-range", arg?.GetType(), parameterContext);
+                        throw new SearchWrongTypeException("an integer, a string range, range, or multi-range", arg?.GetType(), parameterContext, varArgs, varKwargs);
                 }
             }
         }

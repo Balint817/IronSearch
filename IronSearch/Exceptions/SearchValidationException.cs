@@ -5,8 +5,8 @@ namespace IronSearch.Exceptions
     /// </summary>
     public sealed class SearchValidationException : SearchInputException
     {
-        public SearchValidationException(string message, string? parameterContext = null, Exception? innerException = null)
-            : base(message, parameterContext, innerException)
+        public SearchValidationException(string message, string parameterContext, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs, Exception? innerException = null)
+            : base(message, parameterContext, varArgs, varKwargs, innerException)
         {
         }
     }

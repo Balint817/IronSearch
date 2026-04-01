@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronSearch.Records;
 using Range= IronSearch.Records.Range;
 
@@ -12,16 +12,16 @@ namespace IronSearch.Tags
             public abstract IEnumerable<KeyValuePair<double, bool>> GetPairs(MusicInfo musicInfo);
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
             {
-                ThrowIfNotEmpty(varKwargs, EvaluatorNameCalled);
+                ThrowIfNotEmpty(varKwargs, EvaluatorName, varArgs, varKwargs);
 
                 if (varArgs.Length == 0)
                 {
                     return GetPairs(M.I).Any(x => x.Value);
                 }
 
-                ThrowIfNotMatching(varArgs, argRange, EvaluatorNameCalled);
+                ThrowIfNotMatching(varArgs, argRange, EvaluatorName, varArgs, varKwargs);
 
-                MultiRange mr0 = MultiRangeArgumentParser.GetMultiRange(varArgs[0], EvaluatorNameCalled);
+                MultiRange mr0 = MultiRangeArgumentParser.GetMultiRange(varArgs[0], EvaluatorName, varArgs, varKwargs);
                 if (mr0 == MultiRange.InvalidRange)
                 {
                     var arr = GetPairs(M.I).ToArray();

@@ -1,4 +1,4 @@
-﻿using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.Database;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -12,8 +12,8 @@ namespace IronSearch.Tags
         }
         internal static bool EvalStreamer(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "Streamer()");
-            ThrowIfNotEmpty(varKwargs, "Streamer()");
+            ThrowIfNotEmpty(varArgs, "Streamer", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Streamer", varArgs, varKwargs);
             return EvalStreamer(M.I);
         }
     }

@@ -9,14 +9,14 @@ namespace IronSearch.Tags
         static readonly Range evalRangeArgCount = new Range(1, 2);
         internal static dynamic EvalRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, evalRangeArgCount, "Range()");
+            ThrowIfNotMatching(varArgs, evalRangeArgCount, "Range", varArgs, varKwargs);
             bool? exclusiveStart = null;
             bool? exclusiveEnd = null;
             if (varKwargs.ContainsKey("end"))
             {
                 if (varKwargs["end"] is not bool b)
                 {
-                    throw new SearchWrongTypeException("True or False for `end=` (exclusive end)", varKwargs["end"]?.GetType(), "Range()");
+                    throw new SearchWrongTypeException("True or False for `end=` (exclusive end)", varKwargs["end"]?.GetType(), "Range", varArgs, varKwargs);
                 }
 
                 exclusiveEnd = b;
@@ -27,12 +27,12 @@ namespace IronSearch.Tags
             {
                 if (varKwargs["start"] is not bool b)
                 {
-                    throw new SearchWrongTypeException("True or False for `start=` (exclusive start)", varKwargs["start"]?.GetType(), "Range()");
+                    throw new SearchWrongTypeException("True or False for `start=` (exclusive start)", varKwargs["start"]?.GetType(), "Range", varArgs, varKwargs);
                 }
                 exclusiveStart = b;
                 varKwargs.Remove("start");
             }
-            ThrowIfNotEmpty(varKwargs, "Range()");
+            ThrowIfNotEmpty(varKwargs, "Range", varArgs, varKwargs);
 
 
             var arg0 = varArgs[0];
@@ -41,9 +41,9 @@ namespace IronSearch.Tags
             {
                 if (exclusiveEnd.HasValue || exclusiveStart.HasValue)
                 {
-                    throw new SearchValidationException("'end=' and 'start=' keyword arguments are not valid when there is only 1 positional argument.", "Range()");
+                    throw new SearchValidationException("'end=' and 'start=' keyword arguments are not valid when there is only 1 positional argument.", "Range", varArgs, varKwargs);
                 }
-                return RangeArgumentParser.GetRange(arg0, "Range()", allowTime: true);
+                return RangeArgumentParser.GetRange(arg0, "Range", varArgs, varKwargs, allowTime: true);
             }
 
             double start;
@@ -56,7 +56,7 @@ namespace IronSearch.Tags
                 case BigInteger i:
                     if (i > RangeArgumentParser.MaxDouble)
                     {
-                        throw new SearchValidationException($"The value {i} is too large to be used as a range argument.", "Range()");
+                        throw new SearchValidationException($"The value {i} is too large to be used as a range argument.", "Range", varArgs, varKwargs);
                     }
                     start = (double)i;
                     break;
@@ -64,7 +64,7 @@ namespace IronSearch.Tags
                     start = i;
                     break;
                 default:
-                    throw new SearchWrongTypeException("a number for the range start", arg0?.GetType(), "Range()");
+                    throw new SearchWrongTypeException("a number for the range start", arg0?.GetType(), "Range", varArgs, varKwargs);
             }
             var arg1 = varArgs[1];
             switch (arg1)
@@ -75,7 +75,7 @@ namespace IronSearch.Tags
                 case BigInteger i:
                     if (i > RangeArgumentParser.MaxDouble)
                     {
-                        throw new SearchValidationException($"The value {i} is too large to be used as a range argument.", "Range()");
+                        throw new SearchValidationException($"The value {i} is too large to be used as a range argument.", "Range", varArgs, varKwargs);
                     }
                     end = (double)i;
                     break;
@@ -83,7 +83,7 @@ namespace IronSearch.Tags
                     end = i;
                     break;
                 default:
-                    throw new SearchWrongTypeException("a number for the range end", arg1?.GetType(), "Range()");
+                    throw new SearchWrongTypeException("a number for the range end", arg1?.GetType(), "Range", varArgs, varKwargs);
             }
             if (end < start)
             {

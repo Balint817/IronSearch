@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Exceptions;
@@ -14,8 +14,8 @@ namespace IronSearch.Tags
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
             {
 
-                ThrowIfNotEmpty(varKwargs, EvaluatorNameCalled);
-                ThrowIfNotMatching(varArgs, 1, EvaluatorNameCalled);
+                ThrowIfNotEmpty(varKwargs, EvaluatorName, varArgs, varKwargs);
+                ThrowIfNotMatching(varArgs, 1, EvaluatorName, varArgs, varKwargs);
                 switch (varArgs[0])
                 {
                     case string s:
@@ -25,7 +25,7 @@ namespace IronSearch.Tags
                     case FuzzyContains fc:
                         return Evaluate(M.I, fc);
                 }
-                throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), EvaluatorNameCalled);
+                throw new SearchWrongTypeException("a string or regular expression", varArgs[0]?.GetType(), EvaluatorName, varArgs, varKwargs);
             }
             public bool Evaluate(MusicInfo musicInfo, PeroString pStr, string value)
             {

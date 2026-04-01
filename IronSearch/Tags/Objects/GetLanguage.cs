@@ -1,4 +1,4 @@
-﻿using IronSearch.Patches;
+using IronSearch.Patches;
 
 namespace IronSearch.Tags
 {
@@ -6,8 +6,8 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalGetLanguageIndex(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "GetLanguage()");
-            ThrowIfNotEmpty(varKwargs, "GetLanguage()");
+            ThrowIfNotEmpty(varArgs, "GetLanguage", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "GetLanguage", varArgs, varKwargs);
             return RefreshPatch.langIndex;
         }
     }

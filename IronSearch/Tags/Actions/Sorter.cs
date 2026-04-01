@@ -8,7 +8,7 @@ namespace IronSearch.Tags
     {
         internal static bool EvalSorter(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfEmpty(varArgs, "Sorter()");
+            ThrowIfEmpty(varArgs, "Sorter", varArgs, varKwargs);
 
             bool reverse = false;
             int priority = 0;
@@ -22,12 +22,12 @@ namespace IronSearch.Tags
                 var t = varKwargs["priority"];
                 if (t is not int tn)
                 {
-                    throw new SearchWrongTypeException("an integer for `priority=`", t?.GetType(), "Sorter()");
+                    throw new SearchWrongTypeException("an integer for `priority=`", t?.GetType(), "Sorter", varArgs, varKwargs);
                 }
                 priority = tn;
                 varKwargs.Remove("priority");
             }
-            ThrowIfNotEmpty(varKwargs, "Sorter()");
+            ThrowIfNotEmpty(varKwargs, "Sorter", varArgs, varKwargs);
 
             var args = varArgs.ToList();
             if (args[^1] is bool b1)
@@ -51,7 +51,7 @@ namespace IronSearch.Tags
                 }
             }
 
-            ThrowIfEmpty(varArgs, "Sorter()");
+            ThrowIfEmpty(varArgs, "Sorter", varArgs, varKwargs);
 
             RefreshPatch._activeSorters.Add(new(varArgs, reverse, priority));
 

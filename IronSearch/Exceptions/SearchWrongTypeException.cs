@@ -11,11 +11,13 @@ namespace IronSearch.Exceptions
         public SearchWrongTypeException(
             string expectedDescription,
             Type? actualType,
-            string? parameterContext = null,
+            string parameterContext,
+            dynamic[] varArgs,
+            Dictionary<string, dynamic> varKwargs,
             string? extraDetail = null)
             : base(
                 BuildMessage(expectedDescription, actualType, extraDetail),
-                parameterContext)
+                parameterContext, varArgs, varKwargs)
         {
             ExpectedDescription = expectedDescription;
             ActualType = actualType;

@@ -1,11 +1,11 @@
-﻿namespace IronSearch.Tags
+namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
         internal static dynamic EvalGetBPM(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "GetBPM()");
-            ThrowIfNotEmpty(varKwargs, "GetBPM()");
+            ThrowIfNotEmpty(varArgs, "GetBPM", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "GetBPM", varArgs, varKwargs);
             AddBPMInfo(M.I);
             return bpmDict[M.I.uid]!;
         }

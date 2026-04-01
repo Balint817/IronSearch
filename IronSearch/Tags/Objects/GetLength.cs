@@ -1,12 +1,12 @@
-﻿namespace IronSearch.Tags
+namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
 
         internal static dynamic EvalGetLength(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varKwargs, "GetLength()");
-            ThrowIfNotEmpty(varArgs, "GetLength()");
+            ThrowIfNotEmpty(varKwargs, "GetLength", varArgs, varKwargs);
+            ThrowIfNotEmpty(varArgs, "GetLength", varArgs, varKwargs);
 
             var l = AudioHelper.GetMusicLength(M.I);
             if (l is { } ts)

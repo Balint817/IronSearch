@@ -1,23 +1,18 @@
 namespace IronSearch.Exceptions
 {
     /// <summary>
-    /// A named reference (e.g. variable) does not exist.
+    /// Thrown when a comparer/object is called a second time instead of being passed as an argument.
     /// </summary>
     public sealed class SearchCallNotAllowed : SearchInputException
     {
-        public SearchCallNotAllowed(string? parameterContext = null)
-            : base(BuildMessage(parameterContext), parameterContext)
+        public SearchCallNotAllowed(string parameterContext, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
+            : base(BuildMessage(parameterContext), parameterContext, varArgs, varKwargs)
         {
 
         }
-        static string BuildMessage(string? parameterContext)
+        static string BuildMessage(string parameterContext)
         {
-            var s = "You're not supposed to call this twice, ";
-            if (parameterContext != null)
-            {
-                s += $"like {parameterContext}, ";
-            }
-            s += "pass it as an argument instead!";
+            var s = $"You're not supposed to call this twice, like {parameterContext}, pass it as an argument instead!";
             return s;
         }
     }

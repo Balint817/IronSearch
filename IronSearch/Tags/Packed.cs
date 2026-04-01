@@ -1,4 +1,4 @@
-﻿using CustomAlbums.Data;
+using CustomAlbums.Data;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -18,8 +18,8 @@ namespace IronSearch.Tags
 
         internal static bool EvalPacked(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "Packed()");
-            ThrowIfNotEmpty(varKwargs, "Packed()");
+            ThrowIfNotEmpty(varArgs, "Packed", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "Packed", varArgs, varKwargs);
             return EvalPacked(M.I);
         }
     }

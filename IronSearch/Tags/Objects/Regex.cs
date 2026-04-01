@@ -11,7 +11,7 @@ namespace IronSearch.Tags
         {
             var flags = RegexOptions.CultureInvariant
                 | RegexOptions.IgnoreCase;
-            ThrowIfNotMatching(varArgs, evalRegexArgCount, "Regex()");
+            ThrowIfNotMatching(varArgs, evalRegexArgCount, "Regex", varArgs, varKwargs);
 
             if (varKwargs.ContainsKey("case"))
             {
@@ -29,12 +29,12 @@ namespace IronSearch.Tags
                 }
                 else
                 {
-                    throw new SearchWrongTypeException("True or False for `case=`", varKwargs["case"]?.GetType(), "Regex()");
+                    throw new SearchWrongTypeException("True or False for `case=`", varKwargs["case"]?.GetType(), "Regex", varArgs, varKwargs);
                 }
                 varKwargs.Remove("case");
             }
 
-            ThrowIfNotEmpty(varKwargs, "Regex()");
+            ThrowIfNotEmpty(varKwargs, "Regex", varArgs, varKwargs);
 
             if (varArgs.Length == 1)
             {
@@ -50,7 +50,7 @@ namespace IronSearch.Tags
                     return Regex.IsMatch(s1, s0, flags);
                 }
             }
-            throw new SearchValidationException("Regex() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex()");
+            throw new SearchValidationException("Regex() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex", varArgs, varKwargs);
         }
     }
 }

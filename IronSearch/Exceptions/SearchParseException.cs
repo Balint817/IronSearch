@@ -16,12 +16,14 @@ namespace IronSearch.Exceptions
 
         public SearchParseException(
             string message,
+            string parameterContext,
+            dynamic[] varArgs,
+            Dictionary<string, dynamic> varKwargs,
             string? rawInput = null,
             string? failureDetail = null,
             string? expectedDescription = null,
-            string? parameterContext = null,
             Exception? innerException = null)
-            : base(message, parameterContext, innerException)
+            : base(message, parameterContext, varArgs, varKwargs, innerException)
         {
             RawInput = rawInput;
             FailureDetail = failureDetail;
@@ -33,7 +35,9 @@ namespace IronSearch.Exceptions
         /// </summary>
         public static SearchParseException ForRange(
             string expression,
-            string? parameterContext,
+            string parameterContext,
+            dynamic[] varArgs,
+            Dictionary<string, dynamic> varKwargs,
             string? expectedDescription,
             double min = double.NegativeInfinity,
             double max = double.PositiveInfinity)
@@ -51,7 +55,7 @@ namespace IronSearch.Exceptions
                 msg += $"\nExpected: {expectedDescription}.";
             }
 
-            return new SearchParseException(msg, expression, reason, expectedDescription, parameterContext);
+            return new SearchParseException(msg, parameterContext, varArgs, varKwargs, expression, reason, expectedDescription);
         }
 
         /// <summary>
@@ -59,7 +63,9 @@ namespace IronSearch.Exceptions
         /// </summary>
         public static SearchParseException ForMultiRange(
             string expression,
-            string? parameterContext,
+            string parameterContext,
+            dynamic[] varArgs,
+            Dictionary<string, dynamic> varKwargs,
             string? expectedDescription,
             double min = double.NegativeInfinity,
             double max = double.PositiveInfinity)
@@ -77,7 +83,7 @@ namespace IronSearch.Exceptions
                 msg += $"\nExpected: {expectedDescription}.";
             }
 
-            return new SearchParseException(msg, expression, reason, expectedDescription, parameterContext);
+            return new SearchParseException(msg, parameterContext, varArgs, varKwargs, expression, reason, expectedDescription);
         }
     }
 }

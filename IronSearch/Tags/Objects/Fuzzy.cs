@@ -18,13 +18,13 @@ namespace IronSearch.Tags
                 }
                 else
                 {
-                    throw new SearchWrongTypeException("True or False for `case=`", varKwargs["case"]?.GetType(), "Regex()");
+                    throw new SearchWrongTypeException("True or False for `case=`", varKwargs["case"]?.GetType(), "Regex", varArgs, varKwargs);
                 }
                 varKwargs.Remove("case");
             }
 
-            ThrowIfNotEmpty(varKwargs, "Fuzzy()");
-            ThrowIfEmpty(varArgs, "Fuzzy()");
+            ThrowIfNotEmpty(varKwargs, "Fuzzy", varArgs, varKwargs);
+            ThrowIfEmpty(varArgs, "Fuzzy", varArgs, varKwargs);
 
             if (varArgs[^1] is bool b2)
             {
@@ -32,17 +32,17 @@ namespace IronSearch.Tags
                 varArgs = varArgs[..^1];
             }
 
-            ThrowIfNotMatching(varArgs, evalFuzzyArgCount, "Fuzzy()");
+            ThrowIfNotMatching(varArgs, evalFuzzyArgCount, "Fuzzy", varArgs, varKwargs);
 
             if (varArgs[0] is string s0)
             {
                 if (string.IsNullOrEmpty(s0))
                 {
-                    throw new SearchValidationException("pattern text was empty!", "Fuzzy()");
+                    throw new SearchValidationException("pattern text was empty!", "Fuzzy", varArgs, varKwargs);
                 }
                 if (s0.Length > 63)
                 {
-                    throw new SearchValidationException("pattern text is too long to support fuzzy matching!", "Fuzzy()");
+                    throw new SearchValidationException("pattern text is too long to support fuzzy matching!", "Fuzzy", varArgs, varKwargs);
                 }
                 if (varArgs.Length == 1)
                 {
@@ -56,7 +56,7 @@ namespace IronSearch.Tags
 
             }
 
-            throw new SearchValidationException("Fuzzy() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex()");
+            throw new SearchValidationException("Fuzzy() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex", varArgs, varKwargs);
         }
     }
 }

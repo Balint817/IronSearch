@@ -1,4 +1,4 @@
-﻿using CustomAlbums.Data;
+using CustomAlbums.Data;
 using Il2CppAssets.Scripts.Database;
 
 namespace IronSearch.Tags
@@ -21,8 +21,8 @@ namespace IronSearch.Tags
         }
         internal static dynamic EvalGetModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "GetModified()");
-            ThrowIfNotEmpty(varKwargs, "GetModified()");
+            ThrowIfNotEmpty(varArgs, "GetModified", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "GetModified", varArgs, varKwargs);
             return GetModified(M.I)!;
         }
     }
