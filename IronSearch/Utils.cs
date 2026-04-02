@@ -327,6 +327,10 @@ namespace IronSearch
         {
             return double.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
+        public static bool TryParseFloat(this string s, out float x)
+        {
+            return float.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
+        }
         public static bool TryParseLong(this string s, out long x)
         {
             return long.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
@@ -339,9 +343,14 @@ namespace IronSearch
         {
             return uint.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
+
         public static bool TryParseDouble(this ReadOnlySpan<char> s, out double x)
         {
             return double.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
+        }
+        public static bool TryParseFloat(this ReadOnlySpan<char> s, out float x)
+        {
+            return float.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseLong(this ReadOnlySpan<char> s, out long x)
         {
@@ -359,6 +368,10 @@ namespace IronSearch
         public static bool TryParseDouble(this Span<char> s, out double x)
         {
             return double.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
+        }
+        public static bool TryParseFloat(this Span<char> s, out float x)
+        {
+            return float.TryParse(s, numberStyles, CultureInfo.InvariantCulture, out x);
         }
         public static bool TryParseLong(this Span<char> s, out long x)
         {

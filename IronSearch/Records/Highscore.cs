@@ -21,6 +21,24 @@ namespace IronSearch.Records
                 return _evalStr;
             }
         }
+        internal bool _accStrParsedSet = false;
+        internal float? _accStrParsed = null!;
+        public float? AccuracyStringParsed
+        {
+            get
+            {
+                if (_accStrParsedSet)
+                {
+                    _accStrParsedSet = true;
+                    if (string.IsNullOrEmpty(AccuracyStr))
+                    {
+                        return _accStrParsed;
+                    }
+                    _accStrParsed = (Utils.TryParseFloat(AccuracyStr[..^1], out var x) ? x : null);
+                }
+                return _accStrParsed;
+            }
+        }
 
         public override string ToString()
         {
