@@ -158,10 +158,18 @@ If your expression has a problem, the error will appear in the MelonLoader conso
    ```
    ZeroDivisionError: division by zero
    ```
-3. **Tag error** — A specific tag encountered an issue. The message shows which tag was called (including the arguments you passed) and the error:
+3. **Tag/Input error** — A specific tag encountered an issue. The message shows which tag was called (including the arguments you passed) and the error:
    ```
    Error in Cinema(5): Unexpected positional arguments (Cinema does not take any arguments)
    ```
+
+Example of a syntax error:
+
+![Syntax error demo](/Resources/error_syntax.gif)
+
+Example of an invalid input:
+
+![Input error demo](/Resources/error_tag.gif)
 
 ### Keyword arguments
 
