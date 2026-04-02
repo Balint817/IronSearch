@@ -43,7 +43,35 @@ namespace DependentConsoleApp
 
             var fooBars = new List<FooBar>() { new() { Foo = false, Bar = false }, new() { Foo = true, Bar = false }, new() { Foo = false, Bar = true }, new() { Foo = true, Bar = true } };
 
-            var compiled = executor.Compile("foo()");
+            CompiledScript compiled;
+            try
+            {
+                compiled = executor.Compile("foo)");
+            }
+            catch (Exception ex)
+            {
+
+                try
+                {
+                    if (!CompiledScript.TryConvertException(ex, executor.Engine))
+                    {
+                        throw;
+                    }
+                    //CompiledScript.TryConvertException(ex, executor.Engine);
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine(1);
+                    Console.WriteLine(ex2.Message);
+                    return;
+                }
+                Console.WriteLine(2);
+                Console.WriteLine(ex.GetType());
+                Console.WriteLine(ex);
+
+                Console.WriteLine();
+                return;
+            }
 
             foreach (var fooBar in fooBars)
             {
@@ -57,7 +85,10 @@ namespace DependentConsoleApp
                 {
                     try
                     {
-                        CompiledScript.TryConvertException(ex, executor.Engine);
+                        if (!CompiledScript.TryConvertException(ex, executor.Engine))
+                        {
+                            throw;
+                        }
                         //CompiledScript.TryConvertException(ex, executor.Engine);
                     }
                     catch (Exception ex2)

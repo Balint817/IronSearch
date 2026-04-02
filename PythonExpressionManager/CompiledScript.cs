@@ -145,25 +145,21 @@ namespace PythonExpressionManager
 
             var originalCodeLine = ex.GetCodeLine();
 
-            if (!string.IsNullOrEmpty(originalCodeLine) && originalCodeLine.Length >= 10)
+
+            if (!string.IsNullOrEmpty(originalCodeLine) && originalCodeLine.TrimStart(' ').Length > 10)
             {
-                var trimmedCodeLine = originalCodeLine.TrimStart(' ')[8..^1];
+                var trimmedCodeLine = originalCodeLine.TrimStart(' ')[9..^1];
                 var trimmedColumn = Math.Max(ex.Column - (originalCodeLine.Length - trimmedCodeLine.Length + 1), 1);
 
-                message.AppendLine($"File {searchExpressionName}, Column: {trimmedColumn}");
+                message.AppendLine($"in {searchExpressionName}, Column: {trimmedColumn}");
                 message.AppendLine("\t" + trimmedCodeLine);
-                message.AppendLine("\t" + new string(' ', trimmedColumn - 1) + "^");
-            }
-            else if (!string.IsNullOrEmpty(originalCodeLine))
-            {
-                message.AppendLine($"File {searchExpressionName}, Column: {ex.Column}");
-                message.AppendLine("\t" + originalCodeLine);
-                message.AppendLine("\t" + new string(' ', Math.Max(ex.Column - 1, 0)) + "^");
+                message.AppendLine("\t" + new string(' ', Math.Max(trimmedColumn - 1, 0)) + "^^");
+                message.AppendLine("\t" + new string(' ', Math.Max(trimmedColumn - 2, 0)) + "Here");
             }
             else
             {
-                message.AppendLine($"File {searchExpressionName}, Column: {ex.Column}");
-                message.AppendLine("<failed to recover source information>");
+                message.AppendLine($"in {searchExpressionName}, Column: {ex.Column}");
+                message.AppendLine("<failed to recover information>");
             }
 
             throw new PythonException(message.ToString(), ex);
