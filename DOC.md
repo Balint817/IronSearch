@@ -1,4 +1,4 @@
-# IronSearch Advanced Search Guide
+﻿# IronSearch Advanced Search Guide
 
 This is the documentation for the "advanced search" features implemented by IronSearch.\
 For example, functions like `BPM('160-200')`.
@@ -9,7 +9,7 @@ It's a good idea to put longer queries into an 'Expression' to re-use later.
 | Section | Contents |
 |---------|----------|
 | [§1 Quick Start](#1-quick-start) | Prefix, first examples, booleans, sorting teaser |
-| [§2 Syntax](#2-syntax) | Truthiness, `M`, keyword args |
+| [§2 Syntax](#2-syntax) | Truthiness, quoting, types, operators, errors, `M`, keyword arguments |
 | [§3 Range syntax](#3-range-syntax) | `'10+'`, `'?\|…'`, multi-ranges |
 | [§4 Settings](#4-settings) | `IronSearch.cfg`, aliases, `AutoCompleteItems` |
 | [§5 Auto-complete](#5-auto-complete-tab-suggestions) | **Tab** dropdown: when it works, keys, behavior (`AutoCompleteManager.cs`) |
@@ -90,6 +90,79 @@ If you forget the parentheses, the game thinks you are just naming the command i
 
 ![Search demo](/Resources/parenthesis.gif)
 
+### 'string'-ing 'quote'-d 'text' along (quotes and strings)
+
+Single quotes (`'...'`) and double quotes (`"..."`) are interchangeable - they both produce the same 'string' ('string' means 'text'). Use whichever you prefer; just make sure the opening and closing quotes match.
+
+```text
+search: BPM('160+')
+search: BPM("160+")
+```
+
+Both of these are identical.
+
+A string that is passed to a tag expecting a range will be **parsed as a range string** automatically. A bare (unquoted) number is just a number — it is *not* a range.
+
+```text
+search: BPM('160-180')    # range string '160-180' → matches BPM from 160 to 180
+search: BPM(160-180)      # the result of the mathematical expression 160-180, e.g. -20, or BPM(-20) (obviously no such song exists)
+```
+
+So when a tag expects a range, you should pass a quoted string.
+
+#### Escape sequences
+
+You may ask, "if quotes decide where strings start and end, how do I include a quote in the text itself?"\
+This is where 'escaping' comes in. By using a backslash (`\`) before a special character, you can include it in the string without it being interpreted as a control character:
+
+For example:
+- `\'` or `\"` (escaped quote)
+- `\\` (to type one backslash)
+
+In practice you rarely need them, but they are available if you do.
+
+### Operators and precedence
+
+The boolean operators, from **highest** to **lowest** precedence:
+
+| Priority | Operator | Description |
+|----------|----------|-------------------------------|
+| 1 | `not` | Negation (evaluated first) |
+| 2 | `and` | Logical AND |
+| 3 | `or` | Logical OR (evaluated last) |
+
+Use parentheses to override the default order:
+
+```text
+search: Custom() and not Packed() or Favorite()
+```
+
+is interpreted as `(Custom() and (not Packed())) or Favorite()`. If you meant "custom charts that are either unpacked or favorited", write:
+
+```text
+search: Custom() and (not Packed() or Favorite())
+```
+
+The `in` operator is also available (e.g. `'text' in M.author`), but you will rarely need it.\
+Dedicated tags like `Author(...)` cover most use-cases, and are usually preferred as they perform many more checks (Romanization, multiple languages, etc.)
+
+### Error messages
+
+If your expression has a problem, the error will appear in the MelonLoader console. There most important ones you'll see are:
+
+1. **Syntax error** — Your expression could not be parsed. The message shows the character position where parsing failed.
+   ```
+   SyntaxError: unexpected ')' at position 12
+   ```
+2. **Runtime error** — The expression parsed, and your usage of tags was correct, but something else went wrong during execution. For example, the expression `1/0` would give:
+   ```
+   ZeroDivisionError: division by zero
+   ```
+3. **Tag error** — A specific tag encountered an issue. The message shows which tag was called (including the arguments you passed) and the error:
+   ```
+   Error in Cinema(5): Unexpected positional arguments (Cinema does not take any arguments)
+   ```
+
 ### Keyword arguments
 
 Keyword arguments are supported, but each tag controls which keywords it accepts.
@@ -102,6 +175,20 @@ For example, the `Range(...)` object allows you to specify whether the start or 
 
 Many tags accept "range strings" (e.g. BPM ranges, difficulty ranges, etc.).
 
+### Map index reference
+
+Several tags accept a `mapRange` argument that refers to difficulty slots by number:
+
+| Index | Difficulty slot |
+|-------|-----------------|
+| 1 | Easy |
+| 2 | Hard |
+| 3 | Master |
+| 4 | Hidden |
+| 5 | Touhou |
+
+For example, `Difficulty('11+', '3')` checks the **Master** slot, and `FC('4')` checks the **Hidden** slot.
+
 ### Range format
 
 1. Exact range:
@@ -109,7 +196,7 @@ Many tags accept "range strings" (e.g. BPM ranges, difficulty ranges, etc.).
 2. Wildcard / Full range:
    - `'*'` matches any value
 3. Wildcard / Invalid range:
-   - `'?'` matches nothing
+   - `'?'`, see notes below.
 4. Open-ended:
    - `'A+'` matches `value >= A` (A-to-infinity)
    - `'A-'` matches `value <= A` (negative infinity-to-A)
@@ -119,7 +206,7 @@ Many tags accept "range strings" (e.g. BPM ranges, difficulty ranges, etc.).
 
 Notes about `?`:
 
-- By default, `'?'` is an invalid range that **normally matches nothing**.
+- By default, `'?'` is a range that **matches nothing**.
 - However, several tags interpret `'?'` specially as "select the highest available map"
 - Which tags do this is implemented per-tag (see reference below or the Help text).
 
@@ -127,7 +214,7 @@ Notes about `?`:
 
 Some inputs accept multi-ranges. A multi-range takes multiple ranges, and matches any value that matches any of the ranges that make it up.
 
-For example, `MR('100- 200+')` matches values lower than 100, or higher than 200.
+For example, `MR('100- 200+')` or `MR('100-', '200+')` (preference), matches values lower than 100, or higher than 200.
 
 ### Working examples for simple tags using ranges:
 
@@ -147,7 +234,7 @@ Displayed difficulty 9 through 11 on the **highest** map index.
 search: Accuracy('95-100', '?')
 ```
 
-Narrow to songs where your **top-slot** scores are 95%–100% accuracy (see `Accuracy` for wildcard rules).
+Narrow to songs where your **top-slot** scores are 95%–100% accuracy.
 
 ![Search demo narrowing BPM](/Resources/bpm_narrowing.gif)
 
@@ -679,7 +766,7 @@ Usage:
 
 - `Length(lengthRange)`
 
-Checks if the music’s length is within the given range.
+Returns `True` if the music’s length falls within the given range (see also `GetLength` in §7.3 which returns the actual length as a number).
 
 Notes:
 
@@ -1058,7 +1145,7 @@ Parses a regex pattern and returns a regex object to be used in other functions.
 Implementation note:
 
 - The underlying `Regex(...)` constructor is ignore-case by default
-- If you pass a `case=false` keyword to `Regex(...)`, you can make it case-sensitive
+- If you pass a `case=true` keyword to `Regex(...)`, you can make it case-sensitive
 - If you call `Regex(pattern, text)`, a boolean match is returned instantly instead.
 
 ---
@@ -1188,13 +1275,15 @@ Returns the current language index.
 
 ---
 
-#### `GetLength`/`Length`
+#### `GetLength`
 
 Usage:
 
-- `GetLength() or Length()`
+- `GetLength()`
 
-Returns the music length in seconds (or `None` if unavailable).
+Returns the music length in seconds **as a number**, or `None` if the mod failed to obtain it. (The latter is only possible for corrupted customs)
+
+This is different from the `Length(range)` filter in §7.1 which checks whether the length is *within* a range and returns `True`/`False`.
 
 ---
 
