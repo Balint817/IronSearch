@@ -7,7 +7,11 @@ namespace IronSearch.Tags
     {
         internal static bool EvalPacked(MusicInfo musicInfo)
         {
-            if (!EvalCustom(musicInfo)) return false;
+            if (!EvalCustom(musicInfo))
+            {
+                return false;
+            }
+
             return EvalPackedInternal(musicInfo);
         }
 

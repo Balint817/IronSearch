@@ -3,7 +3,7 @@
     //[HarmonyPatch(typeof(LocalizationName), "GetMusicTagNoMusicTxt")]
     internal class NoMusicPatch
     {
-        static bool Prefix(ref string __result)
+        private static bool Prefix(ref string __result)
         {
             if (RefreshPatch.isAdvancedSearch == false)
             {
@@ -24,7 +24,7 @@
     //[HarmonyPatch(typeof(LocalizationName), "GetSearchNameTxt")]
     internal class SearchNamePatch
     {
-        static bool Prefix(ref string __result)
+        private static bool Prefix(ref string __result)
         {
             if (RefreshPatch.isAdvancedSearch != false)
             {

@@ -9,12 +9,12 @@ namespace PythonExpressionManager
         public readonly string _errorName;
         public readonly string _errorMessage;
         public readonly object _originalException;
-        public __internalException(PythonType errorType, string errorName, string errorMessage, object originalException): base(errorMessage, originalException as System.Exception)
+        public __internalException(PythonType errorType, string errorName, string errorMessage, object originalException) : base(errorMessage, originalException as System.Exception)
         {
-            this._errorType = errorType;
-            this._errorName = errorName;
-            this._errorMessage = errorMessage;
-            this._originalException = originalException;
+            _errorType = errorType;
+            _errorName = errorName;
+            _errorMessage = errorMessage;
+            _originalException = originalException;
         }
         public override string ToString()
         {

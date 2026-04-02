@@ -18,14 +18,23 @@ namespace IronSearch
         // --- Public API ---
         public static double NextDouble(double A, double B)
         {
-            if (!(A < B)) throw new ArgumentException("A must be < B");
-            if (double.IsNaN(A) || double.IsNaN(B)) throw new ArgumentException();
+            if (!(A < B))
+            {
+                throw new ArgumentException("A must be < B");
+            }
+
+            if (double.IsNaN(A) || double.IsNaN(B))
+            {
+                throw new ArgumentException();
+            }
 
             ulong a = ToOrdered(A);
             ulong b = ToOrdered(B);
 
             if (b - a <= 1)
+            {
                 throw new ArgumentException("No representable doubles in (A, B)");
+            }
 
             var rng = _rng.Value!;
 
@@ -64,7 +73,9 @@ namespace IronSearch
 
             // Power-of-two fast path
             if ((range & (range - 1)) == 0)
+            {
                 return min + (rng.NextUInt64() & (range - 1));
+            }
 
             ulong limit = ulong.MaxValue - (ulong.MaxValue % range);
 

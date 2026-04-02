@@ -1,6 +1,6 @@
-using System.Text;
 using IronSearch.Exceptions;
 using MelonLoader;
+using System.Text;
 
 namespace IronSearch.Tags
 {

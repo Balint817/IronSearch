@@ -1,12 +1,10 @@
 ﻿using IronPython.Runtime;
 using IronPython.Runtime.Exceptions;
-using IronPython.Runtime.Operations;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Text;
-using static Community.CsharpSqlite.Sqlite3;
 
 namespace PythonExpressionManager
 {
@@ -20,16 +18,16 @@ namespace PythonExpressionManager
             extractMethod = typeof(TraceBack).GetMethod("Extract", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new NullReferenceException();
         }
         //TODO: remove ConvertException, replace with helper method the user can call in their catch block to preserve stack traces, and in general make exceptions more useful.
-        const string tagDict = "___";
-        const string args = "____";
-        const string kwargs = "_____";
-        const string f1 = "______";
-        const string f2 = "_______";
-        const string searchExpressionName = "<expression>";
+        private const string tagDict = "___";
+        private const string args = "____";
+        private const string kwargs = "_____";
+        private const string f1 = "______";
+        private const string f2 = "_______";
+        private const string searchExpressionName = "<expression>";
         internal dynamic Function;
-        static readonly Type pythonAwareExceptionType;
-        static readonly MethodInfo baseExceptionGetterMethod;
-        static readonly MethodInfo extractMethod;
+        private static readonly Type pythonAwareExceptionType;
+        private static readonly MethodInfo baseExceptionGetterMethod;
+        private static readonly MethodInfo extractMethod;
         internal CompiledScript(string body, ScriptExecutor instance)
         {
             var Scripts = new ReadOnlyDictionary<string, dynamic>(instance.RegisteredKeys.ToDictionary(x => x.Key, x => x.Value.Function));

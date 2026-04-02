@@ -5,7 +5,7 @@ namespace DependentConsoleApp
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
 
             //var tag2 = new Script(

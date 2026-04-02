@@ -1,11 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using Romanization;
+﻿using Romanization;
+using System.Collections.ObjectModel;
 
 namespace IronSearch
 {
     public static class RomanizationHelper
     {
-        static readonly Dictionary<string, ReadOnlyCollection<string>> _cache = new()
+        private static readonly Dictionary<string, ReadOnlyCollection<string>> _cache = new()
         {
             [""] = new(new string[] { "" }),
         };
@@ -13,7 +13,7 @@ namespace IronSearch
         {
             return new(input.SelectMany(x => GetAllRomanizations(x)).Distinct().ToArray());
         }
-        static readonly ReadOnlyCollection<string> _empty = new(Array.Empty<string>());
+        private static readonly ReadOnlyCollection<string> _empty = new(Array.Empty<string>());
         public static ReadOnlyCollection<string> GetAllRomanizations(string input)
         {
             if (input is null)
@@ -21,7 +21,9 @@ namespace IronSearch
                 return _empty;
             }
             if (_cache.TryGetValue(input, out var cached))
+            {
                 return cached;
+            }
 
             var results = new HashSet<string>();
 

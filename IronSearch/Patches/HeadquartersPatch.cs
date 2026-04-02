@@ -1,20 +1,20 @@
-﻿using System.Text.Json;
-using System.Text.RegularExpressions;
-using HarmonyLib;
+﻿using HarmonyLib;
 using IronSearch.Records.HQMD5;
 using MelonLoader;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace IronSearch.Patches
 {
     internal class HeadquartersPatch
     {
-        static readonly Regex targetURLRegex = new('^' + Regex.Escape(Headquarters.Main.ApiPrefix + "/sheets/") + "[a-fA-F0-9]+$");
-        static void Prefix(string url, Action<JsonDocument, bool> callback)
+        private static readonly Regex targetURLRegex = new('^' + Regex.Escape(Headquarters.Main.ApiPrefix + "/sheets/") + "[a-fA-F0-9]+$");
+        private static void Prefix(string url, Action<JsonDocument, bool> callback)
         {
             if (targetURLRegex.IsMatch(url))
             {
                 var orig = callback;
-                callback = (a,b) =>
+                callback = (a, b) =>
                 {
                     try
                     {
@@ -28,7 +28,7 @@ namespace IronSearch.Patches
                     {
                         //catch silently
                     }
-                    orig(a,b);
+                    orig(a, b);
                 };
             }
         }

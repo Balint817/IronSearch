@@ -30,7 +30,9 @@ namespace IronSearch.Patches
         internal static int SortByAccuracy(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
+            {
                 throw new SearchCallNotAllowed("ByAccuracy()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
+            }
 
             var acc1 = GetMaxAccuracy(m1);
             var acc2 = GetMaxAccuracy(m2);
@@ -41,7 +43,9 @@ namespace IronSearch.Patches
         private static float GetMaxAccuracy(MusicInfo musicInfo)
         {
             if (!Utils.GetAvailableMaps(musicInfo, out var maps))
+            {
                 return float.MinValue;
+            }
 
             float max = float.MinValue;
 
@@ -169,7 +173,9 @@ namespace IronSearch.Patches
         public static int SortByCallback(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
+            {
                 throw new SearchCallNotAllowed("ByDifficulty()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
+            }
 
             var max1 = GetMaxCallback(m1);
             var max2 = GetMaxCallback(m2);
@@ -180,14 +186,18 @@ namespace IronSearch.Patches
         private static int GetMaxCallback(MusicInfo musicInfo)
         {
             if (!Utils.GetMapCallbacks(musicInfo, out var diffs))
+            {
                 return int.MinValue;
+            }
 
             return diffs.Where(x => x != int.MinValue).Max();
         }
         public static int SortByDifficulty(MusicInfo m1, MusicInfo m2)
         {
             if (!sortingFlag)
+            {
                 throw new SearchCallNotAllowed("ByDifficulty()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
+            }
 
             var max1 = GetMaxDifficulty(m1);
             var max2 = GetMaxDifficulty(m2);
@@ -198,14 +208,18 @@ namespace IronSearch.Patches
         private static int GetMaxDifficulty(MusicInfo musicInfo)
         {
             if (!Utils.GetMapDifficulties(musicInfo, out var diffs))
+            {
                 return int.MinValue;
+            }
 
             int max = int.MinValue;
 
             foreach (var diff in diffs)
             {
                 if (Utils.TryParseInt(diff, out var val) && val > max)
+                {
                     max = val;
+                }
             }
 
             return max;

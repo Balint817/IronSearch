@@ -6,7 +6,7 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        static readonly Range evalFuzzyArgCount = new(1, 2);
+        private static readonly Range evalFuzzyArgCount = new(1, 2);
         internal static dynamic EvalFuzzy(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             bool caseSensitive = true;

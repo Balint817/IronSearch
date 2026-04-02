@@ -5,7 +5,7 @@ namespace IronSearch.Tags
 {
     internal static partial class BuiltIns
     {
-        internal abstract class RangeArgumentEvaluator: Evaluator
+        internal abstract class RangeArgumentEvaluator : Evaluator
         {
             public abstract IEnumerable<double> GetDoubles(MusicInfo musicInfo);
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

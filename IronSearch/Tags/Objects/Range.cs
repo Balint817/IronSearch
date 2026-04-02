@@ -1,12 +1,12 @@
-using System.Numerics;
 using IronSearch.Exceptions;
+using System.Numerics;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        static readonly Range evalRangeArgCount = new Range(1, 2);
+        private static readonly Range evalRangeArgCount = new Range(1, 2);
         internal static dynamic EvalRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotMatching(varArgs, evalRangeArgCount, "Range", varArgs, varKwargs);

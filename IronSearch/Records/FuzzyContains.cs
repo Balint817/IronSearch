@@ -10,10 +10,14 @@
         public FuzzyContains(string containsText, int maxDistance = 2, bool caseInsensitive = true)
         {
             if (string.IsNullOrEmpty(containsText))
+            {
                 throw new ArgumentException(null, nameof(containsText));
+            }
 
             if (containsText.Length > 63)
+            {
                 throw new ArgumentException("Pattern too long for this implementation (max 63 chars)");
+            }
 
             CaseInsensitive = caseInsensitive;
             Pattern = containsText;
@@ -30,7 +34,10 @@
         public bool IsMatch(string text)
         {
             if (string.IsNullOrEmpty(text))
+            {
                 return false;
+            }
+
             if (CaseInsensitive)
             {
                 text = text.ToLowerInvariant();
@@ -41,7 +48,9 @@
             // R[d] = bit masks for distance d
             ulong[] R = new ulong[MaxDistance + 1];
             for (int i = 0; i <= MaxDistance; i++)
+            {
                 R[i] = ~1UL;
+            }
 
             foreach (char c in text)
             {
@@ -68,7 +77,9 @@
 
                 // Check match at last bit
                 if ((R[MaxDistance] & (1UL << m)) == 0)
+                {
                     return true;
+                }
             }
 
             return false;
@@ -83,7 +94,9 @@
                 char c = pattern[i];
 
                 if (!mask.ContainsKey(c))
+                {
                     mask[c] = ~0UL;
+                }
 
                 mask[c] &= ~(1UL << i);
             }

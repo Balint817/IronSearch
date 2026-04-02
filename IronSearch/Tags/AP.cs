@@ -1,5 +1,4 @@
 using Il2CppAssets.Scripts.Database;
-using IronPython.Runtime;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -9,7 +8,7 @@ namespace IronSearch.Tags
         public class APEvaluator : MapArgumentEvaluator
         {
             public override string EvaluatorName => "AP";
-            public override IEnumerable<KeyValuePair<double,bool>> GetPairs(MusicInfo musicInfo)
+            public override IEnumerable<KeyValuePair<double, bool>> GetPairs(MusicInfo musicInfo)
             {
                 Utils.GetAvailableMaps(musicInfo, out var availableMaps);
                 foreach (var diff in availableMaps)

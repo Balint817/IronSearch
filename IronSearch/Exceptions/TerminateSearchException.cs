@@ -6,7 +6,7 @@
         internal readonly bool IsTrue;
         public TerminateSearchException(bool b)
         {
-            this.IsTrue = b;
+            IsTrue = b;
         }
     }
 }

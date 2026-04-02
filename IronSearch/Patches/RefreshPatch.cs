@@ -1,6 +1,3 @@
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using HarmonyLib;
@@ -10,15 +7,14 @@ using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
-using Il2CppInterop.Runtime;
 using Il2CppPeroPeroGames.GlobalDefines;
-using Il2CppPeroTools2.PeroString;
-using IronSearch.Exceptions;
 using IronSearch.Records;
 using IronSearch.Tags;
 using MelonLoader;
 using Newtonsoft.Json;
 using PythonExpressionManager;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace IronSearch.Patches
 {
@@ -268,7 +264,7 @@ namespace IronSearch.Patches
             return false;
         }
 
-        static void PrintCachedSearch(SearchCache searchCache)
+        private static void PrintCachedSearch(SearchCache searchCache)
         {
             if (searchCache.Expiration.HasValue)
             {
@@ -279,7 +275,7 @@ namespace IronSearch.Patches
                 MelonLogger.Msg("Got search results from cache.");
             }
         }
-        static void CachedSearch(SearchResults __instance, SearchCache cache, Il2CppSystem.Collections.Generic.List<MusicInfo> allMusic)
+        private static void CachedSearch(SearchResults __instance, SearchCache cache, Il2CppSystem.Collections.Generic.List<MusicInfo> allMusic)
         {
             foreach (var info in allMusic)
             {

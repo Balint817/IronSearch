@@ -2,21 +2,16 @@
 using IronSearch.Exceptions;
 using IronSearch.Records;
 using PythonExpressionManager;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IronSearch
 {
-    class SearchState
+    internal class SearchState
     {
         public SearchArgument Arg = new(null!, new(1000));
         public List<MusicInfo> Results = new();
     }
-    class MusicSearchWorkerManager : AbstractInteropWorkerManager<MusicInfo, SearchState>
+    internal class MusicSearchWorkerManager : AbstractInteropWorkerManager<MusicInfo, SearchState>
     {
         private CompiledScript _script;
         private List<SearchState?> _states;
@@ -29,7 +24,7 @@ namespace IronSearch
         }
 #pragma warning restore CS8618
 
-        public bool Run(List<MusicInfo> allMusic, CompiledScript script, [MaybeNullWhen(false)]out List<MusicInfo> results)
+        public bool Run(List<MusicInfo> allMusic, CompiledScript script, [MaybeNullWhen(false)] out List<MusicInfo> results)
         {
             _script = script;
             _states = new(_workerCount);
@@ -77,7 +72,7 @@ namespace IronSearch
             }
             return new();
         }
-        SearchState? CatastrophicFailure(string message, Exception? ex = null)
+        private SearchState? CatastrophicFailure(string message, Exception? ex = null)
         {
             if (!_failed)
             {

@@ -23,7 +23,7 @@ namespace IronSearch.Exceptions
             ActualType = actualType;
         }
 
-        static string BuildMessage(string expectedDescription, Type? actualType, string? extraDetail)
+        private static string BuildMessage(string expectedDescription, Type? actualType, string? extraDetail)
         {
             var t = actualType is null ? "null" : actualType.Name;
             var msg = $"Expected {expectedDescription}, but got {t}.";

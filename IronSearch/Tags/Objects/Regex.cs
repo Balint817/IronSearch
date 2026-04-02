@@ -1,12 +1,12 @@
-using System.Text.RegularExpressions;
 using IronSearch.Exceptions;
+using System.Text.RegularExpressions;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        static readonly Range evalRegexArgCount = new(1, 2);
+        private static readonly Range evalRegexArgCount = new(1, 2);
         internal static dynamic EvalRegex(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             var flags = RegexOptions.CultureInvariant

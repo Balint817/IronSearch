@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Net;
-using CustomAlbums.Managers;
+﻿using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
@@ -12,6 +10,8 @@ using IronSearch.UI;
 using MelonLoader;
 using MelonLoader.Utils;
 using PythonExpressionManager;
+using System.Collections.ObjectModel;
+using System.Net;
 
 namespace IronSearch
 {
@@ -59,7 +59,7 @@ namespace IronSearch
     }
     public partial class ModMain : MelonMod
     {
-        static bool? _initStepTracker = null;
+        private static bool? _initStepTracker = null;
         public static bool InitSuccessful { get; internal set; } = false;
         public static bool CustomAlbumsLoaded { get; private set; }
         public static bool HeadquartersLoaded { get; private set; }
@@ -104,7 +104,7 @@ namespace IronSearch
                 return enablePersistentSearchCachingEntry.Value;
             }
         }
-        internal static Dictionary<string,string> Aliases
+        internal static Dictionary<string, string> Aliases
         {
             get
             {
@@ -126,7 +126,7 @@ namespace IronSearch
             }
         }
 
-        void DisposeAll()
+        private void DisposeAll()
         {
 
             cts.Cancel();
@@ -136,7 +136,7 @@ namespace IronSearch
             {
                 AudioHelper.CustomCacheTask?.Dispose();
             }
-            catch (Exception) {}
+            catch (Exception) { }
             AudioHelper.CustomCacheTask = null!;
 
             try
@@ -221,7 +221,7 @@ namespace IronSearch
             }
         }
 
-        static void LoadCinema()
+        private static void LoadCinema()
         {
             try
             {
@@ -238,8 +238,8 @@ namespace IronSearch
             }
         }
 
-        Task<Dictionary<string, bool>> HQLoadTask = null!;
-        CancellationTokenSource cts = new();
+        private Task<Dictionary<string, bool>> HQLoadTask = null!;
+        private CancellationTokenSource cts = new();
 
         public override void OnEarlyInitializeMelon()
         {
@@ -250,7 +250,7 @@ namespace IronSearch
             _initStepTracker = null;
         }
 
-        void MelonHarmonyInit()
+        private void MelonHarmonyInit()
         {
             if (_initStepTracker is false)
             {
@@ -278,7 +278,7 @@ namespace IronSearch
             }
             if (HeadquartersLoaded)
             {
-                HeadquartersPatch.RunPatch(this.HarmonyInstance);
+                HeadquartersPatch.RunPatch(HarmonyInstance);
             }
 
             var category = MelonPreferences.CreateCategory("IronSearch");
@@ -306,8 +306,8 @@ namespace IronSearch
         }
 
 
-        const string scriptFolderName = "Scripts";
-        const string exampleScriptName = "Unpacked.py";
+        private const string scriptFolderName = "Scripts";
+        private const string exampleScriptName = "Unpacked.py";
         public static string ArgumentName => "M";
         public static string BaseDictName => "T";
         public static string ScriptDirectory => Path.Join(MelonEnvironment.UserDataDirectory, scriptFolderName);
@@ -331,11 +331,11 @@ namespace IronSearch
 
         internal static readonly Dictionary<string, string> _helpString = new();
 
-        void RegisterScript(string key, BuiltInDelegate del)
+        private void RegisterScript(string key, BuiltInDelegate del)
         {
             ScriptManager.ScriptExecutor.RegisterScript(key, ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(ScriptManager, del)));
         }
-        void RegisterObject(string key, BuiltInObjectDelegate del)
+        private void RegisterObject(string key, BuiltInObjectDelegate del)
         {
             ScriptManager.ScriptExecutor.RegisterScript(key, ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(ScriptManager, del)));
         }
@@ -912,7 +912,7 @@ namespace IronSearch
             ScriptManager.DefaultPriority = (int)Priorities.Expression;
 
             MelonLogger.Msg("Loading expressions...");
-            var expressionDefault = new Dictionary<string,string>()
+            var expressionDefault = new Dictionary<string, string>()
             {
                 ["NewCustom"] = "Unplayed() and Custom()",
 
@@ -940,7 +940,7 @@ namespace IronSearch
             autoCompleteItemsEntry = category.CreateEntry("AutoCompleteItems", autocompleteDefault, "AutoCompleteItems", "\nDefine alternative keywords for auto-complete here.", validator: Validator(autocompleteDefault));
         }
 
-        static readonly Dictionary<string, Script> LoadedExpressions = new();
+        private static readonly Dictionary<string, Script> LoadedExpressions = new();
         internal const double MiniCacheTimeout = 0.25;
 
         private static void LoadExpressions()

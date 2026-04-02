@@ -33,7 +33,7 @@ namespace IronSearch.Tags
             if (args[^1] is bool b1)
             {
                 reverse = b1;
-                args.RemoveAt(args.Count-1);
+                args.RemoveAt(args.Count - 1);
                 if (args.Count != 0 && args[^1] is int n1)
                 {
                     priority = n1;

@@ -1,5 +1,4 @@
 ﻿using Il2CppInterop.Runtime;
-using System.Threading;
 
 namespace IronSearch
 {
@@ -65,13 +64,17 @@ namespace IronSearch
                     _startEvent.Wait();
 
                     if (_disposed)
+                    {
                         return;
+                    }
 
                     int currentGen = Volatile.Read(ref _generation);
 
                     // 🔥 prevent double execution
                     if (currentGen == lastSeenGeneration)
+                    {
                         continue;
+                    }
 
                     lastSeenGeneration = currentGen;
 
@@ -81,12 +84,16 @@ namespace IronSearch
                     while (true)
                     {
                         if (Volatile.Read(ref _stop) != 0)
+                        {
                             break;
+                        }
 
                         int index = Interlocked.Increment(ref _nextIndex) - 1;
 
                         if (index >= count)
+                        {
                             break;
+                        }
 
                         state = ProcessItem(data[index], state);
                     }
@@ -104,14 +111,18 @@ namespace IronSearch
                 OnWorkerEnd(state);
 
                 if (threadPtr != 0)
+                {
                     IL2CPP.il2cpp_thread_detach(threadPtr);
+                }
             }
         }
 
         public void Execute(T[] data, int count)
         {
             if (_disposed)
+            {
                 throw new ObjectDisposedException(nameof(AbstractInteropWorkerManager<T, TState>));
+            }
 
             _data = data;
             _count = count;
@@ -137,7 +148,9 @@ namespace IronSearch
         public void Dispose()
         {
             if (_disposed)
+            {
                 return;
+            }
 
             _disposed = true;
 

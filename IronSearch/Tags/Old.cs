@@ -4,7 +4,7 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        public class OldEvaluator: RangeArgumentEvaluator
+        public class OldEvaluator : RangeArgumentEvaluator
         {
             public override string EvaluatorName => "Old";
             public override IEnumerable<double> GetDoubles(MusicInfo musicInfo)

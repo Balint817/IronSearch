@@ -7,7 +7,7 @@ namespace IronSearch.Tags
     {
         internal static List<string>? sortedByLastModified;
 
-        public class NewEvaluator: RangeArgumentEvaluator
+        public class NewEvaluator : RangeArgumentEvaluator
         {
             public override string EvaluatorName => "New";
             public override IEnumerable<double> GetDoubles(MusicInfo musicInfo)

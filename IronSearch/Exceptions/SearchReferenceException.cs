@@ -15,7 +15,7 @@ namespace IronSearch.Exceptions
             Kind = kind;
         }
 
-        static string BuildMessage(string referenceName, ReferenceKind kind)
+        private static string BuildMessage(string referenceName, ReferenceKind kind)
         {
             var scope = kind == ReferenceKind.Global ? "global" : "local";
             return $"There is no {scope} variable named '{referenceName}'.";

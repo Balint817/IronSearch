@@ -40,7 +40,7 @@ public class SimpleDropdown : MonoBehaviour
 
         if (topLeft is not { } v)
         {
-            v = new((Screen.width / 2f) - width/2, (Screen.height / 2f) + Height/2);
+            v = new((Screen.width / 2f) - width / 2, (Screen.height / 2f) + Height / 2);
         }
         v.y -= Height;
 
@@ -70,7 +70,10 @@ public class SimpleDropdown : MonoBehaviour
 
     private void HandleKeyboard()
     {
-        if (items.Count == 0) return;
+        if (items.Count == 0)
+        {
+            return;
+        }
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
@@ -120,10 +123,14 @@ public class SimpleDropdown : MonoBehaviour
         float maxY = minY + itemHeight;
 
         if (scroll.y > minY)
+        {
             scroll.y = minY;
+        }
 
         if (scroll.y + (visibleItems * itemHeight) < maxY)
+        {
             scroll.y = maxY - (visibleItems * itemHeight);
+        }
     }
 
     private void OnGUI()
@@ -185,7 +192,10 @@ public class SimpleDropdown : MonoBehaviour
     private void Select(int index)
     {
         if (index < 0 || index >= items.Count)
+        {
             return;
+        }
+
         try
         {
             onSelected?.Invoke(items[index], index);

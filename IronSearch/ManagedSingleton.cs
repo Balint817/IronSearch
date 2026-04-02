@@ -1,8 +1,8 @@
 ﻿namespace IronSearch
 {
-    public static class ManagedSingleton<T> where T: new()
+    public static class ManagedSingleton<T> where T : new()
     {
-        static T? _instance;
+        private static T? _instance;
         public static T Instance
         {
             get

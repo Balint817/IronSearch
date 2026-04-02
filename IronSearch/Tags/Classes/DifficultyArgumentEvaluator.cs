@@ -1,7 +1,7 @@
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Exceptions;
 using IronSearch.Records;
-using Range= IronSearch.Records.Range;
+using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
@@ -9,7 +9,7 @@ namespace IronSearch.Tags
     {
         internal abstract class DifficultyArgumentEvaluator : Evaluator
         {
-            static readonly Range argRange = new(1, 2); // just for the error message, realistically not needed;
+            private static readonly Range argRange = new(1, 2); // just for the error message, realistically not needed;
             // varArg[0] should filter by value, varArg[1] should filter by key.
             public abstract IEnumerable<KeyValuePair<double, double>> GetPairs(MusicInfo musicInfo);
             public abstract bool AllowInvalid0 { get; }

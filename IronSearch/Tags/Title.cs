@@ -26,7 +26,7 @@ namespace IronSearch.Tags
 
                 return result;
             }
-            static IEnumerable<string> GetStringsCustom_Title(MusicInfo mi)
+            private static IEnumerable<string> GetStringsCustom_Title(MusicInfo mi)
             {
                 return RomanizationHelper.GetAllRomanizations(((Album)ModMain.uidToAlbum[mi.uid]).Info.NameRomanized);
             }

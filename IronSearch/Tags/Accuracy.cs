@@ -1,5 +1,4 @@
 using Il2CppAssets.Scripts.Database;
-using IronPython.Runtime;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -20,7 +19,7 @@ namespace IronSearch.Tags
 
                     if (RefreshPatch.highScores.TryGetValue(s, out var score))
                     {
-                        yield return new(diff, (score.AccuracyStringParsed ?? score.Accuracy)*100);
+                        yield return new(diff, (score.AccuracyStringParsed ?? score.Accuracy) * 100);
                     }
                     else
                     {

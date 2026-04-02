@@ -1,7 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.IO.Compression;
-using CustomAlbums.Data;
+﻿using CustomAlbums.Data;
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.Resources;
@@ -11,6 +8,9 @@ using MelonLoader.Utils;
 using NAudio.Vorbis;
 using Newtonsoft.Json;
 using NLayer;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.IO.Compression;
 using UnityEngine;
 
 namespace IronSearch
@@ -23,12 +23,12 @@ namespace IronSearch
 
         public static readonly ConcurrentDictionary<string, TimeSpan?> CustomCache = new();
         public static ConcurrentDictionary<string, TimeSpan>? VanillaCache { get; private set; }
-        static bool _vanillaCacheUpdated = true;
+        private static bool _vanillaCacheUpdated = true;
         public static void ForceBuildVanillaCache()
         {
             if (VanillaCache is not null)
             {
-                MelonLogger.Msg($"Vanilla length cache currently contains {VanillaCache.Count} items.");  
+                MelonLogger.Msg($"Vanilla length cache currently contains {VanillaCache.Count} items.");
             }
             VanillaCache ??= new();
             var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => x.albumIndex != 999 && !VanillaCache.ContainsKey(x.uid)).ToList();
@@ -43,11 +43,11 @@ namespace IronSearch
             for (int i = 0; i < count; i++)
             {
                 _ = GetMusicLength(allMusic[i]);
-                currentRatio = decimal.Floor((i+1) / countDecimal * 1000)/1000;
+                currentRatio = decimal.Floor((i + 1) / countDecimal * 1000) / 1000;
                 if (currentRatio > prevRatio)
                 {
                     var text = $"\rProgress: {currentRatio * 100:F1}%";
-                    Console.Write(text.PadRight(Console.WindowWidth-1));
+                    Console.Write(text.PadRight(Console.WindowWidth - 1));
                     prevRatio = currentRatio;
                 }
             }
@@ -96,7 +96,7 @@ namespace IronSearch
                 // catch silently
             }
 
-            Dictionary<string,TimeSpan> loadCache = new();
+            Dictionary<string, TimeSpan> loadCache = new();
 
             if (text is not null)
             {
@@ -115,7 +115,7 @@ namespace IronSearch
             {
                 VanillaCache.TryAdd(item.Key, item.Value);
             }
-            
+
         }
 
         private static TimeSpan LoadVanillaOne(MusicInfo musicInfo)
@@ -155,7 +155,7 @@ namespace IronSearch
                     {
                         sw.Stop();
                         MelonLogger.Msg($"Custom async calculation cancelled after {sw.Elapsed.TotalSeconds:F1} seconds. Progress: {i}/{count}");
-                        MelonLogger.Msg($"Remaining time estimate: {(1-i/count)*sw.Elapsed.TotalSeconds:F1} seconds");
+                        MelonLogger.Msg($"Remaining time estimate: {(1 - i / count) * sw.Elapsed.TotalSeconds:F1} seconds");
                         return;
                     }
                     var album = allCustoms[i];
@@ -184,7 +184,7 @@ namespace IronSearch
                 }
                 catch (Exception)
                 {
-                    
+
                 }
             }
             return GetCustomLengthDirect(musicInfo.uid);
@@ -273,7 +273,7 @@ namespace IronSearch
 
                 return mpeg.Duration;
             }
-            catch (Exception) 
+            catch (Exception)
             {
                 return null;
             }

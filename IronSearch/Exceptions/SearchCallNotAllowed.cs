@@ -10,7 +10,7 @@ namespace IronSearch.Exceptions
         {
 
         }
-        static string BuildMessage(string parameterContext)
+        private static string BuildMessage(string parameterContext)
         {
             var s = $"You're not supposed to call this twice, like {parameterContext}, pass it as an argument instead!";
             return s;

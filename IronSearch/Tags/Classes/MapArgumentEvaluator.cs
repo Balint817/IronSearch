@@ -1,6 +1,6 @@
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Records;
-using Range= IronSearch.Records.Range;
+using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
@@ -8,7 +8,7 @@ namespace IronSearch.Tags
     {
         internal abstract class MapArgumentEvaluator : Evaluator
         {
-            static readonly Range argRange = new(0,1); // just for the error message, realistically not needed;
+            private static readonly Range argRange = new(0, 1); // just for the error message, realistically not needed;
             public abstract IEnumerable<KeyValuePair<double, bool>> GetPairs(MusicInfo musicInfo);
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
             {

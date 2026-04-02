@@ -1,8 +1,8 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
-using IronSearch;
+﻿using IronSearch;
 using IronSearch.Properties;
 using MelonLoader;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 [assembly: MelonIncompatibleAssemblies(new string[] { })]
 [assembly: MelonOptionalDependencies(new string[] { "Headquarters", "CustomAlbums", "KeybindManager", "PopupLib" })]

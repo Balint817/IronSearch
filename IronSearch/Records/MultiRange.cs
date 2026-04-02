@@ -23,22 +23,43 @@ namespace IronSearch.Records
         public static readonly MultiRange FullRange;
         public override bool Equals(object? obj)
         {
-            if (obj == null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj is not MultiRange mr) return false;
-
-            if (this._ranges.Count != mr._ranges.Count) return false;
-
-            for (int i = 0; i < this._ranges.Count; i++)
+            if (obj == null)
             {
-                if (this._ranges[i] != mr._ranges[i]) return false;
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj is not MultiRange mr)
+            {
+                return false;
+            }
+
+            if (_ranges.Count != mr._ranges.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < _ranges.Count; i++)
+            {
+                if (_ranges[i] != mr._ranges[i])
+                {
+                    return false;
+                }
             }
             return true;
         }
 
         public static bool operator ==(MultiRange? a, MultiRange? b)
         {
-            if (a is null) return b is null;
+            if (a is null)
+            {
+                return b is null;
+            }
+
             return a.Equals(b);
         }
         public static bool operator !=(MultiRange? a, MultiRange? b)
@@ -128,7 +149,7 @@ namespace IronSearch.Records
             }
             foreach (var range in ranges)
             {
-                this.OverlapSelf(range.InvertArray());
+                OverlapSelf(range.InvertArray());
             }
         }
         public void OverlapSelf(params Range[] ranges)
@@ -145,7 +166,8 @@ namespace IronSearch.Records
                     if (range2.TryGetOverlap(range1, out var overlap))
                     {
                         overlaps.Add(overlap);
-                    };
+                    }
+                    ;
                 }
             }
             _ranges = overlaps;
@@ -260,7 +282,7 @@ namespace IronSearch.Records
         }
         public override string ToString()
         {
-            return "("+string.Join(" ", this._ranges.Select(x => x.ToString()))+")";
+            return "(" + string.Join(" ", _ranges.Select(x => x.ToString())) + ")";
         }
     }
 

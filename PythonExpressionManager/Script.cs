@@ -1,10 +1,9 @@
-﻿using IronPython.Hosting;
-using IronPython.Runtime;
+﻿using IronPython.Runtime;
 using Microsoft.Scripting.Hosting;
 
 namespace PythonExpressionManager
 {
-    public sealed class Script: IComparable<Script>, IDisposable
+    public sealed class Script : IComparable<Script>, IDisposable
     {
         public static readonly string OutputFunctionName = "run";
 
@@ -29,7 +28,7 @@ namespace PythonExpressionManager
             Priority = priority;
             Function = null!;
         }
-        public Script(ScriptEngine engine, string source, int priority = (int)Priorities.CustomPython): this(priority)
+        public Script(ScriptEngine engine, string source, int priority = (int)Priorities.CustomPython) : this(priority)
         {
             Scope = engine.CreateScope();
             Source = engine.CreateScriptSourceFromString(source);
@@ -63,7 +62,7 @@ namespace PythonExpressionManager
         /// <summary>
         /// Used internally to register CLR methods.
         /// </summary>
-        internal Script(dynamic function, int priority): this(priority)
+        internal Script(dynamic function, int priority) : this(priority)
         {
             Function = function;
         }

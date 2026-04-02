@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using IronPython.Runtime;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using IronPython.Runtime;
 
 namespace IronSearch.Records
 {
@@ -10,11 +10,11 @@ namespace IronSearch.Records
         {
             return new Range()
             {
-                _start = this._start,
-                _end = this._end,
-                _exclusiveEnd = this._exclusiveEnd,
-                _exclusiveStart = this._exclusiveStart,
-                IsReadonly = this.IsReadonly
+                _start = _start,
+                _end = _end,
+                _exclusiveEnd = _exclusiveEnd,
+                _exclusiveStart = _exclusiveStart,
+                IsReadonly = IsReadonly
             };
         }
 
@@ -50,7 +50,11 @@ namespace IronSearch.Records
         }
         public static bool operator ==(Range? a, Range? b)
         {
-            if (a is null) return b is null;
+            if (a is null)
+            {
+                return b is null;
+            }
+
             return a.Equals(b);
         }
         public static bool operator !=(Range? a, Range? b)
@@ -60,7 +64,7 @@ namespace IronSearch.Records
 
         public override bool Equals(object? obj)
         {
-            return this.CompareTo(obj) == 0;
+            return CompareTo(obj) == 0;
         }
         public override int GetHashCode()
         {
@@ -135,7 +139,10 @@ namespace IronSearch.Records
             get => _start == double.NegativeInfinity ? false : _exclusiveStart;
             set
             {
-                if (!IsReadonly) _exclusiveStart = value;
+                if (!IsReadonly)
+                {
+                    _exclusiveStart = value;
+                }
             }
         }
 
@@ -144,7 +151,10 @@ namespace IronSearch.Records
             get => _end == double.PositiveInfinity ? false : _exclusiveEnd;
             set
             {
-                if (!IsReadonly) _exclusiveEnd = value;
+                if (!IsReadonly)
+                {
+                    _exclusiveEnd = value;
+                }
             }
         }
 
@@ -556,7 +566,7 @@ namespace IronSearch.Records
             }
             if (ExclusiveEnd)
             {
-                s = s+"|";
+                s = s + "|";
             }
 
             return s;

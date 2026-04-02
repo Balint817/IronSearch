@@ -4,7 +4,7 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        class LengthEvaluator: TimeRangeArgumentEvaluator
+        private class LengthEvaluator : TimeRangeArgumentEvaluator
         {
             public override string EvaluatorName => "Length";
             public override IEnumerable<double> GetDoubles(MusicInfo musicInfo)

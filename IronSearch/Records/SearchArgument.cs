@@ -1,8 +1,8 @@
-﻿using System.Dynamic;
-using System.Reflection;
-using Il2CppAssets.Scripts.Database;
+﻿using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
 using IronPython.Runtime;
+using System.Dynamic;
+using System.Reflection;
 
 namespace IronSearch
 {
@@ -18,14 +18,14 @@ namespace IronSearch
         }
         public SearchArgument(MusicInfo mi, PeroString ps)
         {
-            I = mi; 
+            I = mi;
             PS = ps;
         }
         public override bool TryGetMember(GetMemberBinder binder, out object? result)
         {
             const BindingFlags flags =
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase;
-            var prop = this.GetType().GetProperty(binder.Name, flags);
+            var prop = GetType().GetProperty(binder.Name, flags);
             if (prop != null)
             {
                 result = prop.GetValue(this);
@@ -49,11 +49,11 @@ namespace IronSearch
     }
 
 
-    public class ExpressionSearchArgument: SearchArgument
+    public class ExpressionSearchArgument : SearchArgument
     {
         public PythonTuple A { get; } = new();
         public PythonDictionary K { get; } = new();
-        public ExpressionSearchArgument(SearchArgument searchBase, PythonTuple args, PythonDictionary kwargs): base(searchBase.I, searchBase.PS)
+        public ExpressionSearchArgument(SearchArgument searchBase, PythonTuple args, PythonDictionary kwargs) : base(searchBase.I, searchBase.PS)
         {
             A = args;
             K = kwargs;

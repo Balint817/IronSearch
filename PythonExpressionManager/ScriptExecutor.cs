@@ -1,13 +1,13 @@
-﻿using System.Collections.ObjectModel;
-using IronPython.Hosting;
+﻿using IronPython.Hosting;
 using IronPython.Runtime;
 using IronPython.Runtime.Operations;
 using Microsoft.Scripting.Hosting;
+using System.Collections.ObjectModel;
 
 namespace PythonExpressionManager
 {
 
-    public delegate dynamic WrappableCLRDelegate(dynamic input, Dictionary<string,dynamic> tagDict, dynamic[] varArgs, Dictionary<string,dynamic> varKwargs);
+    public delegate dynamic WrappableCLRDelegate(dynamic input, Dictionary<string, dynamic> tagDict, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
     public delegate dynamic WrappedCLRDelegate(dynamic input, PythonDictionary tagDict, PythonTuple varArgs, PythonDictionary varKwargs);
 
     public class ScriptExecutor
@@ -42,7 +42,7 @@ namespace PythonExpressionManager
         public string ArgumentName { get; private set; }
         public string BaseDictName { get; private set; }
 
-        static readonly Dictionary<string, object> _options = new()
+        private static readonly Dictionary<string, object> _options = new()
             {
                 { "PrivateBinding", true }
             };
@@ -110,7 +110,7 @@ namespace PythonExpressionManager
             return new CompiledScript(input, this);
         }
 
-        bool TryRegisterScriptInternal(string key, Script script, bool refresh = true)
+        private bool TryRegisterScriptInternal(string key, Script script, bool refresh = true)
         {
 
             ArgumentNullException.ThrowIfNull(key, nameof(key));
@@ -133,7 +133,7 @@ namespace PythonExpressionManager
         }
         public bool TryRegisterScript(string key, Script script) => TryRegisterScriptInternal(key, script);
 
-        void RegisterScriptInternal(string key, Script script, bool refresh = true)
+        private void RegisterScriptInternal(string key, Script script, bool refresh = true)
         {
             if (!TryRegisterScriptInternal(key, script, refresh))
             {
@@ -142,7 +142,7 @@ namespace PythonExpressionManager
         }
         public void RegisterScript(string key, Script script) => RegisterScriptInternal(key, script);
 
-        bool RemoveScriptWithKeyInternal(string key, Script script, bool refresh = true)
+        private bool RemoveScriptWithKeyInternal(string key, Script script, bool refresh = true)
         {
 
             ArgumentNullException.ThrowIfNull(key, nameof(key));
@@ -266,7 +266,7 @@ namespace PythonExpressionManager
         }
         public Dictionary<string, bool> TryRegisterMultipleScripts(IDictionary<string, Script> scripts) => TryRegisterMultipleScriptsInternal(scripts);
 
-        void RegisterAliasInternal(string key, string otherKey, bool refresh = true)
+        private void RegisterAliasInternal(string key, string otherKey, bool refresh = true)
         {
             ArgumentNullException.ThrowIfNull(key, nameof(key));
             ArgumentNullException.ThrowIfNull(otherKey, nameof(otherKey));
@@ -282,10 +282,10 @@ namespace PythonExpressionManager
         }
         public void RegisterAlias(string key, string otherKey) => RegisterAliasInternal(key, otherKey);
 
-        Dictionary<string, List<Script>> Scripts { get; set; }
-        Dictionary<string, string> KeyAliases;
+        private Dictionary<string, List<Script>> Scripts { get; set; }
+        private Dictionary<string, string> KeyAliases;
 
-        Dictionary<string, Script> _registeredKeys;
+        private Dictionary<string, Script> _registeredKeys;
         public ReadOnlyDictionary<string, Script> RegisteredKeys => new(_registeredKeys);
         public void RefreshScripts()
         {

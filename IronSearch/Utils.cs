@@ -1,11 +1,4 @@
-﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO.Compression;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using CustomAlbums.Data;
+﻿using CustomAlbums.Data;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
@@ -20,6 +13,13 @@ using MelonLoader;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PythonExpressionManager;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO.Compression;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 using ArgumentException = System.ArgumentException;
@@ -83,7 +83,7 @@ namespace IronSearch
             }
             else if (range.End == double.PositiveInfinity)
             {
-                return new Range[1] { new Range(double.NegativeInfinity, range.Start) { ExclusiveEnd = !range.ExclusiveStart} };
+                return new Range[1] { new Range(double.NegativeInfinity, range.Start) { ExclusiveEnd = !range.ExclusiveStart } };
             }
             return new Range[2] { new Range(double.NegativeInfinity, range.Start) { ExclusiveEnd = !range.ExclusiveStart }, new Range(range.End, double.PositiveInfinity) { ExclusiveStart = !range.ExclusiveEnd } };
         }
@@ -112,7 +112,7 @@ namespace IronSearch
         }
         public static T GetResult<T>(this IVariable data)
         {
-             return VariableUtils.GetResult<T>(data);
+            return VariableUtils.GetResult<T>(data);
         }
 
         public static T GetResultOrDefault<T>(this IVariable data, T defaultValue)
@@ -274,7 +274,7 @@ namespace IronSearch
         internal static readonly Regex regexBPM = new Regex(@"^[0-9,]*\.?[0-9,]+[^0-9.,][0-9,]*\.?[0-9,]+$");
 
         internal static readonly Regex regexNonNumeric = new Regex(@"[^0-9.,]");
-        public static bool DetectParseBPM(string input, [MaybeNullWhen(false)]out Range range, double min, double max)
+        public static bool DetectParseBPM(string input, [MaybeNullWhen(false)] out Range range, double min, double max)
         {
             range = null;
             if (string.IsNullOrEmpty(input))
@@ -299,7 +299,7 @@ namespace IronSearch
             }
             return ParseRange(input.Replace(nonNumericMatch, "-"), out range, min, max) ?? false;
         }
-        public static bool DetectParseBPM(string input, [MaybeNullWhen(false)]out Range range)
+        public static bool DetectParseBPM(string input, [MaybeNullWhen(false)] out Range range)
         {
             return DetectParseBPM(input, out range, double.NegativeInfinity, double.PositiveInfinity);
         }
@@ -472,10 +472,16 @@ namespace IronSearch
             }
 
             bool hasLeadingPipe = expression.StartsWith("|");
-            if (hasLeadingPipe) expression = expression[1..];
+            if (hasLeadingPipe)
+            {
+                expression = expression[1..];
+            }
 
             bool hasTrailingPipe = expression.EndsWith("|");
-            if (hasTrailingPipe) expression = expression[..^1];
+            if (hasTrailingPipe)
+            {
+                expression = expression[..^1];
+            }
 
             if (expression.Length == 0)
             {
@@ -678,15 +684,29 @@ namespace IronSearch
             difficulties = new string[5];
 
             if (availableMaps.Contains(1))
+            {
                 difficulties[0] = musicInfo.difficulty1;
+            }
+
             if (availableMaps.Contains(2))
+            {
                 difficulties[1] = musicInfo.difficulty2;
+            }
+
             if (availableMaps.Contains(3))
+            {
                 difficulties[2] = musicInfo.difficulty3;
+            }
+
             if (availableMaps.Contains(4))
+            {
                 difficulties[3] = musicInfo.difficulty4;
+            }
+
             if (availableMaps.Contains(5))
+            {
                 difficulties[4] = musicInfo.difficulty5;
+            }
 
             return true;
         }
@@ -729,7 +749,9 @@ namespace IronSearch
                     using var archive = new ZipArchive(fs, ZipArchiveMode.Read);
                     var entry = archive.GetEntry("cinema.json");
                     if (entry == null)
+                    {
                         return false;
+                    }
 
                     using (var reader = new StreamReader(entry.Open()))
                     using (var jsonReader = new JsonTextReader(reader))
@@ -810,7 +832,7 @@ namespace IronSearch
             return GetCustomAlbumsSaveInternal();
         }
 
-        static object? GetCustomAlbumsSaveInternal()
+        private static object? GetCustomAlbumsSaveInternal()
         {
             var saveManagerType = AccessTools.TypeByName("CustomAlbums.Managers.SaveManager");
             var saveDataField = AccessTools.Field(saveManagerType, "SaveData");
@@ -833,7 +855,9 @@ namespace IronSearch
         public static Vector2 GetCaretVectorPosition(this InputField inputField)
         {
             if (inputField == null || inputField.textComponent == null)
+            {
                 return GetFallback(inputField);
+            }
 
             var text = inputField.textComponent;
             var gen = text.cachedTextGenerator;
@@ -869,7 +893,9 @@ namespace IronSearch
             Camera? cam = null;
 
             if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            {
                 cam = canvas.worldCamera;
+            }
 
             var sc = RectTransformUtility.WorldToScreenPoint(cam, finalWorld);
             return sc;
@@ -878,11 +904,15 @@ namespace IronSearch
         private static Vector2 GetFallback(InputField? inputField)
         {
             if (inputField == null)
+            {
                 return Vector2.zero;
+            }
 
             RectTransform rt = inputField.GetComponent<RectTransform>();
             if (rt == null)
+            {
                 return Vector2.zero;
+            }
 
             Vector3[] corners = new Vector3[4];
             rt.GetWorldCorners(corners);
@@ -893,13 +923,15 @@ namespace IronSearch
             Camera? cam = null;
 
             if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            {
                 cam = canvas.worldCamera;
+            }
 
             var sc = RectTransformUtility.WorldToScreenPoint(cam, bottomLeft);
             return sc;
         }
 
-        public static bool TryTimeStringRangeToTimeRange(this string s, [MaybeNullWhen(false)]out Range r)
+        public static bool TryTimeStringRangeToTimeRange(this string s, [MaybeNullWhen(false)] out Range r)
         {
             r = null;
             if (string.IsNullOrWhiteSpace(s))
@@ -940,7 +972,7 @@ namespace IronSearch
                 var start = ts.TotalSeconds;
                 if (split[1].Length == 0)
                 {
-                    r = new Range(double.NegativeInfinity, start+0.5)
+                    r = new Range(double.NegativeInfinity, start + 0.5)
                     {
                         ExclusiveEnd = true
                     };
@@ -1019,7 +1051,7 @@ namespace IronSearch
             }
             ts = new TimeSpan(totalTicks);
             return true;
-            
+
         }
 
 

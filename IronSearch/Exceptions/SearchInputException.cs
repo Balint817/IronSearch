@@ -5,7 +5,7 @@ using IronPython.Runtime.Operations;
 using IronSearch.Records;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
-using Range= IronSearch.Records.Range;
+using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Exceptions
 {
@@ -42,7 +42,7 @@ namespace IronSearch.Exceptions
 
             var varKwargsArray = VarKwargs.ToArray();
 
-            for (int i = 0; i < VarArgs.Length-1; i++)
+            for (int i = 0; i < VarArgs.Length - 1; i++)
             {
                 var arg = VarArgs[i];
                 sb.Append(FormatArg(arg));
@@ -58,7 +58,7 @@ namespace IronSearch.Exceptions
                 }
             }
 
-            for (int i = 0; i < varKwargsArray.Length-1; i++)
+            for (int i = 0; i < varKwargsArray.Length - 1; i++)
             {
                 var kwarg = varKwargsArray[i];
                 sb.Append(kwarg.Key).Append('=').Append(FormatArg(kwarg.Value));
@@ -75,8 +75,16 @@ namespace IronSearch.Exceptions
         }
         private static string FormatArg(dynamic? arg)
         {
-            if (arg is null) return "None";
-            if (arg is string s) return JsonConvert.SerializeObject(s);
+            if (arg is null)
+            {
+                return "None";
+            }
+
+            if (arg is string s)
+            {
+                return JsonConvert.SerializeObject(s);
+            }
+
             switch (arg)
             {
                 case int or double or bool:
@@ -88,7 +96,7 @@ namespace IronSearch.Exceptions
                         {
                             return "0j";
                         }
-                        return JsonConvert.SerializeObject(complex.Imaginary)+"j";
+                        return JsonConvert.SerializeObject(complex.Imaginary) + "j";
                     }
                     else if (complex.Imaginary == 0)
                     {

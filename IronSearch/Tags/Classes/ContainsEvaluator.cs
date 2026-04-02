@@ -1,14 +1,14 @@
-using System.Text.RegularExpressions;
 using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Exceptions;
 using IronSearch.Records;
+using System.Text.RegularExpressions;
 
 namespace IronSearch.Tags
 {
     internal static partial class BuiltIns
     {
-        internal abstract class ContainsEvaluator: Evaluator
+        internal abstract class ContainsEvaluator : Evaluator
         {
             public abstract IEnumerable<string> GetStrings(MusicInfo musicInfo);
             public override bool Evaluate(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

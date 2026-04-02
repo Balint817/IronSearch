@@ -1,16 +1,14 @@
 ﻿using System.Collections.ObjectModel;
-using IronPython.Hosting;
-using Microsoft.Scripting.Hosting;
 
 namespace PythonExpressionManager
 {
-    public sealed class UserScriptManager: IDisposable
+    public sealed class UserScriptManager : IDisposable
     {
         public readonly string Folder;
         public readonly ScriptExecutor ScriptExecutor;
         public int DefaultPriority { get; set; }
-        readonly Dictionary<string, Script> _loadedScripts;
-        FileSystemWatcher _watcher;
+        private readonly Dictionary<string, Script> _loadedScripts;
+        private FileSystemWatcher _watcher;
         public readonly ReadOnlyDictionary<string, Script> LoadedScripts;
 
         private bool disposedValue;
@@ -58,7 +56,7 @@ namespace PythonExpressionManager
         private bool LoadScript(string filePath)
         {
             var scriptName = Path.GetFileName(filePath[..^3]);
-            if (!scriptName.IsValidVariableName(this.ScriptExecutor))
+            if (!scriptName.IsValidVariableName(ScriptExecutor))
             {
                 return false;
             }
@@ -68,7 +66,8 @@ namespace PythonExpressionManager
                 if (!ScriptExecutor.TryRegisterScript(scriptName, script))
                 {
                     return false;
-                };
+                }
+                ;
                 _loadedScripts.Add(scriptName, script);
                 return true;
             }

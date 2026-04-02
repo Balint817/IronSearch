@@ -1,9 +1,9 @@
-﻿using System.Collections.ObjectModel;
-using Il2CppInterop.Runtime.Injection;
+﻿using Il2CppInterop.Runtime.Injection;
 using IronSearch.Patches;
 using MelonLoader;
 using PopupLib.UI;
 using PythonExpressionManager;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace IronSearch.UI
@@ -35,22 +35,37 @@ namespace IronSearch.UI
 
             public SimpleDropdown? CurrentDropdown { get; private set; }
 
-            int GetMatchTier(string key, string input)
+            private int GetMatchTier(string key, string input)
             {
                 if (key.Equals(input, StringComparison.Ordinal))
+                {
                     return 0;
+                }
+
                 if (key.Equals(input, StringComparison.OrdinalIgnoreCase))
+                {
                     return 1;
+                }
 
                 if (key.StartsWith(input, StringComparison.Ordinal))
+                {
                     return 2;
+                }
+
                 if (key.StartsWith(input, StringComparison.OrdinalIgnoreCase))
+                {
                     return 3;
+                }
 
                 if (key.Contains(input, StringComparison.Ordinal))
+                {
                     return 4;
+                }
+
                 if (key.Contains(input, StringComparison.OrdinalIgnoreCase))
+                {
                     return 5;
+                }
 
                 return 6;
             }
@@ -121,10 +136,14 @@ namespace IronSearch.UI
                 int[,] dp = new int[a.Length + 1, b.Length + 1];
 
                 for (int i = 0; i <= a.Length; i++)
+                {
                     dp[i, 0] = i;
+                }
 
                 for (int j = 0; j <= b.Length; j++)
+                {
                     dp[0, j] = j;
+                }
 
                 for (int i = 1; i <= a.Length; i++)
                 {
@@ -143,9 +162,9 @@ namespace IronSearch.UI
                 return dp[a.Length, b.Length];
             }
         }
-        static CurrentCompleteInfo? CurrentInfo;
-        
-        static Dictionary<string, KeywordInfo> currentKeywords = new();
+        private static CurrentCompleteInfo? CurrentInfo;
+
+        private static Dictionary<string, KeywordInfo> currentKeywords = new();
         public static readonly Dictionary<string, KeywordInfo> AllKeywords = new()
         {
             ["bool"] = new("bool", 1),
@@ -332,7 +351,7 @@ namespace IronSearch.UI
                 findKeyword,
                 startIndex,
                 endIndex,
-                currentKeywords, (s,i) =>
+                currentKeywords, (s, i) =>
                 {
                     var kw = currentKeywords[s].Value;
                     var fullText = findKeyword;
@@ -346,7 +365,7 @@ namespace IronSearch.UI
 
         }
 
-        static void SetText(string newText, int newCaret)
+        private static void SetText(string newText, int newCaret)
         {
             var inputField = SearchFocusPatch.inputField;
             if (inputField == null)

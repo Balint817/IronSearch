@@ -1,12 +1,12 @@
-using System.Numerics;
 using IronSearch.Exceptions;
+using System.Numerics;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        static readonly Range evalRandomArgCount = new(0, 2);
+        private static readonly Range evalRandomArgCount = new(0, 2);
         internal static dynamic EvalRandom(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs, "Random", varArgs, varKwargs);

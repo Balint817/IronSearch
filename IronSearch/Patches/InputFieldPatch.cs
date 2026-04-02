@@ -10,7 +10,7 @@ namespace IronSearch.Patches
     internal class SearchFocusPatch
     {
         internal static PeroInputField? inputField;
-        static void Postfix(PnlMusicSearchItem __instance, bool focus)
+        private static void Postfix(PnlMusicSearchItem __instance, bool focus)
         {
             if (focus)
             {
@@ -37,7 +37,7 @@ namespace IronSearch.Patches
     [HarmonyPatch(typeof(PnlMusicSearchItem), "OnTextChanged")]
     internal class SearchTextChangedPatch
     {
-        static void Postfix(PnlMusicSearchItem __instance)
+        private static void Postfix(PnlMusicSearchItem __instance)
         {
             AutoCompleteManager.StopCurrentAutoComplete();
         }

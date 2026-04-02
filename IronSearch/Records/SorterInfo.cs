@@ -1,15 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using Il2CppAssets.Scripts.Database;
+﻿using Il2CppAssets.Scripts.Database;
+using System.Collections.ObjectModel;
 
 namespace IronSearch.Records
 {
-    public class SorterInfo: IComparable<SorterInfo>
+    public class SorterInfo : IComparable<SorterInfo>
     {
-        static ulong _idTracker = 0;
+        private static ulong _idTracker = 0;
 
         internal readonly ulong _id = _idTracker++;
 
-        List<dynamic> _comparers;
+        private List<dynamic> _comparers;
         public ReadOnlyCollection<dynamic> Comparers { get; private init; }
         public int Priority { get; }
         public bool Reverse { get; }
@@ -58,11 +58,15 @@ namespace IronSearch.Records
         public int CompareTo(SorterInfo? other)
         {
             if (other is null)
+            {
                 return 1; // this instance is greater than null
+            }
 
             var t = Priority.CompareTo(other.Priority);
             if (t != 0)
+            {
                 return t;
+            }
 
             return _id.CompareTo(other._id);
         }

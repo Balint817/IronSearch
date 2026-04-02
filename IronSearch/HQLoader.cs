@@ -29,7 +29,9 @@ namespace IronSearch
                 var data = JsonConvert.DeserializeObject<HQResponse>(json);
 
                 if (data?.charts != null)
+                {
                     allCharts.AddRange(data.charts);
+                }
 
                 totalPages = data?.totalPages ?? 0;
                 currentPage++;
@@ -37,11 +39,15 @@ namespace IronSearch
                 // should let this throw in case there's a server error,
                 // just so we don't save a half-complete backup
                 if (data!.charts.Count == 0)
+                {
                     break;
+                }
 
                 // break if we pass the latest backup
                 if (data.charts.SelectMany(x => x.sheets).Any(x => result.ContainsKey(x.hash)))
+                {
                     break;
+                }
             }
 
             foreach (var chart in allCharts)
@@ -68,14 +74,14 @@ namespace IronSearch
         private static readonly string HQRankingBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, HQRankingBackupFile);
         private static async Task CreateBackup(Dictionary<string, bool> result)
         {
-            await File.WriteAllTextAsync(HQRankingBackupFilePath , JsonConvert.SerializeObject(result));
+            await File.WriteAllTextAsync(HQRankingBackupFilePath, JsonConvert.SerializeObject(result));
         }
 
         private static bool TryLoadBackup(out Dictionary<string, bool> result)
         {
             try
             {
-                result = JsonConvert.DeserializeObject<Dictionary<string,bool>>(File.ReadAllText(HQRankingBackupFile))!;
+                result = JsonConvert.DeserializeObject<Dictionary<string, bool>>(File.ReadAllText(HQRankingBackupFile))!;
                 if (result is null)
                 {
                     result = new();
