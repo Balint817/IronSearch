@@ -33,11 +33,11 @@ namespace IronSearch.Tags
                     }
                     return GetPairs(M.I).Any(kv => mr0.Contains(kv.Value));
                 }
+                ThrowIfNotMatching(varArgs, argRange, EvaluatorName, varArgs, varKwargs);
+
                 MultiRange mr1 = MultiRangeArgumentParser.GetMultiRange(varArgs[1], EvaluatorName, varArgs, varKwargs);
 
                 varArgs = varArgs[2..];
-
-                ThrowIfNotMatching(varArgs, argRange, EvaluatorName, varArgs, varKwargs);
 
                 if (mr1 == MultiRange.InvalidRange)
                 {

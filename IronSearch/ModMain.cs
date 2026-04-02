@@ -146,6 +146,8 @@ namespace IronSearch
             catch (Exception) { }
             HQLoadTask = null!;
 
+            RefreshPatch.workerManager?.Dispose();
+
             ScriptManager?.Dispose();
 
         }

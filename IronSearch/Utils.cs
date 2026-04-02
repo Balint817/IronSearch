@@ -748,9 +748,8 @@ namespace IronSearch
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MelonLogger.Msg(ConsoleColor.DarkRed, ex.ToString());
                 // catch silently
             }
 

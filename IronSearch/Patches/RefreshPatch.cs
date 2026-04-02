@@ -62,6 +62,8 @@ namespace IronSearch.Patches
             isAdvancedSearch = false;
         }
         private static bool IsFirstCall = true;
+
+        internal static MusicSearchWorkerManager? workerManager;
         internal static bool Prefix(SearchResults __instance, string keyword)
         {
             isAdvancedSearch = false;
@@ -136,130 +138,17 @@ namespace IronSearch.Patches
                 Math.Max(allMusic.Count / 100, 4)
             );
 
-            var options = new ParallelOptions
-            {
-                MaxDegreeOfParallelism = processorCount
-            };
+            workerManager ??= new(processorCount);
 
-            var asyncResults = new ConcurrentBag<MusicInfo>();
-            var failed = false;
-
-            try
-            {
-                // AI FTW LETS GOOOOO
-                // IMPORTANT:
-                // Avoid attaching IL2CPP to ThreadPool threads (Parallel.ForEach) because they live for the
-                // lifetime of the process; leaking attached threads causes huge/unbounded shutdown delays.
-                // Instead, create dedicated worker threads that attach+detach deterministically.
-                var workerCount = Math.Clamp(processorCount, 1, Math.Max(1, allMusic.Count));
-                var chunkSize = (allMusic.Count + workerCount - 1) / workerCount;
-
-                int stop = 0;
-                var threads = new Thread[workerCount];
-
-                for (int w = 0; w < workerCount; w++)
-                {
-                    int start = w * chunkSize;
-                    int end = Math.Min(allMusic.Count, start + chunkSize);
-
-                    threads[w] = new Thread(() =>
-                    {
-                        if (start >= end)
-                        {
-                            return;
-                        }
-
-                        nint threadPtr = 0;
-                        try
-                        {
-                            threadPtr = IL2CPP.il2cpp_thread_attach(IL2CPP.il2cpp_domain_get());
-                            var arg = new SearchArgument(null!, new PeroString(1000));
-
-                            for (int i = start; i < end; i++)
-                            {
-                                if (Volatile.Read(ref stop) != 0)
-                                {
-                                    break;
-                                }
-
-                                var music = allMusic[i];
-                                try
-                                {
-                                    arg.I = music;
-                                    if (ModMain.ScriptManager.ScriptExecutor.Evaluate(arg, compiledScript))
-                                    {
-                                        asyncResults.Add(music);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (ex is TerminateSearchException ts)
-                                    {
-                                        if (ts.IsTrue)
-                                        {
-                                            asyncResults.Add(music);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (!failed)
-                                        {
-                                            failed = true;
-                                            try
-                                            {
-                                                if (!CompiledScript.TryConvertException(ex))
-                                                {
-                                                    throw;
-                                                }
-                                            }
-                                            catch (Exception ex2)
-                                            {
-                                                new SearchResponse(ex2, SearchResponse.Type.RuntimeError).PrintSearchError();
-                                            }
-                                        }
-                                        Volatile.Write(ref stop, 1);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            if (threadPtr != 0)
-                            {
-                                // Detach on the same OS thread that attached.
-                                IL2CPP.il2cpp_thread_detach(threadPtr);
-                            }
-                        }
-                    })
-                    {
-                        IsBackground = true,
-                        Name = $"IronSearch.AdvSearchWorker.{w}"
-                    };
-
-                    threads[w].Start();
-                }
-
-                foreach (var t in threads)
-                {
-                    t.Join();
-                }
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Msg(ConsoleColor.DarkRed, $"Parallel execution failed:\n{ex}");
-            }
-
-            if (failed)
+            if (!workerManager.Run(allMusic.ToSystem(), compiledScript, out var results))
             {
                 _sw.Stop();
                 isAdvancedSearch = null;
                 return false;
             }
 
-
             // restore default order (for determinism)
-            var matchedUids = asyncResults.Select(x => x.uid).ToHashSet();
+            var matchedUids = results.Select(x => x.uid).ToHashSet();
 
             foreach (var item in allMusic)
             {
@@ -270,7 +159,6 @@ namespace IronSearch.Patches
             }
 
             _sw.Stop();
-
 
             MelonLogger.Msg($"Advanced search found {__instance.musicResult.m_Unlock.Count} songs in {_sw.Elapsed.TotalSeconds:F1}s.");
             _sw.Restart();
