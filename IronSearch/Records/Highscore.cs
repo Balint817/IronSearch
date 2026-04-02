@@ -34,7 +34,7 @@ namespace IronSearch.Records
                     {
                         return _accStrParsed;
                     }
-                    _accStrParsed = (Utils.TryParseFloat(AccuracyStr[..^1], out var x) ? x : null);
+                    _accStrParsed = (Utils.TryParseFloat(AccuracyStr[..^1], out var x) ? x/100 : null);
                 }
                 return _accStrParsed;
             }
