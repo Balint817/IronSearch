@@ -117,7 +117,7 @@ namespace IronSearch
                         _failed = true;
                         try
                         {
-                            if (!CompiledScript.TryConvertException(ex))
+                            if (!CompiledScript.TryConvertException(ex, ModMain.ScriptManager.ScriptExecutor.Engine))
                             {
                                 throw;
                             }

@@ -61,7 +61,7 @@ namespace PythonExpressionManager
             Function = functionWrapper(Scripts);
         }
 
-        public static bool TryConvertException(Exception wrappedEx, ScriptEngine? engine = null)
+        public static bool TryConvertException(Exception wrappedEx, ScriptEngine? engine)
         {
             switch (wrappedEx)
             {

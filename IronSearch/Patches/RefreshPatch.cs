@@ -121,7 +121,17 @@ namespace IronSearch.Patches
             {
                 isAdvancedSearch = null;
                 _sw.Stop();
-                new SearchResponse("Failed to parse search.", ex, SearchResponse.Type.ParserError).PrintSearchError();
+                try
+                {
+                    if (!CompiledScript.TryConvertException(ex, ModMain.ScriptManager.ScriptExecutor.Engine))
+                    {
+                        throw;
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    new SearchResponse("Failed to parse search.", ex2, SearchResponse.Type.ParserError).PrintSearchError();
+                }
                 return false;
             }
 
