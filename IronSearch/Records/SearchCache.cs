@@ -1,6 +1,6 @@
 ﻿using Il2CppAssets.Scripts.Database;
 
-namespace IronSearch.Patches
+namespace IronSearch.Records
 {
     internal class SearchCache
     {

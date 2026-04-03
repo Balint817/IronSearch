@@ -1,3 +1,5 @@
+using IronSearch.Loaders;
+
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
@@ -8,7 +10,7 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varKwargs, "GetLength", varArgs, varKwargs);
             ThrowIfNotEmpty(varArgs, "GetLength", varArgs, varKwargs);
 
-            var l = AudioHelper.GetMusicLength(M.I);
+            var l = LengthLoader.GetMusicLength(M.I);
             if (l is { } ts)
             {
                 return ts.TotalSeconds;

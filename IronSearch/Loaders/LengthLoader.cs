@@ -14,10 +14,10 @@ using System.Diagnostics;
 using System.IO.Compression;
 using UnityEngine;
 
-namespace IronSearch
+namespace IronSearch.Loaders
 {
 
-    public static class AudioHelper
+    public static class LengthLoader
     {
         private const string AudioLengthBackupFile = "chartLengthSearchCache.json";
         private static readonly string AudioLengthBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, AudioLengthBackupFile);

@@ -14,6 +14,8 @@ using System.Collections.ObjectModel;
 using System.Net;
 using IronSearch.Config;
 using IronSearch.Utils;
+using IronSearch.Core;
+using IronSearch.Loaders;
 
 namespace IronSearch
 {
@@ -40,14 +42,14 @@ namespace IronSearch
         {
 
             cts.Cancel();
-            AudioHelper.customCts.Cancel();
+            LengthLoader.customCts.Cancel();
 
             try
             {
-                AudioHelper.CustomCacheTask?.Dispose();
+                LengthLoader.CustomCacheTask?.Dispose();
             }
             catch (Exception) { }
-            AudioHelper.CustomCacheTask = null!;
+            LengthLoader.CustomCacheTask = null!;
 
             try
             {
@@ -220,7 +222,7 @@ namespace IronSearch
                 return;
             }
             _initStepTracker = false;
-            AudioHelper.LoadVanillaCache();
+            LengthLoader.LoadVanillaCache();
             _initStepTracker = null;
         }
         public override void OnLateInitializeMelon()
@@ -232,7 +234,7 @@ namespace IronSearch
             if (CustomAlbumsLoaded)
             {
                 InitLogic.LoadCinema();
-                AudioHelper.CustomCacheTask = AudioHelper.BuildCustomCache(AudioHelper.customCts.Token);
+                LengthLoader.CustomCacheTask = LengthLoader.BuildCustomCache(LengthLoader.customCts.Token);
                 InitLogic.LoadCustomDict();
             }
             InitLogic.LoadAlbumNames();

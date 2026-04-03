@@ -2,6 +2,7 @@ using Il2CppAssets.Scripts.Database;
 using Il2CppPeroTools2.PeroString;
 using IronPython.Runtime;
 using IronPython.Runtime.Operations;
+using IronSearch.Core;
 using IronSearch.Records;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;

@@ -1,4 +1,5 @@
 using IronSearch.Exceptions;
+using IronSearch.Utils;
 using System.Numerics;
 using Range = IronSearch.Records.Range;
 

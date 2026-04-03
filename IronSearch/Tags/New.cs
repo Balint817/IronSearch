@@ -1,5 +1,6 @@
 using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
 
 namespace IronSearch.Tags
 {

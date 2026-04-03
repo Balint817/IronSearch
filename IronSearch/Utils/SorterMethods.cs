@@ -1,10 +1,11 @@
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using IronSearch.Exceptions;
+using IronSearch.Loaders;
+using IronSearch.Patches;
 using IronSearch.Tags;
-using IronSearch.Utils;
 
-namespace IronSearch.Patches
+namespace IronSearch.Utils
 {
 
     //[HarmonyLib.HarmonyPatch(typeof(SearchResults), "Merge")]
@@ -151,8 +152,8 @@ namespace IronSearch.Patches
             {
                 throw new SearchCallNotAllowed("ByLength()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
-            var length1null = AudioHelper.GetMusicLength(musicInfo1);
-            var length2null = AudioHelper.GetMusicLength(musicInfo2);
+            var length1null = LengthLoader.GetMusicLength(musicInfo1);
+            var length2null = LengthLoader.GetMusicLength(musicInfo2);
 
             if (length1null is not { } length1)
             {

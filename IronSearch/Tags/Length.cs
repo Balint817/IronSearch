@@ -1,4 +1,6 @@
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
+using IronSearch.Loaders;
 
 namespace IronSearch.Tags
 {
@@ -9,7 +11,7 @@ namespace IronSearch.Tags
             public override string EvaluatorName => "Length";
             public override IEnumerable<double> GetDoubles(MusicInfo musicInfo)
             {
-                var length = AudioHelper.GetMusicLength(musicInfo);
+                var length = LengthLoader.GetMusicLength(musicInfo);
                 if (length is not { } ts)
                 {
                     return Array.Empty<double>();

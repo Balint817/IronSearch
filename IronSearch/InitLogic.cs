@@ -2,6 +2,7 @@
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
+using IronSearch.Loaders;
 using IronSearch.Tags;
 using IronSearch.Utils;
 using MelonLoader;
@@ -28,12 +29,12 @@ namespace IronSearch
             if (ModMain.InitSuccessful && IsFirstLengthCacheBuild)
             {
                 IsFirstLengthCacheBuild = false;
-                if (AudioHelper.VanillaCache?.IsEmpty ?? true)
+                if (LengthLoader.VanillaCache?.IsEmpty ?? true)
                 {
                     var s = "Re-building length cache, this may take a while!";
                     MelonLogger.Msg(System.ConsoleColor.Magenta, s);
                 }
-                AudioHelper.ForceBuildVanillaCache();
+                LengthLoader.ForceBuildVanillaCache();
             }
         }
         internal static void LoadAlbumNames()

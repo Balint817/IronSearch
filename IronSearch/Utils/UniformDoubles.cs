@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace IronSearch
+namespace IronSearch.Utils
 {
 
     public static class UniformDouble

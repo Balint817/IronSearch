@@ -1,5 +1,5 @@
 ﻿using Il2CppAssets.Scripts.Database;
-using IronSearch.Patches;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {

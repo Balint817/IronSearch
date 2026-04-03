@@ -1,4 +1,5 @@
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
 using IronSearch.Patches;
 using IronSearch.Utils;
 

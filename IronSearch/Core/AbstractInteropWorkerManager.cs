@@ -1,6 +1,6 @@
 ﻿using Il2CppInterop.Runtime;
 
-namespace IronSearch
+namespace IronSearch.Core
 {
     public abstract class AbstractInteropWorkerManager<T, TState>
     {

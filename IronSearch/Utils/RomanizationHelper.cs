@@ -1,7 +1,7 @@
 ﻿using Romanization;
 using System.Collections.ObjectModel;
 
-namespace IronSearch
+namespace IronSearch.Utils
 {
     public static class RomanizationHelper
     {
@@ -14,6 +14,18 @@ namespace IronSearch
             return new(input.SelectMany(x => GetAllRomanizations(x)).Distinct().ToArray());
         }
         private static readonly ReadOnlyCollection<string> _empty = new(Array.Empty<string>());
+
+        private static readonly ThreadLocal<IRomanizationSystem[]> romanizationSystems = new(() =>
+        {
+            return new IRomanizationSystem[]
+            {
+                new Japanese.ModifiedHepburn(),
+                new Japanese.KanjiReadings(),
+                new Chinese.HanyuPinyin(),
+                new Korean.RevisedRomanization(),
+                new Korean.HanjaReadings(),
+            };
+        });
         public static ReadOnlyCollection<string> GetAllRomanizations(string input)
         {
             if (input is null)
@@ -25,42 +37,22 @@ namespace IronSearch
                 return cached;
             }
 
-            var results = new HashSet<string>();
-
-            try
+            var results = new HashSet<string>()
             {
-                var processed = new Japanese.ModifiedHepburn();
-                results.Add(processed.Process(input));
-            }
-            catch { }
+                input
+            };
 
-            try
-            {
-                var processed = new Japanese.KanjiReadings();
-                results.Add(processed.Process(input));
-            }
-            catch { }
+            var systems = romanizationSystems.Value!;
 
-            try
+            for (int i = 0; i < systems.Length; i++)
             {
-                var processed = new Chinese.HanyuPinyin();
-                results.Add(processed.Process(input));
+                var system = systems[i];
+                try
+                {
+                    results.Add(system.Process(input));
+                }
+                catch {}
             }
-            catch { }
-
-            try
-            {
-                var processed = new Korean.RevisedRomanization();
-                results.Add(processed.Process(input));
-            }
-            catch { }
-
-            try
-            {
-                var processed = new Korean.HanjaReadings();
-                results.Add(processed.Process(input));
-            }
-            catch { }
 
             cached = new(results.ToArray());
             _cache.TryAdd(input, cached);

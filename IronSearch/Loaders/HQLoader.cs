@@ -2,7 +2,7 @@
 using MelonLoader.Utils;
 using Newtonsoft.Json;
 
-namespace IronSearch
+namespace IronSearch.Loaders
 {
     public class HQLoader
     {

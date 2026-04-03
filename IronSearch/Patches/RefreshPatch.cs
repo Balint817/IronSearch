@@ -8,6 +8,8 @@ using Il2CppAssets.Scripts.PeroTools.GeneralLocalization;
 using Il2CppAssets.Scripts.Structs.Modules;
 using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
+using IronSearch.Core;
+using IronSearch.Infrastructure;
 using IronSearch.Records;
 using IronSearch.Tags;
 using IronSearch.Utils;

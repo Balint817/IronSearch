@@ -1,11 +1,12 @@
 ﻿using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
 using IronSearch.Exceptions;
 using IronSearch.Records;
 using IronSearch.Utils;
 using PythonExpressionManager;
 using System.Diagnostics.CodeAnalysis;
 
-namespace IronSearch
+namespace IronSearch.Infrastructure
 {
     internal class SearchState
     {

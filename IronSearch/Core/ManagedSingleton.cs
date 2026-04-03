@@ -1,4 +1,4 @@
-﻿namespace IronSearch
+﻿namespace IronSearch.Core
 {
     public static class ManagedSingleton<T> where T : new()
     {

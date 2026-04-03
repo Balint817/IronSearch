@@ -6,7 +6,7 @@ using MelonLoader.Utils;
 using PythonExpressionManager;
 using System.Collections.ObjectModel;
 
-namespace IronSearch
+namespace IronSearch.Core
 {
     public class AdvancedSearchManager : IDisposable
     {
