@@ -1,11 +1,10 @@
 using IronSearch.Exceptions;
-using System.Collections.Concurrent;
 
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        static readonly object runSyncLock = new();
+        private static readonly object runSyncLock = new();
         internal static bool EvalRunSync(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             lock (runSyncLock)
