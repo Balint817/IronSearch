@@ -21,7 +21,7 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCinemaInternal(MusicInfo musicInfo)
         {
-            var customInfo = (Album)ModMain.uidToAlbum[musicInfo.uid];
+            var customInfo = (Album)ModMain.uidToCustom[musicInfo.uid];
             if (!customInfo.IsPackaged)
             {
                 return Utils.TryParseCinemaJson(customInfo, false);

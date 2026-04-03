@@ -96,7 +96,7 @@ namespace IronSearch
             {
                 state!.Arg.I = music;
 
-                if (ModMain.ScriptManager.ScriptExecutor.Evaluate(state.Arg, _script))
+                if (ModMain.SearchManager.ScriptManager.ScriptExecutor.Evaluate(state.Arg, _script))
                 {
                     state.Results.Add(music);
                 }
@@ -117,7 +117,7 @@ namespace IronSearch
                         _failed = true;
                         try
                         {
-                            if (!CompiledScript.TryConvertException(ex, ModMain.ScriptManager.ScriptExecutor.Engine))
+                            if (!CompiledScript.TryConvertException(ex, ModMain.SearchManager.ScriptManager.ScriptExecutor.Engine))
                             {
                                 throw;
                             }

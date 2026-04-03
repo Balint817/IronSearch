@@ -10,7 +10,7 @@ namespace IronSearch.Patches
         private static long? defaultLValue = null;
         internal static void Prefix(PnlMusicSearchItem __instance, string text)
         {
-            if (ModMain.StartString is null || !text.StartsWith(ModMain.StartString, StringComparison.InvariantCultureIgnoreCase))
+            if (ModMain.Config.StartString is null || !text.StartsWith(ModMain.Config.StartString, StringComparison.InvariantCultureIgnoreCase))
             {
                 if (defaultValue is { } reset)
                 {
@@ -25,8 +25,8 @@ namespace IronSearch.Patches
                 defaultLValue = __instance.m_LCoolDownTime;
             }
 
-            __instance.m_CoolDownTime = defaultValue.Value * ModMain.WaitMultiplierFloat;
-            __instance.m_LCoolDownTime = (long)(defaultLValue!.Value * ModMain.WaitMultiplierFloat);
+            __instance.m_CoolDownTime = defaultValue.Value * ModMain.Config.WaitMultiplierFloat;
+            __instance.m_LCoolDownTime = (long)(defaultLValue!.Value * ModMain.Config.WaitMultiplierFloat);
 
         }
     }

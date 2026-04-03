@@ -16,7 +16,7 @@ namespace IronSearch.Tags
         }
         internal static DateTime GetModifiedInternal(MusicInfo musicInfo)
         {
-            var album = (Album)ModMain.uidToAlbum[musicInfo.uid];
+            var album = (Album)ModMain.uidToCustom[musicInfo.uid];
             return File.GetLastWriteTimeUtc(album.Path);
         }
         internal static dynamic EvalGetModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

@@ -244,23 +244,23 @@ namespace IronSearch.UI
             }
             var findKeyword = inputField.text;
 
-            if (ModMain.StartString is null || findKeyword?.StartsWith(ModMain.StartString, StringComparison.InvariantCultureIgnoreCase) != true)
+            if (ModMain.Config.StartString is null || findKeyword?.StartsWith(ModMain.Config.StartString, StringComparison.InvariantCultureIgnoreCase) != true)
             {
                 return;
             }
 
             int caretPosition = inputField.caretPosition;
-            if (caretPosition < ModMain.StartString.Length)
+            if (caretPosition < ModMain.Config.StartString.Length)
             {
                 return;
             }
 
             currentKeywords = AllKeywords.ToDictionary(x => x.Key, x => x.Value);
 
-            var scriptExecutor = ModMain.ScriptManager.ScriptExecutor;
+            var scriptExecutor = ModMain.SearchManager.ScriptManager.ScriptExecutor;
             try
             {
-                foreach (var item in ModMain.AutoCompleteItems)
+                foreach (var item in ModMain.Config.AutoCompleteItems)
                 {
                     var key = item.Key;
                     if (!key.IsValidVariableName(scriptExecutor))
@@ -300,7 +300,7 @@ namespace IronSearch.UI
             {
                 int i = caretPosition - 1;
 
-                while (i >= ModMain.StartString.Length &&
+                while (i >= ModMain.Config.StartString.Length &&
                        string.Concat("A", findKeyword.AsSpan(i, caretPosition - i))
                              .IsValidVariableName())
                 {
@@ -311,7 +311,7 @@ namespace IronSearch.UI
             }
 
 
-            if (caretPosition == ModMain.StartString.Length)
+            if (caretPosition == ModMain.Config.StartString.Length)
             {
                 if (caretPosition == findKeyword.Length)
                 {
@@ -379,7 +379,7 @@ namespace IronSearch.UI
 
         internal static void AddManagerKeywords()
         {
-            foreach (var item in ModMain.ScriptManager.ScriptExecutor.RegisteredKeys)
+            foreach (var item in ModMain.SearchManager.ScriptManager.ScriptExecutor.RegisteredKeys)
             {
                 AllKeywords.TryAdd(item.Key, new($"{item.Key}(", 0));
             }

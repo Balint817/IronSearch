@@ -28,7 +28,7 @@ namespace IronSearch.Tags
             }
             private static IEnumerable<string> GetStringsCustom_Title(MusicInfo mi)
             {
-                return RomanizationHelper.GetAllRomanizations(((Album)ModMain.uidToAlbum[mi.uid]).Info.NameRomanized);
+                return RomanizationHelper.GetAllRomanizations(((Album)ModMain.uidToCustom[mi.uid]).Info.NameRomanized);
             }
         }
         internal static bool EvalTitle(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

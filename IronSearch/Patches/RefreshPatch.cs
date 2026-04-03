@@ -63,7 +63,7 @@ namespace IronSearch.Patches
         internal static bool Prefix(SearchResults __instance, string keyword)
         {
             isAdvancedSearch = false;
-            if (IsFirstCall || string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.StartString, StringComparison.InvariantCultureIgnoreCase))
+            if (IsFirstCall || string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.Config.StartString, StringComparison.InvariantCultureIgnoreCase))
             {
                 IsFirstCall = false;
                 return true;
@@ -71,7 +71,7 @@ namespace IronSearch.Patches
 
             isAdvancedSearch = true;
 
-            string expression = keyword[ModMain.StartString.Length..].Trim();
+            string expression = keyword[ModMain.Config.StartString.Length..].Trim();
 
             BuiltIns.GlobalVariables.Clear();
             BuiltIns.LocalVariables.Clear();
@@ -90,7 +90,7 @@ namespace IronSearch.Patches
             var allMusic = new Il2CppSystem.Collections.Generic.List<MusicInfo>();
             GlobalDataBase.s_DbMusicTag.GetAllMusicInfo(allMusic);
 
-            if (ModMain.EnablePersistentSearchCaching && searchCache.TryGetValue(expression, out var cache))
+            if (ModMain.Config.EnablePersistentSearchCaching && searchCache.TryGetValue(expression, out var cache))
             {
                 CachedSearch(__instance, cache, allMusic);
                 return false;
@@ -115,7 +115,7 @@ namespace IronSearch.Patches
             CompiledScript compiledScript;
             try
             {
-                compiledScript = ModMain.ScriptManager.ScriptExecutor.Compile(expression);
+                compiledScript = ModMain.SearchManager.ScriptManager.ScriptExecutor.Compile(expression);
             }
             catch (Exception ex)
             {
@@ -123,7 +123,7 @@ namespace IronSearch.Patches
                 _sw.Stop();
                 try
                 {
-                    if (!CompiledScript.TryConvertException(ex, ModMain.ScriptManager.ScriptExecutor.Engine))
+                    if (!CompiledScript.TryConvertException(ex, ModMain.SearchManager.ScriptManager.ScriptExecutor.Engine))
                     {
                         throw;
                     }
@@ -222,7 +222,7 @@ namespace IronSearch.Patches
                         __instance.musicResult.m_Unlock = m_Unlock.ToIL2CPP();
 
 
-                        DateTime? expirationTime = ModMain.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(ModMain.MiniCacheTimeout);
+                        DateTime? expirationTime = ModMain.Config.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(AdvancedSearchManager.MiniCacheTimeout);
 
                         searchCache.TryAdd(expression, new SearchCache(new List<MusicInfo>(), m_Unlock, true, expirationTime));
                     }
@@ -237,7 +237,7 @@ namespace IronSearch.Patches
                 }
                 else
                 {
-                    DateTime? expirationTime = ModMain.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(ModMain.MiniCacheTimeout);
+                    DateTime? expirationTime = ModMain.Config.EnablePersistentSearchCaching ? null : DateTime.UtcNow.AddSeconds(AdvancedSearchManager.MiniCacheTimeout);
 
                     searchCache.TryAdd(expression,
                         new SearchCache(

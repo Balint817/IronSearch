@@ -670,7 +670,7 @@ namespace IronSearch
 
         private static HashSet<int> GetCustomMaps(MusicInfo musicInfo)
         {
-            return ((Album)ModMain.uidToAlbum[musicInfo.uid]).Sheets.Where(x => !string.IsNullOrEmpty(x.Value.Md5)).Select(x => x.Key).ToHashSet();
+            return ((Album)ModMain.uidToCustom[musicInfo.uid]).Sheets.Where(x => !string.IsNullOrEmpty(x.Value.Md5)).Select(x => x.Key).ToHashSet();
         }
 
         public static bool GetMapDifficulties(MusicInfo musicInfo, out string[] difficulties)

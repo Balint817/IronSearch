@@ -17,7 +17,7 @@ namespace IronSearch.Tags
 
         private static bool EvalPackedInternal(MusicInfo musicInfo)
         {
-            return ((Album)ModMain.uidToAlbum[musicInfo.uid]).IsPackaged;
+            return ((Album)ModMain.uidToCustom[musicInfo.uid]).IsPackaged;
         }
 
         internal static bool EvalPacked(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

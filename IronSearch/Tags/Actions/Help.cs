@@ -116,9 +116,9 @@ namespace IronSearch.Tags
                     return;
                 }
                 string? unaliasedName = null;
-                if (!ModMain.HelpStrings.TryGetValue(functionName, out var helpString))
+                if (!ModMain.SearchManager.HelpStrings.TryGetValue(functionName, out var helpString))
                 {
-                    if (!ModMain.Aliases.TryGetValue(functionName, out unaliasedName) || !ModMain.HelpStrings.TryGetValue(unaliasedName, out helpString))
+                    if (!ModMain.SearchManager.SuccessfulAliases.TryGetValue(functionName, out unaliasedName) || !ModMain.SearchManager.HelpStrings.TryGetValue(unaliasedName, out helpString))
                     {
                         MelonLogger.Msg(ConsoleColor.DarkCyan, $"It seems \"{functionName}\" does not work here (or if they do, they never told anybody what they actually do around here)");
                         return;

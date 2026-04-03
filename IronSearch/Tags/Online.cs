@@ -17,7 +17,7 @@ namespace IronSearch.Tags
 
         private static bool EvalOnlineInternal(MusicInfo musicInfo)
         {
-            return ((Album)ModMain.uidToAlbum[musicInfo.uid]).Sheets.Values.Any(x => ModMain._hqChartDict.ContainsKey(x.Md5));
+            return ((Album)ModMain.uidToCustom[musicInfo.uid]).Sheets.Values.Any(x => ModMain._hqChartDict.ContainsKey(x.Md5));
         }
 
         internal static bool EvalOnline(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

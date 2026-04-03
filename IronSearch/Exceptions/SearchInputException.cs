@@ -143,7 +143,7 @@ namespace IronSearch.Exceptions
                 case FuzzyContains fc:
                     return $"Fuzzy({(fc.Pattern is null ? "None" : $"{JsonConvert.SerializeObject(fc.Pattern)}")})";
                 case SearchArgument:
-                    return $"{ModMain.ArgumentName}";
+                    return $"{AdvancedSearchManager.ArgumentName}";
                 case MusicInfo:
                     return $"M.I";
                 case PeroString:

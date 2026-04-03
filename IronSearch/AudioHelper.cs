@@ -192,7 +192,7 @@ namespace IronSearch
 
         private static TimeSpan? GetCustomLengthDirect(string uid)
         {
-            var album = (Album)ModMain.uidToAlbum[uid];
+            var album = (Album)ModMain.uidToCustom[uid];
             try
             {
                 if (album.IsPackaged)
