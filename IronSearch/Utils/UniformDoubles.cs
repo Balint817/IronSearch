@@ -11,7 +11,7 @@ namespace IronSearch.Utils
             {
                 // Seed using time + thread id (simple but effective)
                 ulong seed = (ulong)DateTime.UtcNow.Ticks
-                           ^ (ulong)Thread.CurrentThread.ManagedThreadId * 0x9E3779B97F4A7C15UL;
+                           ^ (ulong)Environment.CurrentManagedThreadId * 0x9E3779B97F4A7C15UL;
                 return new SplitMix64(seed);
             });
 
@@ -23,9 +23,13 @@ namespace IronSearch.Utils
                 throw new ArgumentException("A must be < B");
             }
 
-            if (double.IsNaN(A) || double.IsNaN(B))
+            if (double.IsNaN(A))
             {
-                throw new ArgumentException();
+                throw new ArgumentException(nameof(A));
+            }
+            if (double.IsNaN(B))
+            {
+                throw new ArgumentException(nameof(B));
             }
 
             ulong a = ToOrdered(A);

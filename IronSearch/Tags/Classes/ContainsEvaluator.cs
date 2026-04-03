@@ -30,7 +30,7 @@ namespace IronSearch.Tags
             }
             public bool Evaluate(MusicInfo musicInfo, PeroString pStr, string value)
             {
-                return GetStrings(musicInfo).Any(x => x.LowerContains(value) || pStr.LowerContains(x, value));
+                return GetStrings(musicInfo).Any(x => pStr.LowerContains(x, value));
             }
             public bool Evaluate(MusicInfo musicInfo, Regex value)
             {
