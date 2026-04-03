@@ -1,6 +1,7 @@
 using IronSearch.Config;
 using IronSearch.Patches;
 using MelonLoader;
+using MelonLoader.Utils;
 
 namespace IronSearch
 {
@@ -64,7 +65,7 @@ namespace IronSearch
         internal void CreatePreferences()
         {
             _category = MelonPreferences.CreateCategory("IronSearch");
-            _category.SetFilePath("UserData/IronSearch.cfg", true, false);
+            _category.SetFilePath(Path.Join(MelonEnvironment.UserDataDirectory, "IronSearch.cfg"));
 
             _enableHQSpamEntry = _category.CreateEntry<bool>("EnableHQSpam", true, "EnableHQSpam",
                 "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.",
