@@ -1,5 +1,6 @@
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Exceptions;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {

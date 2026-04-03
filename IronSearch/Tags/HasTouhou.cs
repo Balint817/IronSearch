@@ -1,3 +1,5 @@
+using IronSearch.Utils;
+
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
@@ -7,7 +9,7 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varArgs, "Touhou", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "Touhou", varArgs, varKwargs);
 
-            Utils.GetAvailableMaps(M.I, out var availableMaps);
+            MapUtils.GetAvailableMaps(M.I, out var availableMaps);
             return availableMaps.Contains(4);
         }
     }

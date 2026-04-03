@@ -1,4 +1,5 @@
 using IronSearch.Exceptions;
+using IronSearch.Utils;
 using System.Collections.Concurrent;
 
 namespace IronSearch.Tags
@@ -11,7 +12,7 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varKwargs, "RunOnce", varArgs, varKwargs);
             ThrowIfNotMatching(varArgs, 2, "RunOnce", varArgs, varKwargs);
 
-            if (!Utils.IsCallable(varArgs[0]))
+            if (!PythonUtils.IsCallable(varArgs[0]))
             {
                 throw new SearchValidationException("RunOnce() requires a function with no arguments as the first argument.", "RunOnce", varArgs, varKwargs);
             }
@@ -28,7 +29,7 @@ namespace IronSearch.Tags
             }
             else
             {
-                if (Utils.GetPythonArgCount(varArgs[0]) != 0)
+                if (PythonUtils.GetPythonArgCount(varArgs[0]) != 0)
                 {
                     throw new SearchValidationException("RunOnce() requires a function with no arguments as the first argument.", "RunOnce", varArgs, varKwargs);
                 }

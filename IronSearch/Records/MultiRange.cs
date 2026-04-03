@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using IronSearch.Utils;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace IronSearch.Records
@@ -91,7 +92,7 @@ namespace IronSearch.Records
             {
                 return;
             }
-            _ranges = _ranges.SelectMany(Utils.InvertArray).ToList();
+            _ranges = _ranges.SelectMany(RangeUtils.InvertArray).ToList();
             Resolve();
         }
         public MultiRange Add(params Range[] ranges)

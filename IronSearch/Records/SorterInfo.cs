@@ -1,4 +1,5 @@
 ﻿using Il2CppAssets.Scripts.Database;
+using IronSearch.Utils;
 using System.Collections.ObjectModel;
 
 namespace IronSearch.Records
@@ -22,7 +23,7 @@ namespace IronSearch.Records
             }
             foreach (var item in _comparers)
             {
-                if (!Utils.IsCallable(item))
+                if (!PythonUtils.IsCallable(item))
                 {
                     throw new ArgumentException("one of the argument was not a comparer");
                 }
@@ -43,7 +44,7 @@ namespace IronSearch.Records
                 }
                 else
                 {
-                    var argCount = Utils.GetPythonArgCount(item);
+                    var argCount = PythonUtils.GetPythonArgCount(item);
                     if (argCount != 2)
                     {
                         throw new ArgumentException($"invalid comparer function, expected 2 arguments, got {argCount}");

@@ -10,6 +10,7 @@ using Il2CppAssets.Scripts.UI.Controls;
 using Il2CppPeroPeroGames.GlobalDefines;
 using IronSearch.Records;
 using IronSearch.Tags;
+using IronSearch.Utils;
 using MelonLoader;
 using Newtonsoft.Json;
 using PythonExpressionManager;
@@ -327,7 +328,7 @@ namespace IronSearch.Patches
         }
         private static void LoadCustomData()
         {
-            if (Utils.GetCustomAlbumsSave() is not CustomAlbumsSave save)
+            if (MapUtils.GetCustomAlbumsSave() is not CustomAlbumsSave save)
             {
                 return;
             }

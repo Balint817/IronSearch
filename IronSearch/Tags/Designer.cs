@@ -1,4 +1,5 @@
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {
@@ -14,7 +15,7 @@ namespace IronSearch.Tags
                     yield return item;
                 }
 
-                Utils.GetAvailableMaps(musicInfo, out var availableMaps);
+                MapUtils.GetAvailableMaps(musicInfo, out var availableMaps);
                 foreach (var i in availableMaps)
                 {
                     foreach (var item in RomanizationHelper.GetAllRomanizations(musicInfo.GetLevelDesignerStringByIndex(i)))

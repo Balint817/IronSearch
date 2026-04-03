@@ -1,6 +1,7 @@
 using IronPython.Runtime;
 using IronPython.Runtime.Operations;
 using IronSearch.Records;
+using IronSearch.Utils;
 using MelonLoader;
 using Newtonsoft.Json;
 using PythonExpressionManager;
@@ -84,7 +85,7 @@ namespace IronSearch.Tags
                     matched = false;
                     break;
                 default:
-                    if (Utils.IsCallable(arg0))
+                    if (PythonUtils.IsCallable(arg0))
                     {
                         MelonLogger.Msg(ConsoleColor.DarkCyan, $"This is a function!");
                     }

@@ -3,6 +3,7 @@ using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
 using IronSearch.Tags;
+using IronSearch.Utils;
 using MelonLoader;
 using System;
 using System.Collections.Generic;
@@ -63,7 +64,7 @@ namespace IronSearch
             try
             {
                 MelonLogger.Msg("Checking charts for cinemas, this shouldn't take long...");
-                BuiltIns.hasCinema = AlbumManager.LoadedAlbums.Values.Where(x => Utils.TryParseCinemaJson(x)).Select(x => x.Uid).ToHashSet();
+                BuiltIns.hasCinema = AlbumManager.LoadedAlbums.Values.Where(x => MapUtils.TryParseCinemaJson(x)).Select(x => x.Uid).ToHashSet();
                 MelonLogger.Msg("Cinema tag initialized");
                 BuiltIns.lastCheckedCinema = DateTime.UtcNow;
             }

@@ -1,6 +1,7 @@
 using IronPython.Runtime;
 using IronSearch.Exceptions;
 using IronSearch.Records;
+using IronSearch.Utils;
 using System.Numerics;
 using Range = IronSearch.Records.Range;
 
@@ -28,9 +29,9 @@ namespace IronSearch.Tags
                         }
                         return new Range((double)n, (double)n);
                     case string s:
-                        if (!Utils.ParseRange(s, out var range))
+                        if (!RangeUtils.ParseRange(s, out var range))
                         {
-                            if (allowTime && Utils.TryTimeStringRangeToTimeRange(s, out var time))
+                            if (allowTime && RangeUtils.TryTimeStringRangeToTimeRange(s, out var time))
                             {
                                 return time;
                             }

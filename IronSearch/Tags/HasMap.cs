@@ -1,4 +1,5 @@
 ﻿using Il2CppAssets.Scripts.Database;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {
@@ -9,7 +10,7 @@ namespace IronSearch.Tags
             public override string EvaluatorName => "Map";
             public override IEnumerable<double> GetDoubles(MusicInfo musicInfo)
             {
-                Utils.GetAvailableMaps(musicInfo, out var availableMaps);
+                MapUtils.GetAvailableMaps(musicInfo, out var availableMaps);
                 foreach (var item in availableMaps)
                 {
                     yield return item;

@@ -2,6 +2,7 @@
 using Il2CppAssets.Scripts.UI;
 using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
 using IronSearch.UI;
+using IronSearch.Utils;
 using UnityEngine;
 
 namespace IronSearch.Patches

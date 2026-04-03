@@ -13,6 +13,7 @@ using PythonExpressionManager;
 using System.Collections.ObjectModel;
 using System.Net;
 using IronSearch.Config;
+using IronSearch.Utils;
 
 namespace IronSearch
 {
@@ -136,9 +137,9 @@ namespace IronSearch
             _initStepTracker = false;
 
             Config.CreatePreferences();
-            CustomAlbumsLoaded = Utils.IsAssemblyLoaded("CustomAlbums");
-            HeadquartersLoaded = Utils.IsAssemblyLoaded("Headquarters");
-            PopupLibLoaded = Utils.IsAssemblyLoaded("PopupLib");
+            CustomAlbumsLoaded = MiscUtils.IsAssemblyLoaded("CustomAlbums");
+            HeadquartersLoaded = MiscUtils.IsAssemblyLoaded("Headquarters");
+            PopupLibLoaded = MiscUtils.IsAssemblyLoaded("PopupLib");
             if (!PopupLibLoaded)
             {
                 MelonLogger.Msg(System.ConsoleColor.Magenta, "PopupLib and/or KeybindManager is missing, certain features of the mod will be disabled.");

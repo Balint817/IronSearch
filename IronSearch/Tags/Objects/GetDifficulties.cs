@@ -1,4 +1,5 @@
 using IronPython.Runtime;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {
@@ -9,7 +10,7 @@ namespace IronSearch.Tags
         {
             ThrowIfNotEmpty(varArgs, "GetDifficulties", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "GetDifficulties", varArgs, varKwargs);
-            Utils.GetMapDifficulties(M.I, out var maps);
+            MapUtils.GetMapDifficulties(M.I, out var maps);
             var l = new PythonList();
             foreach (var map in maps)
             {

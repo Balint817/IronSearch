@@ -1,3 +1,5 @@
+using IronSearch.Utils;
+
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns
@@ -8,7 +10,7 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varArgs, "Hidden", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "Hidden", varArgs, varKwargs);
 
-            Utils.GetAvailableMaps(M.I, out var availableMaps);
+            MapUtils.GetAvailableMaps(M.I, out var availableMaps);
             return availableMaps.Contains(4);
         }
     }

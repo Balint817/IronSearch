@@ -1,5 +1,6 @@
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Records;
+using IronSearch.Utils;
 using System.Collections.Concurrent;
 using Range = IronSearch.Records.Range;
 
@@ -35,7 +36,7 @@ namespace IronSearch.Tags
             {
                 return;
             }
-            if (Utils.DetectParseBPM(musicInfo.bpm, out var range))
+            if (RangeUtils.DetectParseBPM(musicInfo.bpm, out var range))
             {
                 bpmDict[musicInfo.uid] = range;
                 return;

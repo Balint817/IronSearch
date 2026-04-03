@@ -1,4 +1,5 @@
 ﻿using Il2CppPeroPeroGames.GlobalDefines;
+using IronSearch.Utils;
 
 namespace IronSearch.Records
 {
@@ -34,7 +35,7 @@ namespace IronSearch.Records
                     {
                         return _accStrParsed;
                     }
-                    _accStrParsed = (Utils.TryParseFloat(AccuracyStr[..^1], out var x) ? x / 100 : null);
+                    _accStrParsed = (NumberUtils.TryParseFloat(AccuracyStr[..^1], out var x) ? x / 100 : null);
                 }
                 return _accStrParsed;
             }

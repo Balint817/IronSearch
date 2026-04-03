@@ -1,3 +1,5 @@
+using IronSearch.Utils;
+
 namespace IronSearch.Exceptions
 {
     /// <summary>
@@ -31,7 +33,7 @@ namespace IronSearch.Exceptions
         }
 
         /// <summary>
-        /// Builds a detailed message when <see cref="Utils.ParseRange"/> fails.
+        /// Builds a detailed message when <see cref="RangeUtils.ParseRange"/> fails.
         /// </summary>
         public static SearchParseException ForRange(
             string expression,
@@ -42,7 +44,7 @@ namespace IronSearch.Exceptions
             double min = double.NegativeInfinity,
             double max = double.PositiveInfinity)
         {
-            var result = Utils.ParseRange(expression, out _, min, max, out var reason);
+            var result = RangeUtils.ParseRange(expression, out _, min, max, out var reason);
             if (result == true)
             {
                 throw new InvalidOperationException("ForRange was called but the expression parsed successfully.");
@@ -59,7 +61,7 @@ namespace IronSearch.Exceptions
         }
 
         /// <summary>
-        /// Builds a detailed message when <see cref="Utils.ParseMultiRange"/> fails.
+        /// Builds a detailed message when <see cref="RangeUtils.ParseMultiRange"/> fails.
         /// </summary>
         public static SearchParseException ForMultiRange(
             string expression,
@@ -70,7 +72,7 @@ namespace IronSearch.Exceptions
             double min = double.NegativeInfinity,
             double max = double.PositiveInfinity)
         {
-            var result = Utils.ParseMultiRange(expression, out _, min, max, out var reason);
+            var result = RangeUtils.ParseMultiRange(expression, out _, min, max, out var reason);
             if (result == true)
             {
                 throw new InvalidOperationException("ForMultiRange was called but the expression parsed successfully.");

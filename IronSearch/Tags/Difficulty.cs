@@ -1,4 +1,5 @@
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {
@@ -10,7 +11,7 @@ namespace IronSearch.Tags
             public override bool AllowInvalid0 => true;
             public override IEnumerable<KeyValuePair<double, double>> GetPairs(MusicInfo musicInfo)
             {
-                if (!Utils.GetMapDifficulties(musicInfo, out var difficulties))
+                if (!MapUtils.GetMapDifficulties(musicInfo, out var difficulties))
                 {
                     yield break;
                 }

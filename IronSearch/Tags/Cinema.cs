@@ -1,5 +1,6 @@
 using CustomAlbums.Data;
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {
@@ -24,7 +25,7 @@ namespace IronSearch.Tags
             var customInfo = (Album)ModMain.uidToCustom[musicInfo.uid];
             if (!customInfo.IsPackaged)
             {
-                return Utils.TryParseCinemaJson(customInfo, false);
+                return MapUtils.TryParseCinemaJson(customInfo, false);
             }
             var lastModified = File.GetLastAccessTimeUtc(customInfo.Path);
             if (lastCheckedCinema >= lastModified)
@@ -32,7 +33,7 @@ namespace IronSearch.Tags
                 return hasCinema.Contains(musicInfo.uid);
             }
             isCinemaModified = true;
-            if (Utils.TryParseCinemaJson(customInfo))
+            if (MapUtils.TryParseCinemaJson(customInfo))
             {
                 hasCinema.Add(musicInfo.uid);
                 return true;

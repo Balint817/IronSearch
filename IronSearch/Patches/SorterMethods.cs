@@ -2,6 +2,7 @@ using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using IronSearch.Exceptions;
 using IronSearch.Tags;
+using IronSearch.Utils;
 
 namespace IronSearch.Patches
 {
@@ -42,7 +43,7 @@ namespace IronSearch.Patches
 
         private static float GetMaxAccuracy(MusicInfo musicInfo)
         {
-            if (!Utils.GetAvailableMaps(musicInfo, out var maps))
+            if (!MapUtils.GetAvailableMaps(musicInfo, out var maps))
             {
                 return float.MinValue;
             }
@@ -185,7 +186,7 @@ namespace IronSearch.Patches
 
         private static int GetMaxCallback(MusicInfo musicInfo)
         {
-            if (!Utils.GetMapCallbacks(musicInfo, out var diffs))
+            if (!MapUtils.GetMapCallbacks(musicInfo, out var diffs))
             {
                 return int.MinValue;
             }
@@ -207,7 +208,7 @@ namespace IronSearch.Patches
 
         private static int GetMaxDifficulty(MusicInfo musicInfo)
         {
-            if (!Utils.GetMapDifficulties(musicInfo, out var diffs))
+            if (!MapUtils.GetMapDifficulties(musicInfo, out var diffs))
             {
                 return int.MinValue;
             }
@@ -216,7 +217,7 @@ namespace IronSearch.Patches
 
             foreach (var diff in diffs)
             {
-                if (Utils.TryParseInt(diff, out var val) && val > max)
+                if (NumberUtils.TryParseInt(diff, out var val) && val > max)
                 {
                     max = val;
                 }

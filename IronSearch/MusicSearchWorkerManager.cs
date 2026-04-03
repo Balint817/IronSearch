@@ -1,6 +1,7 @@
 ﻿using Il2CppAssets.Scripts.Database;
 using IronSearch.Exceptions;
 using IronSearch.Records;
+using IronSearch.Utils;
 using PythonExpressionManager;
 using System.Diagnostics.CodeAnalysis;
 

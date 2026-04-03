@@ -1,5 +1,6 @@
 ﻿using Il2CppInterop.Runtime.Injection;
 using IronSearch.Patches;
+using IronSearch.Utils;
 using MelonLoader;
 using PopupLib.UI;
 using PythonExpressionManager;

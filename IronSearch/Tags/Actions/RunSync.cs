@@ -1,4 +1,5 @@
 using IronSearch.Exceptions;
+using IronSearch.Utils;
 
 namespace IronSearch.Tags
 {
@@ -12,7 +13,7 @@ namespace IronSearch.Tags
                 ThrowIfNotEmpty(varKwargs, "RunSync", varArgs, varKwargs);
                 ThrowIfNotMatching(varArgs, 1, "RunSync", varArgs, varKwargs);
 
-                if (!Utils.IsCallable(varArgs[0]))
+                if (!PythonUtils.IsCallable(varArgs[0]))
                 {
                     throw new SearchValidationException("RunSync() requires a function with no arguments as the argument.", "RunSync", varArgs, varKwargs);
                 }
@@ -29,7 +30,7 @@ namespace IronSearch.Tags
                 }
                 else
                 {
-                    if (Utils.GetPythonArgCount(varArgs[0]) != 0)
+                    if (PythonUtils.GetPythonArgCount(varArgs[0]) != 0)
                     {
                         throw new SearchValidationException("RunSync() requires a function with no arguments as the first argument.", "RunSync", varArgs, varKwargs);
                     }
