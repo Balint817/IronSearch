@@ -17,7 +17,6 @@ namespace PythonExpressionManager
             baseExceptionGetterMethod = pythonAwareExceptionType.GetMethod("get_PythonException", BindingFlags.Public | BindingFlags.Instance)!;
             extractMethod = typeof(TraceBack).GetMethod("Extract", BindingFlags.NonPublic | BindingFlags.Instance) ?? throw new NullReferenceException();
         }
-        //TODO: remove ConvertException, replace with helper method the user can call in their catch block to preserve stack traces, and in general make exceptions more useful.
         private const string tagDict = "___";
         private const string args = "____";
         private const string kwargs = "_____";

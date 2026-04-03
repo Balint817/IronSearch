@@ -10,7 +10,7 @@ namespace IronSearch.Patches
         private static long? defaultLValue = null;
         internal static void Prefix(PnlMusicSearchItem __instance, string text)
         {
-            if (ModMain.StartString is null || !text.StartsWith(ModMain.StartString))
+            if (ModMain.StartString is null || !text.StartsWith(ModMain.StartString, StringComparison.InvariantCultureIgnoreCase))
             {
                 if (defaultValue is { } reset)
                 {

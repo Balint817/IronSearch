@@ -63,7 +63,7 @@ namespace IronSearch.Patches
         internal static bool Prefix(SearchResults __instance, string keyword)
         {
             isAdvancedSearch = false;
-            if (IsFirstCall || string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.StartString))
+            if (IsFirstCall || string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.StartString, StringComparison.InvariantCultureIgnoreCase))
             {
                 IsFirstCall = false;
                 return true;

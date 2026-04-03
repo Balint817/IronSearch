@@ -1442,6 +1442,8 @@ Usage:
 
 - `RunOnce(function, id)`
 
+Runs the provided function only once per `id`.
+
 Notes:
 
 - The first argument must be a **function with no arguments**.
@@ -1450,6 +1452,22 @@ Notes:
 - The return value of the function is ignored; `RunOnce(...)` always returns `True`.
 
 So `RunOnce(...)` is best used for side effects (warming caches, precomputations, etc.).
+
+---
+
+#### `RunSync`
+
+Usage:
+
+- `RunSync(function)`
+
+Runs the provided function in a semi-synchronous context (synchronous across other calls to `RunSync`, but not blocking the entire rest of the search).\
+Useful if you have a function that is not thread-safe.
+
+Notes:
+
+- The first argument must be a **function with no arguments**.
+- The return value of the function is ignored; `RunSync(...)` always returns `True`.
 
 ---
 

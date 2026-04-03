@@ -190,7 +190,6 @@ namespace IronSearch.UI
             ["zip"] = new("zip", 2),
 
         };
-        private static string StartString => ModMain.StartString;
         internal static void Update()
         {
             if (CurrentInfo == null)
@@ -245,13 +244,13 @@ namespace IronSearch.UI
             }
             var findKeyword = inputField.text;
 
-            if (StartString is null || findKeyword?.StartsWith(StartString) != true)
+            if (ModMain.StartString is null || findKeyword?.StartsWith(ModMain.StartString, StringComparison.InvariantCultureIgnoreCase) != true)
             {
                 return;
             }
 
             int caretPosition = inputField.caretPosition;
-            if (caretPosition < StartString.Length)
+            if (caretPosition < ModMain.StartString.Length)
             {
                 return;
             }
@@ -301,7 +300,7 @@ namespace IronSearch.UI
             {
                 int i = caretPosition - 1;
 
-                while (i >= StartString.Length &&
+                while (i >= ModMain.StartString.Length &&
                        string.Concat("A", findKeyword.AsSpan(i, caretPosition - i))
                              .IsValidVariableName())
                 {
@@ -312,7 +311,7 @@ namespace IronSearch.UI
             }
 
 
-            if (caretPosition == StartString.Length)
+            if (caretPosition == ModMain.StartString.Length)
             {
                 if (caretPosition == findKeyword.Length)
                 {

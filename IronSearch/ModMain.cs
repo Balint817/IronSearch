@@ -76,9 +76,11 @@ namespace IronSearch
 
         internal static MelonPreferences_Entry<Dictionary<string, string>> autoCompleteItemsEntry = null!; // validated
 
-        internal static MelonPreferences_Entry<double> waitMultiplierEntry = null!;
+        internal static MelonPreferences_Entry<double> waitMultiplierEntry = null!; // validated
 
         internal static MelonPreferences_Entry<bool> enableHQSpamEntry = null!; // validated
+
+        internal static MelonPreferences_Entry<bool> enteredCodeEntry = null!; // validated
 
         internal static MelonPreferences_Entry<bool> enablePersistentSearchCachingEntry = null!; // validated
 
@@ -95,6 +97,13 @@ namespace IronSearch
             get
             {
                 return enableHQSpamEntry.Value;
+            }
+        }
+        internal static bool EnteredCode
+        {
+            get
+            {
+                return enteredCodeEntry.Value;
             }
         }
         internal static bool EnablePersistentSearchCaching
@@ -284,15 +293,54 @@ namespace IronSearch
             var category = MelonPreferences.CreateCategory("IronSearch");
             category.SetFilePath("UserData/IronSearch.cfg");
 
-            enableHQSpamEntry = category.CreateEntry<bool>("EnableHQSpam", false, "EnableHQSpam", "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.", validator: Validator(false));
-            enablePersistentSearchCachingEntry = category.CreateEntry<bool>("EnablePersistentSearchCaching", true, "EnablePersistentSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.", validator: Validator(false));
+            enableHQSpamEntry = category.CreateEntry<bool>("EnableHQSpam", true, "EnableHQSpam", "\nEnables searching for uploaded & ranked custom charts,\nbut unfortunately requires spamming the server.\nA fast connection is recommended.", validator: Validator(true));
+            enablePersistentSearchCachingEntry = category.CreateEntry<bool>("EnablePersistentSearchCaching", true, "EnablePersistentSearchCaching", "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.", validator: Validator(true));
             var defaultMult = 2.5;
             waitMultiplierEntry = category.CreateEntry<double>("WaitMultiplier", defaultMult, "WaitMultiplier", "\nIncreases the amount of time that must pass after search text changes before the search is refreshed.\nThe multiplier affects ONLY advanced searches, normal searches are unaffected.", validator: new WaitMultiplierValidator(defaultMult));
             startSearchStringEntry = category.CreateEntry<string>("StartSearchText", "search:", "StartSearchText", "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.", validator: Validator("search:"));
-
-            if (startSearchStringEntry.Value == null)
+            enteredCodeEntry = category.CreateEntry<bool>("_Code", false, "_Code", "\nFor internal use.", validator: Validator(false));
+            if (!EnteredCode)
             {
-                startSearchStringEntry.Value = startSearchStringEntry.DefaultValue;
+                var random = new Random();
+                const string chars = "abcdefghijklmnopqrstuvwxyz"; // avoid confusing chars
+                var generatedCode = new string(Enumerable.Repeat(chars, 8)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+
+                MelonLogger.Msg(System.ConsoleColor.DarkGreen, "Before we proceed, please read the following carefully:\n");
+
+                MelonLogger.Msg(System.ConsoleColor.Yellow,
+                    "WARNING: This mod allows execution of custom Python code provided by third parties.\n"
+                    + "Running code from untrusted sources can result in serious consequences, including but not limited to:\n"
+                    + "- Unauthorized access to your system\n"
+                    + "- Data theft or corruption\n"
+                    + "- Installation of malware or backdoors\n"
+                    + "- Permanent system damage\n"
+                    + "\n"
+                    + "You are solely responsible for any code you choose to execute. The developer of this mod does NOT review,\n"
+                    + $"verify, or guarantee the safety of any third-party scripts, confirmation code is {generatedCode}, nor any other scripts you may receive from other users.\n"
+                    + "\n"
+                    + "By continuing, you acknowledge that you understand these risks and agree that the developer is not liable\n"
+                    + "for any damage, loss of data, security breaches, or other consequences resulting from the use of this mod.\n");
+
+                Thread.Sleep(5000);
+
+                MelonLogger.Msg(System.ConsoleColor.Red, $"To confirm that you have read and understood this warning, please enter the confirmation code below: ");
+
+                while (true)
+                {
+                    var input = Console.ReadLine()?.Trim().ToLowerInvariant();
+
+                    if (input == generatedCode)
+                    {
+                        enteredCodeEntry.Value = true;
+                        MelonLogger.Msg(System.ConsoleColor.Green, "Welcome to IronSearch!");
+                        break;
+                    }
+                    else
+                    {
+                        MelonLogger.Msg(System.ConsoleColor.Red, "Incorrect code. Please read the warning carefully and try again:");
+                    }
+                }
             }
 
 
