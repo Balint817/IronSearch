@@ -315,6 +315,15 @@ namespace IronSearch.Core
                 + "The '?' wildcard for the highest difficulty is supported."
             );
 
+
+
+            RegisterObject("CustomInfo", BuiltIns.EvalCustomInfo);
+            RegisterHelp(new() { "CustomInfo" },
+                "Usage: CustomInfo()\n\n"
+                + "If the song is a custom, returns the custom information.\n"
+                + "Otherwise, returns None."
+            );
+
             RegisterObject("EmptyMultiRange", BuiltIns.EvalEmptyMultiRange);
             RegisterObject("EMR", BuiltIns.EvalEmptyMultiRange);
             RegisterHelp(new() { "EmptyMultiRange", "EMR" },

@@ -29,7 +29,7 @@ namespace IronSearch
         public static ReadOnlyDictionary<string, bool> HQChartDict => new(_hqChartDict);
 
         internal static Dictionary<string, object> uidToCustom = new();
-        public static ReadOnlyDictionary<string, object> UIDToAlbum => new(uidToCustom);
+        public static ReadOnlyDictionary<string, object> UIDToCustom => new(uidToCustom);
 
         private void DisposeAll()
         {

@@ -1181,6 +1181,48 @@ Returns:
 
 ---
 
+#### `CustomInfo`
+
+Usage:
+
+- `CustomInfo()`
+
+If the song is a custom, returns the custom information. Otherwise, returns None.\
+Some useful properties:
+
+| Property | Value |
+|------|----------------|
+| `IsPackaged` | Whether the custom is a .mdm |
+| `IsPack` | Whether the custom is part of a pack |
+| `PackName` | The pack the custom is part of |
+| `Sheets` | The available maps of the custom as a `dict[int, Sheet]` |
+| `Info` | Returns an `AlbumInfo` object which is the custom equivalent of the `M` argument. |
+
+Properties of the `AlbumInfo` object returned by `CustomInfo().Info`:
+
+| Property | Value |
+|------|----------------|
+| `Name` | same as `M.name` |
+| `NameRomanized` | the romanized version of `Name` (optional field) |
+| `Author` | same as `M.author` |
+| `LevelDesigner` | same as `M.levelDesigner` |
+| `LevelDesignerX` | same as `M.levelDesignerX` (where X is a map index) |
+| `DifficultyX` | same as `M.difficultyX` (where X is a map index) |
+| `Difficulties` | The available DifficultyX values but instead as a `dict[int, string]` |
+| `Bpm` | same as `M.bpm` |
+| `Scene` | same as `M.scene` |
+| `SearchTags` | the search tags of the custom |
+| `SceneEgg` | The selected scene egg for the chart |
+| `HideBmsDifficulty` | The index of the difficulty the Supreme/Hidden map will replace |
+| `HideBmsMessage` | the message shown when the hidden map is uncovered |
+| `HideBmsMode` | the method with which the hidden can be shown |
+
+
+The only useful property of a `Sheet = Sheets[int]` is `Sheet.Md5` which returns the MD5 hash of the map (this is used to uniquely identify maps)
+
+
+---
+
 #### `EmptyMultiRange`/`EMR`
 
 Usage:
