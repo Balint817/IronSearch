@@ -16,19 +16,14 @@ namespace IronSearch.Tags
     {
         internal static readonly ConcurrentDictionary<string, bool> helpIds = new();
         internal static bool helpEnabled = true;
-        internal static Mutex helpMutex = new();
+        internal static object helpLock = new object(); 
         internal static bool EvalHelp(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotMatching(varArgs, 1, "Help", varArgs, varKwargs);
 
-            try
+            lock (helpLock)
             {
-                helpMutex.WaitOne();
                 EvalHelpInternal(varArgs[0]);
-            }
-            finally
-            {
-                helpMutex.ReleaseMutex();
             }
 
 
