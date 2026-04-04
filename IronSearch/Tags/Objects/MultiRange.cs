@@ -8,7 +8,6 @@ namespace IronSearch.Tags
     {
         internal static dynamic EvalMultiRange(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfEmpty(varArgs, "MultiRange", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "MultiRange", varArgs, varKwargs);
 
             var multiRanges = new List<MultiRange>();
