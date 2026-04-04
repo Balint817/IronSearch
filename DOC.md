@@ -1217,9 +1217,7 @@ Properties of the `AlbumInfo` object returned by `CustomInfo().Info`:
 | `HideBmsMessage` | the message shown when the hidden map is uncovered |
 | `HideBmsMode` | the method with which the hidden can be shown |
 
-
 The only useful property of a `Sheet = Sheets[int]` is `Sheet.Md5` which returns the MD5 hash of the map (this is used to uniquely identify maps)
-
 
 ---
 
