@@ -7,8 +7,8 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalCustomInfo(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "EmptyMultiRange", varArgs, varKwargs);
-            ThrowIfNotEmpty(varKwargs, "EmptyMultiRange", varArgs, varKwargs);
+            ThrowIfNotEmpty(varArgs, "CustomInfo", varArgs, varKwargs);
+            ThrowIfNotEmpty(varKwargs, "CustomInfo", varArgs, varKwargs);
             if (!ModMain.CustomAlbumsLoaded || !ModMain.uidToCustom.TryGetValue(M.I.uid, out var value))
             {
                 return null!;
