@@ -101,7 +101,7 @@ search: BPM("160+")
 
 Both of these are identical.
 
-A string that is passed to a tag expecting a range will be **parsed as a range string** automatically. A bare (unquoted) number is just a number — it is *not* a range.
+A string that is passed to a tag expecting a range will be **parsed as a range string** automatically. A bare (unquoted) number is just a number - it is *not* a range.
 
 ```text
 search: BPM('160-180')    # range string '160-180' → matches BPM from 160 to 180
@@ -150,15 +150,15 @@ Dedicated tags like `Author(...)` cover most use-cases, and are usually preferre
 
 If your expression has a problem, the error will appear in the MelonLoader console. There most important ones you'll see are:
 
-1. **Syntax error** — Your expression could not be parsed. The message shows the character position where parsing failed.
+1. **Syntax error** - Your expression could not be parsed. The message shows the character position where parsing failed.
    ```
    SyntaxError: unexpected ')' at position 12
    ```
-2. **Runtime error** — The expression parsed, and your usage of tags was correct, but something else went wrong during execution. For example, the expression `1/0` would give:
+2. **Runtime error** - The expression parsed, and your usage of tags was correct, but something else went wrong during execution. For example, the expression `1/0` would give:
    ```
    ZeroDivisionError: division by zero
    ```
-3. **Tag/Input error** — A specific tag encountered an issue. The message shows which tag was called (including the arguments you passed) and the error:
+3. **Tag/Input error** - A specific tag encountered an issue. The message shows which tag was called (including the arguments you passed) and the error:
    ```
    Error in Cinema(5): Unexpected positional arguments (Cinema does not take any arguments)
    ```
