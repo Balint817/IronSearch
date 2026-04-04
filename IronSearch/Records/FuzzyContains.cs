@@ -1,5 +1,8 @@
 ﻿namespace IronSearch.Records
 {
+    using System;
+    using System.Collections.Generic;
+
     public class FuzzyContains
     {
         public readonly string Pattern;
@@ -7,11 +10,11 @@
         public readonly int MaxDistance;
         private readonly Dictionary<char, ulong> _charMask;
 
-        public FuzzyContains(string containsText, int maxDistance = 2, bool caseInsensitive = true)
+        public FuzzyContains(string containsText, int maxDistance = 1, bool caseInsensitive = true)
         {
             if (string.IsNullOrEmpty(containsText))
             {
-                throw new ArgumentException(null, nameof(containsText));
+                throw new ArgumentException("Pattern cannot be null or empty.", nameof(containsText));
             }
 
             if (containsText.Length > 63)
@@ -49,34 +52,35 @@
             ulong[] R = new ulong[MaxDistance + 1];
             for (int i = 0; i <= MaxDistance; i++)
             {
-                R[i] = ~1UL;
+                R[i] = (1UL << i) - 1;
             }
+
+            ulong matchBit = 1UL << (m - 1);
 
             foreach (char c in text)
             {
-                ulong charMask = _charMask.TryGetValue(c, out var mask)
-                    ? mask
-                    : ~0UL;
+                // Unrecognized characters get 0
+                ulong charMask = _charMask.TryGetValue(c, out var mask) ? mask : 0UL;
 
                 ulong prev = R[0];
 
-                // Exact match (distance 0)
                 R[0] = ((R[0] << 1) | 1UL) & charMask;
 
                 for (int d = 1; d <= MaxDistance; d++)
                 {
                     ulong temp = R[d];
 
-                    R[d] = ((R[d] << 1) | 1UL) & charMask   // match
-                         | ((prev | R[d - 1]) << 1)         // insertion
-                         | prev                             // deletion
-                         | (prev << 1);                     // substitution
+                    R[d] = (((R[d] << 1) | 1UL) & charMask) // match
+                         | ((prev | R[d - 1]) << 1)         // insertion & substitution
+                         | prev;                            // deletion
+
+                    // Constantly allow matches to start with errors
+                    R[d] |= (1UL << d) - 1;
 
                     prev = temp;
                 }
 
-                // Check match at last bit
-                if ((R[MaxDistance] & (1UL << m)) == 0)
+                if ((R[MaxDistance] & matchBit) != 0)
                 {
                     return true;
                 }
@@ -92,13 +96,11 @@
             for (int i = 0; i < pattern.Length; i++)
             {
                 char c = pattern[i];
-
                 if (!mask.ContainsKey(c))
                 {
-                    mask[c] = ~0UL;
+                    mask[c] = 0UL;
                 }
-
-                mask[c] &= ~(1UL << i);
+                mask[c] |= (1UL << i);
             }
 
             return mask;
