@@ -51,7 +51,7 @@ namespace IronSearch.Utils
                 {
                     results.Add(system.Process(input));
                 }
-                catch {}
+                catch { }
             }
 
             cached = new(results.ToArray());

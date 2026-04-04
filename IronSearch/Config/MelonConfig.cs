@@ -1,6 +1,5 @@
 using IronSearch.Config;
 using IronSearch.Core;
-using IronSearch.Patches;
 using MelonLoader;
 using MelonLoader.Utils;
 
@@ -22,7 +21,7 @@ namespace IronSearch
         {
             get => _startSearchStringEntry.Value ?? string.Empty;
             internal set => _startSearchStringEntry.Value = value;
-            
+
         }
         public bool EnableHQSpam
         {

@@ -3,7 +3,6 @@ using Il2CppAssets.Scripts.PeroTools.Commons;
 using IronSearch.Core;
 using IronSearch.Exceptions;
 using IronSearch.Loaders;
-using IronSearch.Patches;
 using IronSearch.Tags;
 
 namespace IronSearch.Utils

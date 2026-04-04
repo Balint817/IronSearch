@@ -1,6 +1,5 @@
 using IronPython.Runtime;
 using IronSearch.Exceptions;
-using IronSearch.Utils;
 using System.Collections;
 
 namespace IronSearch.Tags

@@ -16,7 +16,7 @@ namespace IronSearch.Tags
     {
         internal static readonly ConcurrentDictionary<string, bool> helpIds = new();
         internal static bool helpEnabled = true;
-        internal static object helpLock = new object(); 
+        internal static object helpLock = new object();
         internal static bool EvalHelp(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotMatching(varArgs, 1, "Help", varArgs, varKwargs);

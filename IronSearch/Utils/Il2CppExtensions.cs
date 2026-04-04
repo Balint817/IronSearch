@@ -2,12 +2,7 @@
 using Il2CppInterop.Runtime;
 using Il2CppPeroTools2.PeroString;
 using IronSearch.Records;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IronSearch.Utils
 {

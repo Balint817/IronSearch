@@ -708,7 +708,11 @@ namespace IronSearch.Core
 
         public void Dispose()
         {
-            if (_disposed) return;
+            if (_disposed)
+            {
+                return;
+            }
+
             _disposed = true;
             _loadedExpressions.Clear();
             _helpStrings.Clear();

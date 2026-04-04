@@ -1,5 +1,4 @@
 using IronSearch.Core;
-using IronSearch.Patches;
 
 namespace IronSearch.Tags
 {

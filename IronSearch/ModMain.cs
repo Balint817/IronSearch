@@ -1,21 +1,13 @@
-﻿using CustomAlbums.Managers;
-using Il2CppAssets.Scripts.Database;
-using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.Managers;
+﻿using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.UI.Controls;
 using IronPython.Runtime;
-using IronSearch.Patches;
-using IronSearch.Tags;
-using IronSearch.UI;
-using MelonLoader;
-using MelonLoader.Utils;
-using PythonExpressionManager;
-using System.Collections.ObjectModel;
-using System.Net;
-using IronSearch.Config;
-using IronSearch.Utils;
 using IronSearch.Core;
 using IronSearch.Loaders;
+using IronSearch.Patches;
+using IronSearch.UI;
+using IronSearch.Utils;
+using MelonLoader;
+using System.Collections.ObjectModel;
 
 namespace IronSearch
 {

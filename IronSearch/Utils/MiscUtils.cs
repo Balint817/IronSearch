@@ -1,30 +1,4 @@
-﻿using CustomAlbums.Data;
-using HarmonyLib;
-using Il2CppAssets.Scripts.Database;
-using Il2CppAssets.Scripts.PeroTools.Commons;
-using Il2CppAssets.Scripts.PeroTools.Nice.Interface;
-using Il2CppInterop.Runtime;
-using Il2CppPeroTools2.PeroString;
-using IronPython.Runtime;
-using IronSearch.Patches;
-using IronSearch.Records;
-using IronSearch.Tags;
-using MelonLoader;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using PythonExpressionManager;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO.Compression;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using UnityEngine;
-using UnityEngine.UI;
-using static Community.CsharpSqlite.Sqlite3;
-using ArgumentException = System.ArgumentException;
-using Range = IronSearch.Records.Range;
+﻿using System.Diagnostics;
 
 namespace IronSearch.Utils
 {

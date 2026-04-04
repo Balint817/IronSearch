@@ -1,6 +1,5 @@
 using IronPython.Runtime;
 using IronSearch.Core;
-using IronSearch.Patches;
 
 namespace IronSearch.Tags
 {
@@ -19,7 +18,8 @@ namespace IronSearch.Tags
                 {
                     l.Add(score);
                 }
-                else {
+                else
+                {
                     l.Add(null);
                 }
             }

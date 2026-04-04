@@ -2,17 +2,11 @@
 using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Core;
-using IronSearch.Patches;
 using IronSearch.Records;
 using IronSearch.Tags;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace IronSearch.Utils
 {
