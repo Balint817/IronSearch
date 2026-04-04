@@ -1,4 +1,5 @@
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -8,7 +9,7 @@ namespace IronSearch.Tags
 
         internal static bool EvalFavorite(MusicInfo musicInfo)
         {
-            return SearchResults_RefreshPatch.favorites.Contains(musicInfo.uid);
+            return ActiveSearch.favorites.Contains(musicInfo.uid);
         }
         internal static bool EvalFavorite(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

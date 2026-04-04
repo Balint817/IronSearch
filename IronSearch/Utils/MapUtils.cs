@@ -1,6 +1,7 @@
 ﻿using CustomAlbums.Data;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
 using IronSearch.Patches;
 using IronSearch.Records;
 using IronSearch.Tags;
@@ -112,7 +113,7 @@ namespace IronSearch.Utils
 
         internal static LocalInfo GetLocalSafe(this MusicInfo mi, int language)
         {
-            return SearchResults_RefreshPatch.localInfos[mi.uid][language];
+            return ActiveSearch.localInfos[mi.uid][language];
         }
 
         public static object? GetCustomAlbumsSave()

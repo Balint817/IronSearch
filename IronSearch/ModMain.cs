@@ -58,7 +58,7 @@ namespace IronSearch
             catch (Exception) { }
             HQLoadTask = null!;
 
-            SearchResults_RefreshPatch.workerManager?.Dispose();
+            ActiveSearch.workerManager?.Dispose();
 
             SearchManager?.Dispose();
 

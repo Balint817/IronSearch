@@ -17,7 +17,7 @@ namespace IronSearch.Tags
                 {
                     string s = musicInfo.uid + "_" + diff;
 
-                    if (!SearchResults_RefreshPatch.highScores.TryGetValue(s, out var score))
+                    if (!ActiveSearch.highScores.TryGetValue(s, out var score))
                     {
                         yield return new(diff, false);
                         continue;

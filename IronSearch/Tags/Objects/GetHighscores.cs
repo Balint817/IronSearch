@@ -1,4 +1,5 @@
 using IronPython.Runtime;
+using IronSearch.Core;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -14,7 +15,7 @@ namespace IronSearch.Tags
             for (int i = 1; i <= 5; i++)
             {
                 var s = M.I.uid + "_" + i;
-                if (SearchResults_RefreshPatch.highScores.TryGetValue(s, out var score))
+                if (ActiveSearch.highScores.TryGetValue(s, out var score))
                 {
                     l.Add(score);
                 }

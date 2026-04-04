@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Il2Cpp;
+using IronSearch.Core;
 
 namespace IronSearch.Patches
 {
@@ -8,7 +9,7 @@ namespace IronSearch.Patches
     {
         private static bool Prefix(ref string __result)
         {
-            if (SearchResults_RefreshPatch.isAdvancedSearch != false)
+            if (ActiveSearch.isAdvancedSearch != false)
             {
                 __result = "Results";
                 return false;

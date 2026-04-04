@@ -1,4 +1,5 @@
 using IronSearch.Config;
+using IronSearch.Core;
 using IronSearch.Patches;
 using MelonLoader;
 using MelonLoader.Utils;
@@ -118,7 +119,7 @@ namespace IronSearch
         {
             if (EnablePersistentSearchCaching is false)
             {
-                SearchResults_RefreshPatch.searchCache.Clear();
+                ActiveSearch.searchCache.Clear();
             }
         }
 

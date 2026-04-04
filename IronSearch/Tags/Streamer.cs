@@ -1,4 +1,5 @@
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -8,7 +9,7 @@ namespace IronSearch.Tags
 
         internal static bool EvalStreamer(MusicInfo musicInfo)
         {
-            return SearchResults_RefreshPatch.streamer?.Contains(musicInfo.uid) ?? false;
+            return ActiveSearch.streamer?.Contains(musicInfo.uid) ?? false;
         }
         internal static bool EvalStreamer(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

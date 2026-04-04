@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Il2Cpp;
+using IronSearch.Core;
 
 namespace IronSearch.Patches
 {
@@ -8,12 +9,12 @@ namespace IronSearch.Patches
     {
         private static bool Prefix(ref string __result)
         {
-            if (SearchResults_RefreshPatch.isAdvancedSearch == false)
+            if (ActiveSearch.isAdvancedSearch == false)
             {
                 return true;
             }
 
-            if (SearchResults_RefreshPatch.isAdvancedSearch == true)
+            if (ActiveSearch.isAdvancedSearch == true)
             {
                 __result = "But nobody came.";
             }

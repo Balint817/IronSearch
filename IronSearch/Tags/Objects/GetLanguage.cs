@@ -1,3 +1,4 @@
+using IronSearch.Core;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -8,7 +9,7 @@ namespace IronSearch.Tags
         {
             ThrowIfNotEmpty(varArgs, "GetLanguage", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "GetLanguage", varArgs, varKwargs);
-            return SearchResults_RefreshPatch.langIndex;
+            return ActiveSearch.langIndex;
         }
     }
 }

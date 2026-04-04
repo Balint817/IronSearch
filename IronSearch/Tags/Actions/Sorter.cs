@@ -1,4 +1,5 @@
 using IronPython.Runtime.Operations;
+using IronSearch.Core;
 using IronSearch.Exceptions;
 using IronSearch.Patches;
 
@@ -53,9 +54,9 @@ namespace IronSearch.Tags
 
             ThrowIfEmpty(varArgs, "Sorter", varArgs, varKwargs);
 
-            lock (SearchResults_RefreshPatch._activeSorters)
+            lock (ActiveSearch._activeSorters)
             {
-                SearchResults_RefreshPatch._activeSorters.Add(new(varArgs, reverse, priority));
+                ActiveSearch._activeSorters.Add(new(varArgs, reverse, priority));
             }
 
             return true;

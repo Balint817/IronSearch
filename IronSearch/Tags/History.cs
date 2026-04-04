@@ -1,4 +1,5 @@
 using Il2CppAssets.Scripts.Database;
+using IronSearch.Core;
 using IronSearch.Patches;
 
 namespace IronSearch.Tags
@@ -8,7 +9,7 @@ namespace IronSearch.Tags
 
         internal static bool EvalHistory(MusicInfo musicInfo)
         {
-            return SearchResults_RefreshPatch.history.Contains(musicInfo.uid);
+            return ActiveSearch.history.Contains(musicInfo.uid);
         }
         internal static bool EvalHistory(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
