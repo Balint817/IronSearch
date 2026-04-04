@@ -531,7 +531,6 @@ Checks if the music has **all perfect** scores in the specified map range.
 Notes:
 
 - If you pass wildcard `?`, the implementation selects the **highest available map**.
-  - This is the default behavior for `AP()`.
 - The tag requires perfect for every map in the selected range.
 
 Example:

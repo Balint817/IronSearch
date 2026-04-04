@@ -129,8 +129,7 @@ namespace IronSearch.Core
             RegisterHelp(new() { "AP", "AllPerfect" },
                 "Usage: AP() or AP(mapRange)\n\n"
                 + "Checks if the music has all perfect scores in the specified map range.\n"
-                + "If you pass wildcard '?', the implementation selects the highest available map.\n"
-                + "This is the default behavior for AP()."
+                + "If you pass wildcard '?', the implementation selects the highest available map."
             );
 
             RegisterScript("Author", BuiltIns.EvalAuthor);
