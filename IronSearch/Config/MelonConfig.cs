@@ -75,7 +75,7 @@ namespace IronSearch
                 "\nWhether search results should be cached to improve performance.\nHighly recommended, but if you write custom scripts with side-effects, this may cause problems.",
                 validator: Validator(true));
 
-            var defaultMult = 2.5;
+            var defaultMult = 4;
             _waitMultiplierEntry = _category.CreateEntry<double>("WaitMultiplier", defaultMult, "WaitMultiplier",
                 "\nIncreases the amount of time that must pass after search text changes before the search is refreshed.\nThe multiplier affects ONLY advanced searches, normal searches are unaffected.",
                 validator: new WaitMultiplierValidator(defaultMult));
