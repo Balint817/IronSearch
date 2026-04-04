@@ -53,7 +53,10 @@ namespace IronSearch.Tags
 
             ThrowIfEmpty(varArgs, "Sorter", varArgs, varKwargs);
 
-            SearchResults_RefreshPatch._activeSorters.Add(new(varArgs, reverse, priority));
+            lock (SearchResults_RefreshPatch._activeSorters)
+            {
+                SearchResults_RefreshPatch._activeSorters.Add(new(varArgs, reverse, priority));
+            }
 
             return true;
         }
