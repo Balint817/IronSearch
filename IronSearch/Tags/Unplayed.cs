@@ -18,7 +18,13 @@ namespace IronSearch.Tags
                 {
                     string s = musicInfo.uid + "_" + diff;
 
-                    yield return new(diff, !SearchResults_RefreshPatch.highScores.ContainsKey(s));
+                    if (!SearchResults_RefreshPatch.highScores.TryGetValue(s, out var score))
+                    {
+                        yield return new(diff, true);
+                        continue;
+                    }
+
+                    yield return new(diff, score.Clears == 0);
                 }
             }
         }
