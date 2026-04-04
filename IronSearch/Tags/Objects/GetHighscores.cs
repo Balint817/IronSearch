@@ -18,6 +18,9 @@ namespace IronSearch.Tags
                 {
                     l.Add(score);
                 }
+                else {
+                    l.Add(null);
+                }
             }
             return l;
         }
