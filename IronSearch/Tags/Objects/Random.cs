@@ -34,7 +34,6 @@ namespace IronSearch.Tags
             ThrowIfNotMatching(varArgs, evalRandomArgCount, "Random", varArgs, varKwargs);
 
             long start;
-
             switch (varArgs[0])
             {
                 case int n1:
@@ -55,7 +54,7 @@ namespace IronSearch.Tags
             }
 
             long end;
-            switch (varArgs[0])
+            switch (varArgs[1])
             {
                 case int n1:
                     end = n1;
@@ -72,6 +71,11 @@ namespace IronSearch.Tags
                     break;
                 default:
                     throw new SearchWrongTypeException($"expected 2 integers", varArgs[0]?.GetType(), "Random", varArgs, varKwargs);
+            }
+
+            if (start > end)
+            {
+                (start, end) = (end, start);
             }
 
             return Random.Shared.NextInt64(start, end);

@@ -33,13 +33,9 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varKwargs, "LogOnce", varArgs, varKwargs);
 
             var sb = new StringBuilder();
-            sb.Append(id);
-            sb.Append(separator);
-            foreach (var item in varArgs)
-            {
-                sb.Append((object)item);
-                sb.Append(separator);
-            }
+            sb.Append($"{id}: ");
+
+            sb.Append(string.Join(separator, varArgs.Select(x => ((object)x)?.ToString() ?? "None")));
 
             if (logOnceIds.TryAdd(id, false))
             {
