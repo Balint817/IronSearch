@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: MelonIncompatibleAssemblies(new string[] { })]
-[assembly: MelonOptionalDependencies(new string[] { "Headquarters", "CustomAlbums", "KeybindManager", "PopupLib" })]
+[assembly: MelonOptionalDependencies(new string[] { "Headquarters", "CustomAlbums", "Playlists" })]
 [assembly: MelonAdditionalDependencies(new string[] { })]
 //[assembly: MelonAuthorColor()]
 //[assembly: MelonColor()]

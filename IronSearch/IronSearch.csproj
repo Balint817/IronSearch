@@ -74,6 +74,9 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>$(MD_DIRECTORY)\MelonLoader\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Playlists">
+      <HintPath>$(MD_DIRECTORY)\Mods\Playlists.dll</HintPath>
+    </Reference>
     <Reference Include="PopupLib">
       <HintPath>$(MD_DIRECTORY)\Mods\PopupLib.dll</HintPath>
     </Reference>
