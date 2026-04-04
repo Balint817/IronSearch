@@ -4,7 +4,7 @@ namespace IronSearch.Patches
 {
 
     [HarmonyLib.HarmonyPatch(typeof(PnlMusicSearchItem), "OnTextChanged")]
-    internal class TextChangedPatch
+    internal class PnlMusic_TextChanged_CooldownPatch
     {
         private static float? defaultValue = null;
         private static long? defaultLValue = null;

@@ -8,7 +8,7 @@ namespace IronSearch.Tags
 
         internal static bool EvalFavorite(MusicInfo musicInfo)
         {
-            return RefreshPatch.favorites.Contains(musicInfo.uid);
+            return SearchResults_RefreshPatch.favorites.Contains(musicInfo.uid);
         }
         internal static bool EvalFavorite(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

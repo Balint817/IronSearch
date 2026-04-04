@@ -8,7 +8,7 @@ namespace IronSearch.Tags
 
         internal static bool EvalStreamer(MusicInfo musicInfo)
         {
-            return RefreshPatch.streamer?.Contains(musicInfo.uid) ?? false;
+            return SearchResults_RefreshPatch.streamer?.Contains(musicInfo.uid) ?? false;
         }
         internal static bool EvalStreamer(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

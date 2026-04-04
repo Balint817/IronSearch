@@ -238,7 +238,7 @@ namespace IronSearch.UI
             {
                 return;
             }
-            var inputField = SearchFocusPatch.inputField;
+            var inputField = PnlMusic_FocusChangedPatch.inputField;
             if (inputField == null)
             {
                 return;
@@ -367,7 +367,7 @@ namespace IronSearch.UI
 
         private static void SetText(string newText, int newCaret)
         {
-            var inputField = SearchFocusPatch.inputField;
+            var inputField = PnlMusic_FocusChangedPatch.inputField;
             if (inputField == null)
             {
                 MelonLogger.Msg(ConsoleColor.Red, "input field is null when trying to set auto-complete text");

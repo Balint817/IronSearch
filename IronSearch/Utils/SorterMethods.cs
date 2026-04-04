@@ -26,7 +26,7 @@ namespace IronSearch.Utils
             {
                 throw new SearchCallNotAllowed("ByName()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
-            return musicInfo1.GetLocalSafe(RefreshPatch.langIndex).Name.CompareTo(musicInfo2.GetLocalSafe(RefreshPatch.langIndex).Name);
+            return musicInfo1.GetLocalSafe(SearchResults_RefreshPatch.langIndex).Name.CompareTo(musicInfo2.GetLocalSafe(SearchResults_RefreshPatch.langIndex).Name);
         }
 
         internal static int SortByAccuracy(MusicInfo m1, MusicInfo m2)
@@ -55,7 +55,7 @@ namespace IronSearch.Utils
             {
                 string uid = musicInfo.uid + "_" + map;
 
-                if (RefreshPatch.highScores.TryGetValue(uid, out var score) && score.Accuracy > max)
+                if (SearchResults_RefreshPatch.highScores.TryGetValue(uid, out var score) && score.Accuracy > max)
                 {
                     max = score.Accuracy;
                 }

@@ -8,7 +8,7 @@ namespace IronSearch.Tags
 
         internal static bool EvalHistory(MusicInfo musicInfo)
         {
-            return RefreshPatch.history.Contains(musicInfo.uid);
+            return SearchResults_RefreshPatch.history.Contains(musicInfo.uid);
         }
         internal static bool EvalHistory(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

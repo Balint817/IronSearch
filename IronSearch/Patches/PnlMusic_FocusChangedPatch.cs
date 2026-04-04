@@ -8,7 +8,7 @@ using UnityEngine;
 namespace IronSearch.Patches
 {
     [HarmonyPatch(typeof(PnlMusicSearchItem), "OnTextFocusChanged")]
-    internal class SearchFocusPatch
+    internal class PnlMusic_FocusChangedPatch
     {
         internal static PeroInputField? inputField;
         private static void Postfix(PnlMusicSearchItem __instance, bool focus)
@@ -33,14 +33,6 @@ namespace IronSearch.Patches
             }
             position = inputField.GetCaretVectorPosition();
             return true;
-        }
-    }
-    [HarmonyPatch(typeof(PnlMusicSearchItem), "OnTextChanged")]
-    internal class SearchTextChangedPatch
-    {
-        private static void Postfix(PnlMusicSearchItem __instance)
-        {
-            AutoCompleteManager.StopCurrentAutoComplete();
         }
     }
 }

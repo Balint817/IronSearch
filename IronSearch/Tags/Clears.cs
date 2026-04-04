@@ -19,7 +19,7 @@ namespace IronSearch.Tags
                 {
                     var s = musicInfo.uid + "_" + diff;
 
-                    if (RefreshPatch.highScores.TryGetValue(s, out var score))
+                    if (SearchResults_RefreshPatch.highScores.TryGetValue(s, out var score))
                     {
                         yield return new(diff, score.Clears);
                     }

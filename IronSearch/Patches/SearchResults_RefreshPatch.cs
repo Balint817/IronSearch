@@ -22,7 +22,7 @@ using System.Diagnostics;
 namespace IronSearch.Patches
 {
     [HarmonyPatch(typeof(SearchResults), "RefreshData")]
-    internal static class RefreshPatch
+    internal static class SearchResults_RefreshPatch
     {
 
         internal static List<SorterInfo> _activeSorters = new();
@@ -435,25 +435,25 @@ namespace IronSearch.Patches
                 firstPrepare = false;
                 PrepareSearchDataFirstTime(allMusic);
             }
-            RefreshPatch.langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
-            RefreshPatch.history = DataHelper.history.ToSystem();
-            RefreshPatch.highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToDictionary(x => x.Uid, x => x);
-            RefreshPatch.fullCombos = DataHelper.fullComboMusic.ToSystem().ToHashSet();
-            RefreshPatch.favorites = DataHelper.collections.ToSystem().ToHashSet();
-            RefreshPatch.hides = DataHelper.hides.ToSystem().ToHashSet();
+            SearchResults_RefreshPatch.langIndex = Language.LanguageToIndex(SingletonScriptableObject<LocalizationSettings>.instance.GetActiveOption("Language"));
+            SearchResults_RefreshPatch.history = DataHelper.history.ToSystem();
+            SearchResults_RefreshPatch.highScores = DataHelper.highest.ToSystem().Select(x => x.ScoresToObjects()).ToDictionary(x => x.Uid, x => x);
+            SearchResults_RefreshPatch.fullCombos = DataHelper.fullComboMusic.ToSystem().ToHashSet();
+            SearchResults_RefreshPatch.favorites = DataHelper.collections.ToSystem().ToHashSet();
+            SearchResults_RefreshPatch.hides = DataHelper.hides.ToSystem().ToHashSet();
 
             try
             {
-                RefreshPatch.streamer = Singleton<AnchorModule>.instance.m_DbAnchor.m_AnchorMusicInfos.ToSystem().Keys.ToHashSet();
+                SearchResults_RefreshPatch.streamer = Singleton<AnchorModule>.instance.m_DbAnchor.m_AnchorMusicInfos.ToSystem().Keys.ToHashSet();
             }
             catch
             {
-                RefreshPatch.streamer = new();
+                SearchResults_RefreshPatch.streamer = new();
             }
 
             if (ModMain.CustomAlbumsLoaded)
             {
-                RefreshPatch.LoadCustomData();
+                SearchResults_RefreshPatch.LoadCustomData();
             }
         }
     }

@@ -112,7 +112,7 @@ namespace IronSearch.Utils
 
         internal static LocalInfo GetLocalSafe(this MusicInfo mi, int language)
         {
-            return RefreshPatch.localInfos[mi.uid][language];
+            return SearchResults_RefreshPatch.localInfos[mi.uid][language];
         }
 
         public static object? GetCustomAlbumsSave()

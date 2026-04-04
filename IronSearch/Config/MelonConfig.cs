@@ -118,7 +118,7 @@ namespace IronSearch
         {
             if (EnablePersistentSearchCaching is false)
             {
-                RefreshPatch.searchCache.Clear();
+                SearchResults_RefreshPatch.searchCache.Clear();
             }
         }
 

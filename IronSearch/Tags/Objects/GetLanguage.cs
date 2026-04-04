@@ -8,7 +8,7 @@ namespace IronSearch.Tags
         {
             ThrowIfNotEmpty(varArgs, "GetLanguage", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "GetLanguage", varArgs, varKwargs);
-            return RefreshPatch.langIndex;
+            return SearchResults_RefreshPatch.langIndex;
         }
     }
 }

@@ -106,7 +106,7 @@ namespace IronSearch
             {
                 // ...
             }
-            SearchFocusPatch.inputField = null;
+            PnlMusic_FocusChangedPatch.inputField = null;
         }
         public override void OnUpdate()
         {
@@ -160,7 +160,7 @@ namespace IronSearch
             }
             if (HeadquartersLoaded)
             {
-                HeadquartersPatch.RunPatch(HarmonyInstance);
+                Headquarters_GetPatch.RunPatch(HarmonyInstance);
             }
 
             var category = MelonPreferences.CreateCategory("IronSearch");

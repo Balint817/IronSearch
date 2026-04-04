@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace IronSearch.Patches
 {
-    internal class HeadquartersPatch
+    internal class Headquarters_GetPatch
     {
         private static readonly Regex targetURLRegex = new('^' + Regex.Escape(Headquarters.Main.ApiPrefix + "/sheets/") + "[a-fA-F0-9]+$");
         private static void Prefix(string url, Action<JsonDocument, bool> callback)
