@@ -1158,6 +1158,16 @@ Implementation note:
 
 ---
 
+#### `NotNone`
+
+Usage:
+
+- `NotNone(list)`
+
+Returns a copy of the list with None/null values filtered out.
+
+---
+
 #### `Random`
 
 Usage:

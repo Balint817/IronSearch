@@ -426,6 +426,13 @@ namespace IronSearch.Core
                 + "This function also allows you to do the following for multiple ranges: MultiRange('0-1 5-7')"
             );
 
+            RegisterObject("NotNone", BuiltIns.EvalNotNone);
+            RegisterObject("NotNull", BuiltIns.EvalNotNone);
+            RegisterHelp(new() { "NotNone", "NotNull" },
+                "Usage: NotNone(list)\n\n"
+                + "Returns a copy of the list with None/null values filtered out."
+            );
+
             RegisterObject("Random", BuiltIns.EvalRandom);
             RegisterHelp(new() { "Random" },
                 "Usage: Random() or Random(start, end)\n\n"
