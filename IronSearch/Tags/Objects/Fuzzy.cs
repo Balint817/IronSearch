@@ -18,9 +18,22 @@ namespace IronSearch.Tags
                 }
                 else
                 {
-                    throw new SearchWrongTypeException("True or False for `case=`", varKwargs["case"]?.GetType(), "Regex", varArgs, varKwargs);
+                    throw new SearchWrongTypeException("True or False for `case=`", varKwargs["case"]?.GetType(), "Fuzzy", varArgs, varKwargs);
                 }
                 varKwargs.Remove("case");
+            }
+            int maxDistance = 1;
+            if (varKwargs.ContainsKey("max"))
+            {
+                if (varKwargs["max"] is int n)
+                {
+                    maxDistance = n;
+                }
+                else
+                {
+                    throw new SearchWrongTypeException("integer for `max=`", varKwargs["max"]?.GetType(), "Fuzzy", varArgs, varKwargs);
+                }
+                varKwargs.Remove("max");
             }
 
             ThrowIfNotEmpty(varKwargs, "Fuzzy", varArgs, varKwargs);
@@ -46,12 +59,12 @@ namespace IronSearch.Tags
                 }
                 if (varArgs.Length == 1)
                 {
-                    return new FuzzyContains(s0, caseInsensitive: !caseSensitive);
+                    return new FuzzyContains(s0, maxDistance, caseInsensitive: !caseSensitive);
                 }
 
                 if (varArgs[1] is string s1)
                 {
-                    return new FuzzyContains(s0, caseInsensitive: !caseSensitive).IsMatch(s1);
+                    return new FuzzyContains(s0, maxDistance, caseInsensitive: !caseSensitive).IsMatch(s1);
                 }
 
             }
