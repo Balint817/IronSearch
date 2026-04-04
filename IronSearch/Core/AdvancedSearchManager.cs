@@ -327,13 +327,6 @@ namespace IronSearch.Core
                 + "Otherwise, returns None."
             );
 
-            RegisterObject("EmptyMultiRange", BuiltIns.EvalEmptyMultiRange);
-            RegisterObject("EMR", BuiltIns.EvalEmptyMultiRange);
-            RegisterHelp(new() { "EmptyMultiRange", "EMR" },
-                "Usage: EmptyMultiRange()\n\n"
-                + "Returns an empty multi-range, which matches nothing."
-            );
-
             RegisterObject("FullRange", BuiltIns.EvalFullRange);
             RegisterObject("FR", BuiltIns.EvalFullRange);
             RegisterHelp(new() { "FullRange", "FR" },

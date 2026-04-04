@@ -1221,16 +1221,6 @@ The only useful property of a `Sheet = Sheets[int]` is `Sheet.Md5` which returns
 
 ---
 
-#### `EmptyMultiRange`/`EMR`
-
-Usage:
-
-- `EmptyMultiRange()`
-
-Returns an empty multi-range which matches nothing.
-
----
-
 #### `FullRange`/`FR`
 
 Usage:
