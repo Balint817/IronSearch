@@ -410,17 +410,16 @@ search: Sorter(ByBPM(), ByName()) and Custom()
 
 Comparers are evaluated in order. The first non-equal comparison decides the ordering.
 
-### Reverse + priority (advanced)
+### Reverse, priority, ID (advanced)
 
 The underlying `Sorter(...)` implementation supports additional keyword arguments:
 
-- `reverse=...` (True/False; negates the first non-equal comparison result)
-- `priority=...` (integer, lower number is higher priority)
+- `reverse=...` (True/False; negates the first non-equal comparison result, default isFalse)
+- `priority=...` (integer, lower number is higher priority, default is0)
+- `id=...` (string, the id of the call, default is '')
 
-If there are 2 or more sorter calls with equal priority, only the last is executed. \
-If there are 2 or more sorter calls with different priorities, they are executed in ascending order.
-
-These arguments can also be passed as positional arguments, omitting the keyword.
+If there are 2 or more sorter calls with equal ID and equal priority, only the first is executed.\
+if there are 2 or more sorter calls with equal ID and different priorities, they are executed in ascending order of priority.
 
 ### Custom comparers (VERY advanced)
 
