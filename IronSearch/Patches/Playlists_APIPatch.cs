@@ -41,12 +41,11 @@ namespace IronSearch.Patches
                         continue;
                     }
                     var expression = ModMain.Config.StartString + item[1..];
-                    ActiveSearch.IsFirstCall = false;
+                    ActiveSearch.SkipNextCall = false;
                     switch (ActiveSearch.Run(expression, out var result))
                     {
                         case SearchResult.OK:
                             newAlbums.AddRange(result.Select(x => x.uid));
-                            MelonLogger.Msg(ConsoleColor.Green, $"Injected {newAlbums.Count} into the playlist '{cp.Name}'.");
                             break;
                         case SearchResult.Error:
                             MelonLogger.Msg(ConsoleColor.Red, $"Injection into the playlist '{cp.Name}' failed.");
