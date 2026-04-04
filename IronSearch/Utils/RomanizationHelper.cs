@@ -1,11 +1,12 @@
 ﻿using Romanization;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 
 namespace IronSearch.Utils
 {
     public static class RomanizationHelper
     {
-        private static readonly Dictionary<string, ReadOnlyCollection<string>> _cache = new()
+        private static readonly ConcurrentDictionary<string, ReadOnlyCollection<string>> _cache = new()
         {
             [""] = new(new string[] { "" }),
         };
