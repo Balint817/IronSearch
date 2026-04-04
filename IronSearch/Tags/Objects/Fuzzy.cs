@@ -9,7 +9,7 @@ namespace IronSearch.Tags
         private static readonly Range evalFuzzyArgCount = new(1, 2);
         internal static dynamic EvalFuzzy(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            bool caseSensitive = true;
+            bool caseSensitive = false;
             if (varKwargs.ContainsKey("case"))
             {
                 if (varKwargs["case"] is bool b)
