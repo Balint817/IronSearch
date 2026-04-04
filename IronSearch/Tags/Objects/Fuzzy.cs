@@ -69,7 +69,7 @@ namespace IronSearch.Tags
 
             }
 
-            throw new SearchValidationException("Fuzzy() expects a pattern string, or two strings (pattern, text) to test a match.", "Regex", varArgs, varKwargs);
+            throw new SearchValidationException("Fuzzy() expects a pattern string, or two strings (pattern, text) to test a match.", "Fuzzy", varArgs, varKwargs);
         }
     }
 }
