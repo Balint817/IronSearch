@@ -803,7 +803,7 @@ Checks if the custom chart was last modified within the given time window.
 Example:
 
 ```text
-search: Modified('7d')
+search: Modified('0s-7d')
 ```
 
 Matches songs that have been modified (or added) in the last 7 days.
