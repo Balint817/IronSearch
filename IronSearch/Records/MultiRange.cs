@@ -219,7 +219,7 @@ namespace IronSearch.Records
         //params Range[] ranges
         //MultiRange ranges
         [MemberNotNull(nameof(Ranges))]
-        private void Resolve()
+        public void Resolve()
         {
             if (IsReadOnly)
             {
@@ -246,7 +246,7 @@ namespace IronSearch.Records
             Ranges = _ranges.AsReadOnly();
         }
 
-        internal bool Contains(double n)
+        public bool Contains(double n)
         {
             return _ranges.Any(x => x.Contains(n));
         }
@@ -267,7 +267,7 @@ namespace IronSearch.Records
             Resolve();
         }
 
-        internal MultiRange(Range range)
+        public MultiRange(Range range)
         {
             if (range is null)
             {
