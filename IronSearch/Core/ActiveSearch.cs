@@ -46,12 +46,23 @@ namespace IronSearch.Core
 
         internal static readonly Dictionary<string, Dictionary<int, LocalInfo>> localInfos = new();
         internal static bool? isAdvancedSearch = false;
-        private static bool IsFirstCall = true;
+        internal static bool IsFirstCall = true;
 
         internal static MusicSearchWorkerManager? workerManager;
 
         private static Stopwatch _sw = new();
+
+        private static object _lock = new object();
         public static SearchResult Run(string keyword, out List<MusicInfo> finalResult)
+        {
+            SearchResult result;
+            lock (_lock)
+            {
+                result = RunPrivate(keyword, out finalResult);
+            }
+            return result;
+        }
+        private static SearchResult RunPrivate(string keyword, out List<MusicInfo> finalResult)
         {
             finalResult = null!;
             if (IsFirstCall || string.IsNullOrEmpty(keyword) || !keyword.StartsWith(ModMain.Config.StartString, StringComparison.InvariantCultureIgnoreCase))
@@ -61,7 +72,6 @@ namespace IronSearch.Core
             }
 
             isAdvancedSearch = true;
-
 
             string expression = keyword[ModMain.Config.StartString.Length..].Trim();
 

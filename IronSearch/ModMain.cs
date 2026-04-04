@@ -18,6 +18,7 @@ namespace IronSearch
         public static bool CustomAlbumsLoaded { get; private set; }
         public static bool HeadquartersLoaded { get; private set; }
         public static bool PopupLibLoaded { get; private set; }
+        public static bool PlaylistsLoaded { get; private set; }
 
         internal static MelonConfig Config = null!;
         internal static AdvancedSearchManager SearchManager = null!;
@@ -134,6 +135,7 @@ namespace IronSearch
             CustomAlbumsLoaded = MiscUtils.IsAssemblyLoaded("CustomAlbums");
             HeadquartersLoaded = MiscUtils.IsAssemblyLoaded("Headquarters");
             PopupLibLoaded = MiscUtils.IsAssemblyLoaded("PopupLib");
+            PlaylistsLoaded = MiscUtils.IsAssemblyLoaded("Playlists");
             if (!PopupLibLoaded)
             {
                 MelonLogger.Msg(System.ConsoleColor.Magenta, "PopupLib and/or KeybindManager is missing, certain features of the mod will be disabled.");
@@ -153,6 +155,10 @@ namespace IronSearch
             if (HeadquartersLoaded)
             {
                 Headquarters_GetPatch.RunPatch(HarmonyInstance);
+            }
+            if (PlaylistsLoaded)
+            {
+                Playlists_APIPatch.RunPatch(HarmonyInstance);
             }
 
             var category = MelonPreferences.CreateCategory("IronSearch");
