@@ -1493,6 +1493,19 @@ search: Custom() and 'banana' in M.author
 Custom charts whose author string contains `banana` (case-sensitive).\
 For this example, you can use `Author('banana')` instead; `M` is for checks or logic that do not yet have a dedicated tag.
 
+
+| Property | Value |
+|------|----------------|
+| `M.uid` | The song's uid, for example `'0-8'` |
+| `M.name` | The song's title, for example `'Yuki no Shizuku Ame no Oto'` |
+| `M.author` | The song's author, for example `'Tianyou feat.Tokyo Tower'` |
+| `M.bpm` | The song's BPM **as a string** (for range, use `GetBPM()`), for example `'130'` |
+| `M.scene` | The song's scene in the scene ID format, for example `'scene_01'` |
+| `M.levelDesignerX` | The level designer for a specific map of the chart, where X is the index, for example `'Howard_Y'`  |
+| `M.levelDesigner` | Hidden level designer field for the chart itself in general, for example, `Howard_Y` |
+| `M.difficultyX` | The difficulty **as a string** for a specific map of the chart, for example, `'6'` |
+| `M.callbackDifficultyX` | The callback difficulty **as an `int`** for a specific map of the chart, for example, `6` |
+
 ### 8.2 The `Scripts/` directory (user-defined tags)
 
 User scripts live in a folder created automatically at:
@@ -1502,6 +1515,8 @@ User scripts live in a folder created automatically at:
 On startup, IronSearch also writes an example file:
 
 - `Scripts/Unpacked.py`
+
+Scripts use IronPython 3.4 syntax.
 
 ### Script file format
 
