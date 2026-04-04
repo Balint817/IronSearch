@@ -825,7 +825,7 @@ Notes:
 Example:
 
 ```text
-search: New(5)
+search: New('1-5')
 ```
 
 Returns the 5 most recently added custom charts.
@@ -847,7 +847,7 @@ Notes:
 Example:
 
 ```text
-search: Old(5)
+search: Old('1-5')
 ```
 
 Returns the 5 oldest custom charts.
