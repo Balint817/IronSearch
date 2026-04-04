@@ -1255,10 +1255,13 @@ Equivalent to the `'*'` wildcard. Matches everything.
 
 Usage:
 
-- `Fuzzy(pattern, case=true/false) or Fuzzy(pattern, text, case=true/false)`
+- `Fuzzy(pattern, case=true/false, max=int) or Fuzzy(pattern, text, case=true/false, max=int)`
 
-The first usage returns an object which can be used to fuzzy-match text, while the latter instantly fuzzy-matches the provided text.
+The first usage returns an object which can be used to fuzzy-match text, while the latter instantly fuzzy-matches the provided text.\
 The first one will have a method `.Match(text)` that returns `True` if the text matches the pattern.
+
+- `case` changes whether the matching is case-sensitive. (`false` (insensitive) by default)
+- `max` is the maximum allowed error for the fuzzy search. (1 character by default)
 
 ---
 
