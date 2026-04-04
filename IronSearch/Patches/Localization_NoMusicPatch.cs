@@ -4,7 +4,7 @@ using Il2Cpp;
 namespace IronSearch.Patches
 {
     [HarmonyPatch(typeof(LocalizationName), "GetMusicTagNoMusicTxt")]
-    internal class NoMusicPatch
+    internal class Localization_NoMusicPatch
     {
         private static bool Prefix(ref string __result)
         {
@@ -22,19 +22,6 @@ namespace IronSearch.Patches
                 __result = "Error; Check your console";
             }
             return false;
-        }
-    }
-    [HarmonyPatch(typeof(LocalizationName), "GetSearchNameTxt")]
-    internal class SearchNamePatch
-    {
-        private static bool Prefix(ref string __result)
-        {
-            if (SearchResults_RefreshPatch.isAdvancedSearch != false)
-            {
-                __result = "Results";
-                return false;
-            }
-            return true;
         }
     }
 }
