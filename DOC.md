@@ -1399,6 +1399,8 @@ Usage:
 
 Initializes a global variable (shared across songs in the same search evaluation) if it does not exist.
 
+Using global variables should be combined with `RunOnce` or `RunSync` as they are otherwise unreliable due to multi-threading.
+
 ---
 
 #### `GetGlobal`/`GG`/`LoadGlobal`/`LG`
@@ -1411,6 +1413,8 @@ Returns global variable value created by `DefineGlobal` or `SetGlobal`.
 
 If the variable does not exist, the search fails.
 
+Using global variables should be combined with `RunOnce` or `RunSync` as they are otherwise unreliable due to multi-threading.
+
 ---
 
 #### `SetGlobal`/`SG`
@@ -1420,6 +1424,8 @@ Usage:
 - `SetGlobal(varName, value)`
 
 Creates or overwrites a global variable value.
+
+Using global variables should be combined with `RunOnce` or `RunSync` as they are otherwise unreliable due to multi-threading.
 
 ---
 
