@@ -58,7 +58,7 @@ namespace IronSearch.Tags
                 case 1:
                     if (!char.IsDigit(value[0]))
                     {
-                        throw new SearchValidationException("For a one-character scene filter, use a single digit (1–9).", "Scene", varArgs, varKwargs);
+                        throw new SearchValidationException("For a one-character scene filter, use a single digit (1-9).", "Scene", varArgs, varKwargs);
                     }
                     sceneFilter = '0' + value;
                     break;

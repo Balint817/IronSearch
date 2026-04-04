@@ -242,7 +242,7 @@ Displayed difficulty 9 through 11 on the **highest** map index.
 search: Accuracy('95-100', '?')
 ```
 
-Narrow to songs where your **top-slot** scores are 95%–100% accuracy.
+Narrow to songs where your **top-slot** scores are 95%-100% accuracy.
 
 ![Search demo narrowing BPM](/Resources/bpm_narrowing.gif)
 
