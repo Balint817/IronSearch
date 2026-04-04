@@ -21,7 +21,7 @@ namespace IronSearch.Tags
                 return true;
             }
 
-            d[M.I.uid][s] = varArgs[1];
+            d[s] = varArgs[1];
 
             return true;
         }
