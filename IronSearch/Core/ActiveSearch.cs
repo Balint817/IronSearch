@@ -13,6 +13,7 @@ using IronSearch.Utils;
 using MelonLoader;
 using Newtonsoft.Json;
 using PythonExpressionManager;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -20,7 +21,7 @@ namespace IronSearch.Core
 {
     public static class ActiveSearch
     {
-        internal static List<SorterInfo> _activeSorters = new();
+        internal static ConcurrentDictionary<string, ConcurrentDictionary<int, SorterInfo>> _activeSorters = new();
         internal static int langIndex;
         internal static Dictionary<string, Highscore> highScores { get; set; } = new();
 
@@ -158,18 +159,11 @@ namespace IronSearch.Core
             {
                 SorterMethods._randomDictionary.Clear();
 
-                if (_activeSorters.Count != 0)
+                if (!_activeSorters.IsEmpty)
                 {
+                    var sorterInfos = _activeSorters.Values.SelectMany(x => x.Values).ToList();
 
-                    _activeSorters.Sort();
-                    var filteredByPriority = new SortedDictionary<int, SorterInfo>();
-
-                    foreach (var sorterInfo in _activeSorters)
-                    {
-                        filteredByPriority[sorterInfo.Priority] = sorterInfo;
-                    }
-
-                    var sorterInfos = filteredByPriority.Values.ToList();
+                    sorterInfos.Sort();
 
                     Comparison<MusicInfo> comparer = (MusicInfo musicInfo1, MusicInfo musicInfo2) =>
                     {
@@ -236,7 +230,7 @@ namespace IronSearch.Core
             }
             finally
             {
-                if (_activeSorters.Count != 0)
+                if (!_activeSorters.IsEmpty)
                 {
                     MelonLogger.Msg($"Sorting completed in {_sw.Elapsed.TotalSeconds:F1}s.");
                 }

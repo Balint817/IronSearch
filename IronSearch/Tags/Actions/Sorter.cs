@@ -8,10 +8,11 @@ namespace IronSearch.Tags
     {
         internal static bool EvalSorter(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfEmpty(varArgs, "Sorter", varArgs, varKwargs);
+            ThrowIfEmpty(varArgs, "Sort", varArgs, varKwargs);
 
             bool reverse = false;
             int priority = 0;
+            string id = "";
             if (varKwargs.ContainsKey("reverse"))
             {
                 reverse = PythonOps.IsTrue(varKwargs["reverse"]);
@@ -22,40 +23,29 @@ namespace IronSearch.Tags
                 var t = varKwargs["priority"];
                 if (t is not int tn)
                 {
-                    throw new SearchWrongTypeException("an integer for `priority=`", t?.GetType(), "Sorter", varArgs, varKwargs);
+                    throw new SearchWrongTypeException("an integer for `priority=`", t?.GetType(), "Sort", varArgs, varKwargs);
                 }
                 priority = tn;
                 varKwargs.Remove("priority");
             }
-            ThrowIfNotEmpty(varKwargs, "Sorter", varArgs, varKwargs);
-
-            var args = varArgs.ToList();
-            if (args[^1] is bool b1)
+            if (varKwargs.ContainsKey("id"))
             {
-                reverse = b1;
-                args.RemoveAt(args.Count - 1);
-                if (args.Count != 0 && args[^1] is int n1)
+                var t = varKwargs["id"];
+                if (t is not string s)
                 {
-                    priority = n1;
-                    args.RemoveAt(args.Count - 1);
+                    throw new SearchWrongTypeException("a string for `id=`", t?.GetType(), "Sort", varArgs, varKwargs);
                 }
+                id = s;
+                varKwargs.Remove("id");
             }
-            else if (args[^1] is int n1)
-            {
-                priority = n1;
-                args.RemoveAt(args.Count - 1);
-                if (args.Count != 0 && args[^1] is bool b2)
-                {
-                    reverse = b2;
-                    args.RemoveAt(args.Count - 1);
-                }
-            }
+            ThrowIfNotEmpty(varKwargs, "Sort", varArgs, varKwargs);
+            ThrowIfEmpty(varArgs, "Sort", varArgs, varKwargs);
 
-            ThrowIfEmpty(varArgs, "Sorter", varArgs, varKwargs);
-
-            lock (ActiveSearch._activeSorters)
+            ActiveSearch._activeSorters.TryAdd(id, new());
+            var dict = ActiveSearch._activeSorters[id];
+            if (!dict.ContainsKey(priority))
             {
-                ActiveSearch._activeSorters.Add(new(varArgs, reverse, priority));
+                dict.TryAdd(priority, new(varArgs, reverse, priority));
             }
 
             return true;
