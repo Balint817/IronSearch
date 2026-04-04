@@ -98,9 +98,10 @@ namespace IronSearch.Core
             RegisterScript("Accuracy", BuiltIns.EvalAccuracy);
             RegisterScript("Acc", BuiltIns.EvalAccuracy);
             RegisterHelp(new() { "Accuracy", "Acc" },
-                "Usage: Accuracy(accuracyRange) or Accuracy(accuracyRange, levelRange)\n\n"
-                + "Checks if the music has a score in the specified accuracy range, and optionally, specify which difficulties to match as well.\n"
-                + "The level range can be a range from 1-5, specifying which levels are matched, or the wildcard '?' to select the highest level."
+                "Usage: Accuracy(accuracyRange) or Accuracy(accuracyRange, mapRange)\n\n"
+                + "Checks if the music has scores in the specified accuracy range, optionally restricting to specific maps.\n"
+                + "Input accuracy is a percentage range (e.g. 90-100).\n"
+                + "If the map range is a wildcard '?', the tag selects the highest available map."
             );
 
 
@@ -126,9 +127,10 @@ namespace IronSearch.Core
             RegisterScript("AP", BuiltIns.EvalAP);
             RegisterScript("AllPerfect", BuiltIns.EvalAP);
             RegisterHelp(new() { "AP", "AllPerfect" },
-                "Usage: AP() or AP(difficultyRange)\n\n"
-                + "Checks if the music has an all perfect in the specified difficulty range.\n"
-                + "The difficulty range can be a range from 1-5, specifying which difficulties are matched, or the wildcard '?' to select the highest difficulty."
+                "Usage: AP() or AP(mapRange)\n\n"
+                + "Checks if the music has all perfect scores in the specified map range.\n"
+                + "If you pass wildcard '?', the implementation selects the highest available map.\n"
+                + "This is the default behavior for AP()."
             );
 
             RegisterScript("Author", BuiltIns.EvalAuthor);
@@ -145,25 +147,25 @@ namespace IronSearch.Core
 
             RegisterScript("Callback", BuiltIns.EvalCallback);
             RegisterHelp(new() { "Callback" },
-                "Usage: Callback(callbackRange) or Callback(callbackRange, levelRange)\n\n"
-                + "Checks if the music has the specified callback difficulty.\n"
+                "Usage: Callback(callbackRange) or Callback(callbackRange, mapRange)\n\n"
+                + "Checks if the music has a callback difficulty that matches the provided range.\n"
                 + "'Callback difficulty' refers to the difficulty that's actually sent to the game servers, rather than displayed.\n"
-                + "Unlike normal difficulty, it is always an integer, and cannot be '?', 'E', etc.\n"
-                + "The level range can be a range from 1-5, specifying which levels are matched, or the wildcard '?' to select the highest level."
+                + "Unlike normal difficulty, it is always an integer; string difficulty like 'E' turns into -1.\n"
+                + "If mapRange is the wildcard '?', it selects the highest available map."
             );
 
             RegisterScript("Cinema", BuiltIns.EvalCinema);
             RegisterScript("Video", BuiltIns.EvalCinema);
             RegisterHelp(new() { "Cinema", "Video" },
                 "Usage: Cinema()\n\n"
-                + "Checks if the music is a custom chart that has a video background."
+                + "Checks if the music is a custom chart with an animated video background."
             );
 
             RegisterScript("Clears", BuiltIns.EvalClears);
             RegisterHelp(new() { "Clears" },
-                "Usage: Clears(clearRange) or Clears(clearRange, levelRange)\n\n"
-                + "Checks if the music has the specified number of clears on any difficulty, and optionally, specify which difficulties to match.\n"
-                + "The level range can be a range from 1-5, specifying which levels are matched, or the wildcard '?' to select the highest level."
+                "Usage: Clears(clearRange) or Clears(clearRange, mapRange)\n\n"
+                + "Checks if the music has clears in the specified range, optionally restricting to specific maps.\n"
+                + "If the map range is a wildcard '?', the tag selects the highest available map."
             );
 
             RegisterScript("Custom", BuiltIns.EvalCustom);
@@ -184,9 +186,10 @@ namespace IronSearch.Core
             RegisterScript("Difficulty", BuiltIns.EvalDifficulty);
             RegisterScript("Diff", BuiltIns.EvalDifficulty);
             RegisterHelp(new() { "Difficulty", "Diff" },
-                "Usage: Difficulty(difficultyRange, levelRange)\n\n"
-                + "Checks if the music has a difficulty in the specified range, and optionally specify which levels to match.\n"
-                + "The level range can be a range from 1-5, specifying which levels are matched, or the wildcard '?' to select the highest level."
+                "Usage: Difficulty(difficultyRange, mapRange)\n\n"
+                + "Checks if the music has a difficulty in the given difficulty range, optionally restricting which maps match.\n"
+                + "mapRange set to '?' means 'select the highest available map'.\n"
+                + "difficultyRange set to wildcard '?' will match non-integer difficulties like '?' or 'E'."
             );
 
             RegisterScript("Favorite", BuiltIns.EvalFavorite);
@@ -199,9 +202,9 @@ namespace IronSearch.Core
             RegisterScript("FullCombo", BuiltIns.EvalFC);
             RegisterScript("FC", BuiltIns.EvalFC);
             RegisterHelp(new() { "FullCombo", "FC" },
-                "Usage: FullCombo() or FullCombo(levelRange)\n\n"
-                + "Checks if the music has a full combo in the specified level range.\n"
-                + "The level range can be a range from 1-5, specifying which levels are matched, or the wildcard '?' to select the highest level."
+                "Usage: FullCombo() or FullCombo(mapRange)\n\n"
+                + "Checks full combo status.\n"
+                + "If mapRange is '?', it selects the highest applicable difficulty."
             );
 
             RegisterScript("Hidden", BuiltIns.EvalHasHidden);
@@ -210,46 +213,47 @@ namespace IronSearch.Core
             RegisterScript("HasSupreme", BuiltIns.EvalHasHidden);
             RegisterHelp(new() { "HasHidden", "Hidden", "Supreme", "HasSupreme" },
                 "Usage: Hidden()\n\n"
-                + "Checks if the music has a hidden difficulty"
+                + "Checks whether the music has a 'hidden' difficulty (difficulty 4)."
             );
 
             RegisterScript("Map", BuiltIns.EvalHasMap);
             RegisterScript("HasMap", BuiltIns.EvalHasMap);
             RegisterHelp(new() { "HasMap", "Map" },
-                "Usage: Map(levelRange)\n\n"
-                + "Checks if the music has a specific level/map"
+                "Usage: Map(mapRange)\n\n"
+                + "Checks whether the music has a map in the specified range."
             );
 
             RegisterScript("Touhou", BuiltIns.EvalHasTouhou);
             RegisterScript("HasTouhou", BuiltIns.EvalHasTouhou);
             RegisterHelp(new() { "HasTouhou", "Touhou" },
                 "Usage: Touhou()\n\n"
-                + "Checks if the music has a Touhou difficulty"
+                + "Checks whether the music has a 'Touhou' difficulty (difficulty 5)."
             );
 
             RegisterScript("History", BuiltIns.EvalHistory);
             RegisterHelp(new() { "History" },
                 "Usage: History()\n\n"
-                + "Checks if the music is in your chart history (last played charts)"
+                + "Checks if the music is in the chart history (recently played charts)."
             );
 
             RegisterScript("Length", BuiltIns.EvalLength);
             RegisterHelp(new() { "Length" },
                 "Usage: Length(lengthRange)\n\n"
-                + "Checks if the music's length is in the specified range.\n"
-                + "This can be a normal range (in seconds), or time formatted like '1m30s'."
+                + "Checks if the music's length falls within the given range.\n"
+                + "Accepts numeric ranges in seconds (e.g. '180-240') or time strings like '1m30s'.\n"
+                + "See also GetLength() which returns the actual length as a number."
             );
 
             RegisterScript("New", BuiltIns.EvalNew);
             RegisterHelp(new() { "New" },
                 "Usage: New(topRange)\n\n"
-                + "Checks if the music is the Nth last added custom chart."
+                + "Checks if the music is among the Nth last added custom charts."
             );
 
             RegisterScript("Old", BuiltIns.EvalOld);
             RegisterHelp(new() { "Old" },
                 "Usage: Old(bottomRange)\n\n"
-                + "Checks if the music is the Nth earliest added custom chart."
+                + "Checks if the music is among the Nth first added custom charts."
             );
 
             RegisterScript("Online", BuiltIns.EvalOnline);
@@ -283,9 +287,9 @@ namespace IronSearch.Core
 
             RegisterScript("Modified", BuiltIns.EvalModified);
             RegisterHelp(new() { "Modified" },
-                "Usage: Modified(timeRange) or Modified(timeTicks)\n\n"
-                + "Checks if the music was last modified in the specified time range.\n"
-                + "The time range can be something like '7d' for 7 days, '24h' for 24 hours, etc., or given as time ticks, for example, Modified(Days(7))"
+                "Usage: Modified(timeString)\n\n"
+                + "Checks if the custom chart was last modified within the given time window.\n"
+                + "Accepts time ranges like '7d' for 7 days, '1h' for 1 hour, etc."
             );
 
             RegisterScript("Streamer", BuiltIns.EvalStreamer);
@@ -309,10 +313,9 @@ namespace IronSearch.Core
 
             RegisterScript("Unplayed", BuiltIns.EvalUnplayed);
             RegisterHelp(new() { "Unplayed" },
-                "Usage: Unplayed() or Unplayed(levelRange)\n\n"
-                + "Checks if the music is unplayed (no score on any difficulty).\n"
-                + "Alternatively, checks if the music hasn't been played on the specified levels.\n"
-                + "The '?' wildcard for the highest difficulty is supported."
+                "Usage: Unplayed() or Unplayed(mapRange)\n\n"
+                + "Checks whether the music has not been played, or (optionally) not played on one of the specified difficulty maps.\n"
+                + "Wildcard '?' as mapRange selects highest applicable difficulty."
             );
 
 
@@ -348,19 +351,22 @@ namespace IronSearch.Core
             RegisterObject("Fuzzy", BuiltIns.EvalFuzzy);
             RegisterObject("F", BuiltIns.EvalFuzzy);
             RegisterHelp(new() { "Fuzzy", "F" },
-                "Usage: Fuzzy(pattern, case=true/false) or Fuzzy(pattern, text, case=true/false)\n\n"
-                + "The first usage returns an object which can be used to fuzzy-match text, while the latter instantly fuzzy-matches the provided text."
+                "Usage: Fuzzy(pattern, case=true/false, max=int) or Fuzzy(pattern, text, case=true/false, max=int)\n\n"
+                + "The first usage returns an object which can be used to fuzzy-match text (via .Match(text)),\n"
+                + "while the latter instantly fuzzy-matches the provided text.\n"
+                + "'case' changes whether the matching is case-sensitive (false/insensitive by default).\n"
+                + "'max' is the maximum allowed error for the fuzzy search (1 character by default)."
             );
 
             RegisterObject("GetBPM", BuiltIns.EvalGetBPM);
             RegisterHelp(new() { "GetBPM" },
                 "Usage: GetBPM()\n\n"
-                + "Returns the BPM of the song as a Range (or None if BPM parsing fails)"
+                + "Returns the BPM Range of the song (or None if not available)."
             );
             RegisterObject("GetModified", BuiltIns.EvalGetModified);
             RegisterHelp(new() { "GetModified" },
                 "Usage: GetModified()\n\n"
-                + "Returns the last-modified time of the song (or None if the request is not valid)."
+                + "Returns the custom chart's last-modified time."
             );
 
             RegisterObject("GetCallbacks", BuiltIns.EvalGetCallbacks);
@@ -375,7 +381,7 @@ namespace IronSearch.Core
             RegisterObject("Diffs", BuiltIns.EvalGetDifficulties);
             RegisterHelp(new() { "GetDifficulties", "Difficulties", "Diffs" },
                 "Usage: GetDifficulties() or Difficulties() or Diffs()\n\n"
-                + "Returns a list of the music's difficulties."
+                + "Returns a list of the current song's difficulties (as strings)."
             );
 
             RegisterObject("GetHighscores", BuiltIns.EvalGetHighscores);
@@ -390,13 +396,14 @@ namespace IronSearch.Core
             RegisterObject("Language", BuiltIns.EvalGetLanguageIndex);
             RegisterHelp(new() { "GetLanguage", "Language" },
                 "Usage: GetLanguage() or Language()\n\n"
-                + "Returns the music's language as an index (0 for Japanese, 1 for English, etc.)"
+                + "Returns the current language index."
             );
 
             RegisterObject("GetLength", BuiltIns.EvalGetLength);
             RegisterHelp(new() { "GetLength" },
-                "Usage: GetLength() or Length()\n\n"
-                + "Returns the music's length in seconds."
+                "Usage: GetLength()\n\n"
+                + "Returns the music length in seconds as a number, or None if the mod failed to obtain it.\n"
+                + "This is different from the Length(range) filter which checks whether the length is within a range and returns True/False."
             );
 
             RegisterScript("Help", BuiltIns.EvalHelp);
@@ -447,16 +454,21 @@ namespace IronSearch.Core
 
             RegisterObject("Random", BuiltIns.EvalRandom);
             RegisterHelp(new() { "Random" },
-                "Usage: Random() or Random(start, end)\n\n"
-                + "Random() returns a random real number between 0.0 and 1.0,\n"
-                + "Random(start, end) returns a random integer in the range 'start-end|'\n"
+                "Usage: Random() or Random(range) or Random(start, end)\n\n"
+                + "Random() returns a random real number in [0.0, 1.0) (end exclusive).\n"
+                + "Random(range) returns a random real number in [start, end) (end exclusive).\n"
+                + "Random(start, end) returns a random integer in [start, end) (end exclusive)."
             );
 
             RegisterObject("Range", BuiltIns.EvalRange);
             RegisterObject("R", BuiltIns.EvalRange);
             RegisterHelp(new() { "Range", "R" },
-                "Usage: Range(rangeString)\n\n"
-                + "Parses a range string and returns a range object that can be used in other functions.\n"
+                "Usage: Range(rangeString) or Range(a, b)\n\n"
+                + "Parses a range string and returns a range object usable in other functions.\n"
+                + "Range(x) where x is a number makes a single-value range.\n"
+                + "Range(x) where x is a string parses it into a Range.\n"
+                + "Range(start, end) where both are numbers creates an inclusive numeric range.\n"
+                + "Keyword arguments: start=True/False (makes the start exclusive), end=True/False (makes the end exclusive).\n"
                 + "The range string can be in the following formats:\n"
                 + "- 'A-B' for a range from A to B (inclusive)\n"
                 + "- '*' for a wildcard that matches everything\n"
@@ -472,8 +484,9 @@ namespace IronSearch.Core
             RegisterHelp(new() { "Regex", "Re" },
                 "Usage: Regex(pattern)\n\n"
                 + "Parses a regex pattern and returns a regex object that can be used in other functions.\n"
-                + "The regex syntax is the same as Python's regex syntax.\n"
-                + "Teaching regex syntax is out of scope for this help string. If you don't know how to use it, don't worry, you probably won't need it."
+                + "The underlying Regex(...) constructor is ignore-case by default.\n"
+                + "If you pass a case=true keyword, you can make it case-sensitive.\n"
+                + "If you call Regex(pattern, text), a True/False match is returned instantly instead."
             );
 
 
@@ -539,14 +552,25 @@ namespace IronSearch.Core
             RegisterScript("RunOnce", BuiltIns.EvalRunOnce);
             RegisterHelp(new() { "RunOnce" },
                 "Usage: RunOnce(function, id)\n\n"
-                + "Runs the specified script only the first time it is encountered in a search.\n"
-                + "Always returns True."
+                + "Runs the provided function only once per ID.\n"
+                + "The first argument must be a function with no arguments.\n"
+                + "The second argument must be a string ID.\n"
+                + "When a specific ID is encountered for the first time, the function is executed.\n"
+                + "The return value of the function is ignored; RunOnce(...) always returns True."
+            );
+
+            RegisterScript("RunSync", BuiltIns.EvalRunSync);
+            RegisterHelp(new() { "RunSync" },
+                "Usage: RunSync(function)\n\n"
+                + "Runs the provided function in a semi-synchronous context (synchronous across other calls to RunSync, but not blocking the entire rest of the search).\n"
+                + "The first argument must be a function with no arguments.\n"
+                + "The return value of the function is ignored; RunSync(...) always returns True."
             );
 
             RegisterScript("Sorter", BuiltIns.EvalSorter);
             RegisterScript("Sort", BuiltIns.EvalSorter);
             RegisterHelp(new() { "Sorter", "Sort" },
-                "Usage: Sorter(comparerFunction)\n\n"
+                "Usage: Sorter(comparer, ...) or Sort(comparer, ...)\n\n"
                 + "Sorts the search results based on the specified comparer function.\n"
                 + "The comparer function is a function that takes the music as input and returns a value that is used for sorting.\n"
                 + "For example, Sorter(ByLength) would sort the search results based on the chart length.\n"
@@ -554,6 +578,10 @@ namespace IronSearch.Core
                 + "- if A is smaller, -1\n"
                 + "- if A equals B, 0\n"
                 + "- if A is greater, 1\n"
+                + "Keyword arguments:\n"
+                + "- reverse=True/False (negates the first non-equal comparison result, default is False)\n"
+                + "- priority=int (lower number is higher priority, default is 0)\n"
+                + "- id=string (the ID of the call, default is '')"
             );
 
             RegisterScript("Log", BuiltIns.EvalLog);
@@ -569,7 +597,8 @@ namespace IronSearch.Core
             RegisterScript("LogOnce", BuiltIns.EvalLogOnce);
             RegisterHelp(new() { "LogOnce" },
                 "Usage: LogOnce(value, id='someId')\n\n"
-                + "Logs the specified value to the console for debugging purposes, but only the first time it's encountered with the specified id."
+                + "Logs the specified value to the console for debugging purposes, but only the first time it's encountered with the specified id.\n"
+                + "Supports keyword sep=... to change the separator."
             );
 
             RegisterScript("LogUnique", BuiltIns.EvalLogUnique);
@@ -577,7 +606,8 @@ namespace IronSearch.Core
                 "Usage: LogUnique(value)\n\n"
                 + "Logs the specified value to the console for debugging purposes, but only once for each unique value.\n"
                 + "For example, LogUnique(M.author) would log the name of each unique author in the search results,\n"
-                + "but if there are multiple songs by the same author, their name would only be logged once."
+                + "but if there are multiple songs by the same author, their name would only be logged once.\n"
+                + "Supports keyword sep=... to change the separator."
             );
 
 
@@ -585,56 +615,56 @@ namespace IronSearch.Core
             RegisterObject("ByAcc", BuiltIns.EvalByAccuracy);
             RegisterHelp(new() { "ByAccuracy", "ByAcc" },
                 "Usage: ByAccuracy()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by accuracy."
+                + "Returns a comparer function that can be used in Sort to sort by accuracy."
             );
 
             RegisterObject("ByBPM", BuiltIns.EvalByBPM);
             RegisterHelp(new() { "ByBPM" },
                 "Usage: ByBPM()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by BPM."
+                + "Returns a comparer function that can be used in Sort to sort by BPM."
             );
 
             RegisterObject("ByDifficulty", BuiltIns.EvalByDifficulty);
             RegisterObject("ByDiff", BuiltIns.EvalByDifficulty);
             RegisterHelp(new() { "ByDifficulty", "ByDiff" },
                 "Usage: ByDifficulty()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by difficulty."
+                + "Returns a comparer function that can be used in Sort to sort by difficulty."
             );
 
             RegisterObject("ByLength", BuiltIns.EvalByLength);
             RegisterHelp(new() { "ByLength" },
                 "Usage: ByLength()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by length."
+                + "Returns a comparer function that can be used in Sort to sort by length."
             );
 
             RegisterObject("ByName", BuiltIns.EvalByName);
             RegisterHelp(new() { "ByName" },
                 "Usage: ByName()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by the music's title."
+                + "Returns a comparer function that can be used in Sort to sort by the music's title."
             );
 
             RegisterObject("ByRandom", BuiltIns.EvalByRandom);
             RegisterHelp(new() { "ByRandom" },
                 "Usage: ByRandom()\n\n"
-                + "Returns a key function that can be used in Sorter to sort randomly."
+                + "Returns a comparer function that can be used in Sort to sort randomly."
             );
 
             RegisterObject("ByModified", BuiltIns.EvalByModified);
             RegisterHelp(new() { "ByModified" },
                 "Usage: ByModified()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by last modified time."
+                + "Returns a comparer function that can be used in Sort to sort by last modified time."
             );
 
             RegisterObject("ByScene", BuiltIns.EvalByScene);
             RegisterHelp(new() { "ByScene" },
                 "Usage: ByScene()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by scene."
+                + "Returns a comparer function that can be used in Sort to sort by scene."
             );
 
             RegisterObject("ByUID", BuiltIns.EvalByUID);
             RegisterHelp(new() { "ByUID" },
                 "Usage: ByUID()\n\n"
-                + "Returns a key function that can be used in Sorter to sort by the music's UID."
+                + "Returns a comparer function that can be used in Sort to sort by UID."
             );
         }
         private void LoadExpressions()
