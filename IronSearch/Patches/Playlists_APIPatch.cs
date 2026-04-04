@@ -1,12 +1,8 @@
 ﻿using HarmonyLib;
 using IronSearch.Core;
-using IronSearch.Records.HQMD5;
 using MelonLoader;
-using Playlists;
 using Playlists.Patches;
 using System.Reflection;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace IronSearch.Patches
 {
@@ -64,7 +60,8 @@ namespace IronSearch.Patches
         internal static void RunPatch(HarmonyLib.Harmony harmonyInstance)
         {
             try
-            {;
+            {
+                ;
                 _targetMethod = AccessTools.Method(typeof(APIPatch), "Prefix");
                 var prefix = Prefix;
                 harmonyInstance.Patch(_targetMethod, prefix: new HarmonyMethod(prefix.Method));
