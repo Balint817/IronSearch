@@ -205,6 +205,8 @@ namespace IronSearch
             SearchManager = new(Config);
             SearchManager.Initialize();
 
+            MelonLogger.Msg(System.ConsoleColor.Green, "Scripts initialized.");
+
             _initStepTracker = null;
         }
         public override void OnInitializeMelon()
@@ -253,6 +255,8 @@ namespace IronSearch
             }
 
             AutoCompleteManager.AddManagerKeywords();
+
+            MelonLogger.Msg(System.ConsoleColor.Green, "Initialization successful.");
 
             InitSuccessful = true;
         }
