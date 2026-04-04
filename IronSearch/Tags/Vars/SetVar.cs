@@ -16,9 +16,9 @@ namespace IronSearch.Tags
                 throw new SearchWrongTypeException("a string variable name", varArgs[0]?.GetType(), "SetVar", varArgs, varKwargs);
             }
 
-            LocalVariables.TryAdd(M.I.uid, new());
+            var d = LocalVariables.GetOrAdd(M.I.uid, _ => new());
 
-            LocalVariables[M.I.uid][s] = varArgs[1];
+            d[s] = varArgs[1];
             return true;
         }
     }
