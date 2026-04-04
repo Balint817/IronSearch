@@ -10,12 +10,15 @@ namespace IronSearch.Core
 {
     public class AdvancedSearchManager : IDisposable
     {
+        private const string BaseFolderName = "IronSearch";
+
         private const string ScriptFolderName = "Scripts";
+
         private const string ExampleScriptName = "Unpacked.py";
 
         public static string ArgumentName => "M";
         public static string BaseDictName => "T";
-        public static string ScriptDirectory => Path.Join(MelonEnvironment.UserDataDirectory, ScriptFolderName);
+        public static string ScriptDirectory => Path.Join(MelonEnvironment.UserDataDirectory, BaseFolderName, ScriptFolderName);
         public static string ExampleScriptFilePath => Path.Join(ScriptDirectory, ExampleScriptName);
 
         internal const double MiniCacheTimeout = 0.25;
