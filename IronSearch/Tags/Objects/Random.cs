@@ -11,7 +11,6 @@ namespace IronSearch.Tags
         internal static dynamic EvalRandom(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs, "Random", varArgs, varKwargs);
-            ThrowIfNotMatching(varArgs, 2, "Random", varArgs, varKwargs);
             if (varArgs.Length == 0)
             {
                 return Random.Shared.NextDouble();
@@ -31,6 +30,8 @@ namespace IronSearch.Tags
 
                 return UniformDouble.NextDouble(r.Start, r.End);
             }
+
+            ThrowIfNotMatching(varArgs, evalRandomArgCount, "Random", varArgs, varKwargs);
 
             long start;
 
