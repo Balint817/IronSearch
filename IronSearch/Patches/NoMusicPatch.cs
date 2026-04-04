@@ -1,16 +1,19 @@
-﻿namespace IronSearch.Patches
+﻿using HarmonyLib;
+using Il2Cpp;
+
+namespace IronSearch.Patches
 {
-    //[HarmonyPatch(typeof(LocalizationName), "GetMusicTagNoMusicTxt")]
+    [HarmonyPatch(typeof(LocalizationName), "GetMusicTagNoMusicTxt")]
     internal class NoMusicPatch
     {
         private static bool Prefix(ref string __result)
         {
-            if (RefreshPatch.isAdvancedSearch == false)
+            if (SearchResults_RefreshPatch.isAdvancedSearch == false)
             {
                 return true;
             }
 
-            if (RefreshPatch.isAdvancedSearch == true)
+            if (SearchResults_RefreshPatch.isAdvancedSearch == true)
             {
                 __result = "But nobody came.";
             }
@@ -21,12 +24,12 @@
             return false;
         }
     }
-    //[HarmonyPatch(typeof(LocalizationName), "GetSearchNameTxt")]
+    [HarmonyPatch(typeof(LocalizationName), "GetSearchNameTxt")]
     internal class SearchNamePatch
     {
         private static bool Prefix(ref string __result)
         {
-            if (RefreshPatch.isAdvancedSearch != false)
+            if (SearchResults_RefreshPatch.isAdvancedSearch != false)
             {
                 __result = "Results";
                 return false;
