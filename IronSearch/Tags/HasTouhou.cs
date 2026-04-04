@@ -10,7 +10,7 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varKwargs, "Touhou", varArgs, varKwargs);
 
             MapUtils.GetAvailableMaps(M.I, out var availableMaps);
-            return availableMaps.Contains(4);
+            return availableMaps.Contains(5);
         }
     }
 }
