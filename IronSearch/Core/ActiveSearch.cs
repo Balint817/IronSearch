@@ -384,8 +384,6 @@ namespace IronSearch.Core
                         dict[i] = new(mi.GetLocal(i));
                     }
                 }
-
-                File.WriteAllText("localInfos.json", JsonConvert.SerializeObject(localInfos));
             }
             catch (Exception ex)
             {
