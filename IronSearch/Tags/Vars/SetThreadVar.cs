@@ -5,7 +5,7 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        internal static readonly ThreadLocal<Dictionary<string, dynamic>> ThreadLocalVariables = new(() => new());
+        internal static ThreadLocal<Dictionary<string, dynamic>> ThreadLocalVariables = null!;
         internal static dynamic EvalSetThreadVar(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotMatching(varArgs, 2, "SetThreaded", varArgs, varKwargs);

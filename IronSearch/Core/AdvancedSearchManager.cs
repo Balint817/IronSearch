@@ -651,6 +651,16 @@ namespace IronSearch.Core
                 + "The return value of the function is ignored; RunOnce(...) always returns True."
             );
 
+            RegisterScript("RunThreadOnce", BuiltIns.EvalRunThreadOnce);
+            RegisterHelp(new() { "RunThreadOnce" },
+                "Usage: RunThreadOnce(function, id)\n\n"
+                + "Runs the provided function only once per thread, per ID.\n"
+                + "The first argument must be a function with no arguments.\n"
+                + "The second argument is optional, but if given, must be a string ID.\n"
+                + "When a specific ID is encountered for the first time on a specific thread, the function is executed.\n"
+                + "The return value of the function is ignored; RunThreadOnce(...) always returns True."
+            );
+
             RegisterScript("RunSync", BuiltIns.EvalRunSync);
             RegisterHelp(new() { "RunSync" },
                 "Usage: RunSync(function)\n\n"
