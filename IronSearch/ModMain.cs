@@ -62,7 +62,7 @@ namespace IronSearch
             return uid is not null;
 
         }
-        private static bool PlayIDToUIDInternal(string playId, [MaybeNullWhen(false)]out string uid)
+        private static bool PlayIDToUIDInternal(string playId, [MaybeNullWhen(false)] out string uid)
         {
             uid = null;
             if (playId.Length == 32)
@@ -89,7 +89,7 @@ namespace IronSearch
             return true;
         }
 
-        private static bool PlayIDToCustomUID(string md5Hash, [MaybeNullWhen(false)]out string uid)
+        private static bool PlayIDToCustomUID(string md5Hash, [MaybeNullWhen(false)] out string uid)
         {
             uid = AlbumManager.LoadedAlbums.Values.FirstOrDefault(a => a.Sheets.Values.Any(s => s.Md5 == md5Hash))?.Uid;
             return uid is not null;

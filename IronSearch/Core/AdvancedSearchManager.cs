@@ -42,7 +42,10 @@ namespace IronSearch.Core
         }
         public void LoadCustomTags(IEnumerable<CustomTagInfo> customTags)
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
 
             ScriptManager.DefaultPriority = (int)Priorities.CustomCLR;
 
@@ -74,7 +77,11 @@ namespace IronSearch.Core
         }
         public void Initialize()
         {
-            if (_disposed || _isInit) return;
+            if (_disposed || _isInit)
+            {
+                return;
+            }
+
             _isInit = true;
             MelonLogger.Msg("Initializing UserScriptManager...");
 
@@ -107,19 +114,31 @@ namespace IronSearch.Core
 
         private void RegisterScript(string key, BuiltInDelegate del)
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
+
             ScriptManager.ScriptExecutor.RegisterScript(key, ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(ScriptManager, del)));
         }
 
         private void RegisterObject(string key, BuiltInObjectDelegate del)
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
+
             ScriptManager.ScriptExecutor.RegisterScript(key, ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(ScriptManager, del)));
         }
 
         private void RegisterHelp(List<string> keys, string helpString)
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
+
             if (keys is null || keys.Count is 0)
             {
                 throw new ArgumentNullException(nameof(keys));
@@ -137,7 +156,11 @@ namespace IronSearch.Core
 
         private void RegisterAllBuiltIns()
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
+
             RegisterScript("Accuracy", BuiltIns.EvalAccuracy);
             RegisterScript("Acc", BuiltIns.EvalAccuracy);
             RegisterHelp(new() { "Accuracy", "Acc" },
@@ -704,7 +727,11 @@ namespace IronSearch.Core
         }
         private void LoadExpressions()
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
+
             try
             {
                 var expressions = _config.Expressions;
@@ -738,7 +765,11 @@ namespace IronSearch.Core
 
         private ExpressionDelegate LoadExpression(string expression)
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
+
             var compiled = ScriptManager.ScriptExecutor.Compile(expression);
             ExpressionDelegate baseDel = (SearchArgument M, PythonTuple varArgs, PythonDictionary varKwargs) =>
             {
@@ -750,7 +781,11 @@ namespace IronSearch.Core
 
         private void LoadAliases()
         {
-            if (_disposed || !_isInit) throw new InvalidOperationException();
+            if (_disposed || !_isInit)
+            {
+                throw new InvalidOperationException();
+            }
+
             try
             {
                 var aliases = _config.Aliases;

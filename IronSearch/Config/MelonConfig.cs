@@ -77,7 +77,7 @@ namespace IronSearch
                 return _searchHistoryEntry.Value.AsReadOnly();
             }
             internal set => _searchHistoryEntry.Value = value.ToList();
-            
+
         }
 
         private static GenericValidator<T> Validator<T>(T defaultValue) => new(defaultValue);

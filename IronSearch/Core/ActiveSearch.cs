@@ -11,7 +11,6 @@ using IronSearch.Records;
 using IronSearch.Tags;
 using IronSearch.Utils;
 using MelonLoader;
-using Newtonsoft.Json;
 using PythonExpressionManager;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;

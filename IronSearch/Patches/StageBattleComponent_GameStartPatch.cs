@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using Il2CppFormulaBase;
-using IronSearch.Records.HQMD5;
-using System.Text.Json;
 
 namespace IronSearch.Patches
 {
