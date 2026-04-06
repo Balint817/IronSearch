@@ -2,6 +2,7 @@ using IronSearch.Config;
 using IronSearch.Core;
 using MelonLoader;
 using MelonLoader.Utils;
+using System.Collections.ObjectModel;
 
 namespace IronSearch
 {
@@ -15,6 +16,7 @@ namespace IronSearch
         private MelonPreferences_Entry<bool> _enteredCodeEntry = null!;
         private MelonPreferences_Entry<bool> _enablePersistentSearchCachingEntry = null!;
         private MelonPreferences_Entry<string> _startSearchStringEntry = null!;
+        private MelonPreferences_Entry<List<string>> _searchHistoryEntry = null!;
         private MelonPreferences_Category _category = null!;
 
         public string StartString
@@ -60,6 +62,24 @@ namespace IronSearch
         }
         public float WaitMultiplierFloat => (float)WaitMultiplier;
 
+        internal List<string> SearchHistoryMutable
+        {
+            get => _searchHistoryEntry.Value;
+        }
+        public ReadOnlyCollection<string> SearchHistory
+        {
+            get
+            {
+                if (_searchHistoryEntry.Value is null)
+                {
+                    return null!;
+                }
+                return _searchHistoryEntry.Value.AsReadOnly();
+            }
+            internal set => _searchHistoryEntry.Value = value.ToList();
+            
+        }
+
         private static GenericValidator<T> Validator<T>(T defaultValue) => new(defaultValue);
 
         internal void CreatePreferences()
@@ -88,6 +108,9 @@ namespace IronSearch
                 "\nFor internal use.",
                 validator: Validator(false));
 
+            _searchHistoryEntry = _category.CreateEntry<List<string>>("SearchHistory", new(), "SearchHistory",
+                "\nYour 20 most successful advanced searches.",
+                validator: Validator(new List<string>()));
 
             var expressionDefault = new Dictionary<string, string>()
             {

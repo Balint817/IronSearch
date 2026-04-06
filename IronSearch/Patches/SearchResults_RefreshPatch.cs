@@ -44,6 +44,9 @@ namespace IronSearch.Patches
                 __instance.musicResult.m_Unlock.Add(musicInfo);
             }
 
+            ModMain.Config.SearchHistoryMutable.Add(keyword);
+            ModMain.Config.SearchHistoryMutable.RemoveAt(0);
+
             return false;
         }
 
