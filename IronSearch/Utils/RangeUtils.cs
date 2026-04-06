@@ -64,14 +64,13 @@ namespace IronSearch.Utils
             failureReason = null;
             range = null!;
             var l = new List<Range>();
-            var nullFlag = true;
             if (expression.StartsWith("(") && expression.EndsWith(")"))
             {
                 expression = expression[1..^1];
             }
             foreach (var substr in expression.Trim(' ').Split(' '))
             {
-                if (string.IsNullOrWhiteSpace(substr))
+                if (string.IsNullOrEmpty(substr))
                 {
                     continue;
                 }
@@ -80,18 +79,12 @@ namespace IronSearch.Utils
                 if (result == true)
                 {
                     l.Add(r);
-                    nullFlag = false;
                 }
                 else
                 {
                     failureReason = $"In segment \"{substr}\": {subReason}";
                     return false;
                 }
-            }
-            if (nullFlag)
-            {
-                failureReason = "No valid range segments were found (empty or whitespace only).";
-                return null;
             }
             range = new(l.ToArray());
             return true;
@@ -108,7 +101,7 @@ namespace IronSearch.Utils
         {
             failureReason = null;
             range = null!;
-            if (string.IsNullOrWhiteSpace(expression))
+            if (string.IsNullOrEmpty(expression) || string.IsNullOrWhiteSpace(expression))
             {
                 failureReason = "The value is empty or only whitespace.";
                 return null;
@@ -160,7 +153,7 @@ namespace IronSearch.Utils
                 var head = expression.AsSpan(0, expression.Length - 1);
                 if (!head.TryParseDouble(out start))
                 {
-                    failureReason = $"Could not parse a number from \"{head.ToString()}\" (the part before '+').";
+                    failureReason = $"Could not parse a number from \"{head}\" (the part before '+').";
                     return null;
                 }
                 end = max;
@@ -301,7 +294,7 @@ namespace IronSearch.Utils
         public static bool TryTimeStringRangeToTimeRange(this string s, [MaybeNullWhen(false)] out Range r)
         {
             r = null;
-            if (string.IsNullOrWhiteSpace(s))
+            if (string.IsNullOrEmpty(s) || string.IsNullOrWhiteSpace(s))
             {
                 return false;
             }
@@ -367,7 +360,7 @@ namespace IronSearch.Utils
         public static bool TryTimeStringToTimeSpan(this string s, out TimeSpan ts)
         {
             ts = TimeSpan.Zero;
-            if (string.IsNullOrWhiteSpace(s))
+            if (string.IsNullOrEmpty(s) || string.IsNullOrWhiteSpace(s))
             {
                 return false;
             }
@@ -388,7 +381,7 @@ namespace IronSearch.Utils
                 {
                     return false;
                 }
-                if (!long.TryParse(s[start..pos], out var value))
+                if (!NumberUtils.TryParseLong(s[start..pos], out var value))
                 {
                     return false;
                 }
