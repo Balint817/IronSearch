@@ -553,6 +553,15 @@ namespace IronSearch.Core
             RegisterHelp(new() { "DefineGlobal", "DG" },
                 "Usage: DefineGlobal(varName, value)\n\n"
                 + "If the global variable doesn't already exist, initializes a global variable with the specified name and value that can be passed between songs.\n"
+                + "This type of variable is not thread-safe."
+            );
+
+            RegisterObject("DefineThreaded", BuiltIns.EvalDefineThreadVar);
+            RegisterObject("DT", BuiltIns.EvalDefineThreadVar);
+            RegisterHelp(new() { "DefineThreaded", "DT" },
+                "Usage: DefineThreaded(varName, value)\n\n"
+                + "If the thread-global variable doesn't already exist, initializes a thread-global variable with the specified name and value.\n"
+                + "This is an alternative to global variables that is thread-safe, but the trade-off is that the value is different on every thread."
             );
 
             RegisterObject("DefineVar", BuiltIns.EvalDefineVar);
@@ -560,6 +569,7 @@ namespace IronSearch.Core
             RegisterHelp(new() { "DefineVar", "DV" },
                 "Usage: DefineVar(varName, value)\n\n"
                 + "If the variable doesn't already exist, initializes a variable with the specified name and value that can be accessed in the current song's filter.\n"
+                + "This type of variable is thread-safe."
             );
 
             RegisterObject("GetGlobal", BuiltIns.EvalGetGlobalVar);
@@ -570,6 +580,18 @@ namespace IronSearch.Core
                 "Usage: GetGlobal(varName)\n\n"
                 + "Returns the value of the global variable with the specified name that was defined with DefineGlobal or SetGlobal.\n"
                 + "The search fails if an undefined global variable is accessed."
+                + "This type of variable is not thread-safe."
+            );
+
+            RegisterObject("GetThreaded", BuiltIns.EvalGetThreadVar);
+            RegisterObject("GT", BuiltIns.EvalGetThreadVar);
+            RegisterObject("LoadThreaded", BuiltIns.EvalGetThreadVar);
+            RegisterObject("LT", BuiltIns.EvalGetThreadVar);
+            RegisterHelp(new() { "GetThreaded", "GT", "LoadThreaded", "LT" },
+                "Usage: GetThreaded(varName)\n\n"
+                + "Returns the value of the thread-global variable with the specified name that was defined with DefineThreaded or SetThreaded.\n"
+                + "The search fails if an undefined thread-global variable is accessed."
+                + "This is an alternative to global variables that is thread-safe, but the trade-off is that the value is different on every thread."
             );
 
             RegisterObject("GetVar", BuiltIns.EvalGetVar);
@@ -581,6 +603,7 @@ namespace IronSearch.Core
                 + "Returns the value of the variable with the specified name for the current song's filter.\n"
                 + "The variable must have been created with either SetVar or DefineVar in the current song's filter\n"
                 + "The search fails if an undefined variable is accessed."
+                + "This type of variable is thread-safe."
             );
 
             RegisterObject("SetGlobal", BuiltIns.EvalSetGlobalVar);
@@ -589,6 +612,16 @@ namespace IronSearch.Core
                 "Usage: SetGlobal(varName, value)\n\n"
                 + "Sets the value of the global variable with the specified name to the given value that can be passed between songs.\n"
                 + "If the variable doesn't exist, it is created. If it already exists, it's value is overwritten.\n"
+                + "This type of variable is not thread-safe."
+            );
+
+            RegisterObject("SetThreaded", BuiltIns.EvalSetThreadVar);
+            RegisterObject("ST", BuiltIns.EvalSetThreadVar);
+            RegisterHelp(new() { "SetThreaded", "ST" },
+                "Usage: SetThreaded(varName, value)\n\n"
+                + "Sets the value of the thread-global variable with the specified name to the given value.\n"
+                + "If the variable doesn't exist, it is created. If it already exists, it's value is overwritten.\n"
+                + "This type of variable is not thread-safe."
             );
 
             RegisterObject("SetVar", BuiltIns.EvalSetVar);
@@ -597,6 +630,7 @@ namespace IronSearch.Core
                 "Usage: SetVar(varName, value)\n\n"
                 + "Sets the value of the variable with the specified name to the given value for the current song's filter.\n"
                 + "If the variable doesn't exist, it is created. If it already exists, it's value is overwritten.\n"
+                + "This is an alternative to global variables that is thread-safe, but the trade-off is that the value is different on every thread."
             );
 
 

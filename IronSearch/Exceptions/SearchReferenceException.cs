@@ -17,14 +17,30 @@ namespace IronSearch.Exceptions
 
         private static string BuildMessage(string referenceName, ReferenceKind kind)
         {
-            var scope = kind == ReferenceKind.Global ? "global" : "local";
+            string scope;
+            switch (kind)
+            {
+                case ReferenceKind.Local:
+                    scope = "local";
+                    break;
+                case ReferenceKind.Global:
+                    scope = "global";
+                    break;
+                case ReferenceKind.ThreadGlobal:
+                    scope = "thread-global";
+                    break;
+                default:
+                    scope = "<unknown kind>";
+                    break;
+            }
             return $"There is no {scope} variable named '{referenceName}'.";
         }
 
         public enum ReferenceKind
         {
             Local,
-            Global
+            Global,
+            ThreadGlobal,
         }
     }
 }
