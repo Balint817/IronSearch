@@ -319,6 +319,12 @@ namespace IronSearch.Core
                 + "Additionally, due to technical reasons, ranking information may not update instantly if a chart has been ranked AFTER this setting was enabled."
             );
 
+            RegisterScript("Recent", BuiltIns.EvalRecent);
+            RegisterHelp(new() { "Recent" },
+                "Usage: Recent(range)\n\n"
+                + "Checks if the music is among the Nth last played charts."
+            );
+
             RegisterScript("Scene", BuiltIns.EvalScene);
             RegisterHelp(new() { "Scene" },
                 "Usage: Scene(sceneName) or Scene(sceneIndex)\n\n"
