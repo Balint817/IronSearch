@@ -8,7 +8,7 @@ namespace IronSearch.Tags
 
     internal delegate dynamic ExpressionDelegate(SearchArgument input, PythonTuple varArgs, PythonDictionary varKwargs);
     internal delegate bool BuiltInDelegate(SearchArgument input, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
-    internal delegate dynamic BuiltInObjectDelegate(SearchArgument input, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
+    public delegate dynamic BuiltInObjectDelegate(SearchArgument input, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs);
     internal partial class BuiltIns
     {
         internal static void ThrowIfNotEmpty(IReadOnlyDictionary<string, dynamic> d, string parameterContext, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

@@ -31,6 +31,14 @@ namespace IronSearch
         internal static Dictionary<string, object> uidToCustom = new();
         public static ReadOnlyDictionary<string, object> UIDToCustom => new(uidToCustom);
 
+        internal static List<CustomTagInfo> customTags = new();
+
+        public static void RegisterCustomTag(CustomTagInfo info)
+        {
+            ArgumentNullException.ThrowIfNull(info, nameof(info));
+            customTags.Add(info);
+        }
+
         private void DisposeAll()
         {
 
@@ -112,6 +120,7 @@ namespace IronSearch
 
         private Task<Dictionary<string, bool>> HQLoadTask = null!;
         private CancellationTokenSource cts = new();
+        internal static bool autoLoadCustomTags;
 
         public override void OnEarlyInitializeMelon()
         {
@@ -260,10 +269,13 @@ namespace IronSearch
                 MelonLogger.Msg(System.ConsoleColor.DarkRed, "Failed to load custom ranking information, online features will not work properly!");
             }
 
+            SearchManager.LoadCustomTags(customTags);
+            autoLoadCustomTags = true;
+
             AutoCompleteManager.AddManagerKeywords();
 
-            MelonLogger.Msg(System.ConsoleColor.Green, "Initialization successful.");
 
+            MelonLogger.Msg(System.ConsoleColor.Green, "Initialization successful.");
             InitSuccessful = true;
         }
     }
