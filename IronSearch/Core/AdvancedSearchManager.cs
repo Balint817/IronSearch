@@ -289,13 +289,7 @@ namespace IronSearch.Core
             RegisterScript("New", BuiltIns.EvalNew);
             RegisterHelp(new() { "New" },
                 "Usage: New(topRange)\n\n"
-                + "Checks if the music is among the Nth last added custom charts."
-            );
-
-            RegisterScript("Old", BuiltIns.EvalOld);
-            RegisterHelp(new() { "Old" },
-                "Usage: Old(bottomRange)\n\n"
-                + "Checks if the music is among the Nth first added custom charts."
+                + "Checks if the music is among the Nth most recently added custom charts."
             );
 
             RegisterScript("Online", BuiltIns.EvalOnline);

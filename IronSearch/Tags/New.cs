@@ -19,7 +19,9 @@ namespace IronSearch.Tags
                 {
                     yield break;
                 }
-                yield return (double)idx;
+                idx += 1; // 1-based index
+                yield return idx;
+                yield return -idx;
             }
         }
         internal static bool EvalNew(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
