@@ -310,20 +310,21 @@ namespace IronSearch.Utils
             }
 
             var split = s.Split('-');
-            if (split.Length == 1)
+            if (split.Length < 3 && (s.EndsWith('-') || split.Length == 1))
             {
-                if (!TryTimeStringToTimeSpan(split[0], out var ts))
+                if (!TryTimeStringToTimeSpan(s.TrimEnd('-'), out var ts))
                 {
                     return false;
                 }
                 var secs = ts.TotalSeconds;
-                r = new Range(secs - 0.5, secs + 0.5)
+                r = new Range(double.NegativeInfinity, secs + 0.5)
                 {
                     ExclusiveEnd = true
                 };
                 return true;
             }
-            else if (split.Length == 2)
+
+            if (split.Length == 2)
             {
                 if (!TryTimeStringToTimeSpan(split[0], out var ts))
                 {
