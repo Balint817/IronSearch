@@ -816,7 +816,8 @@ Usage:
 
 - `New(topRange)`
 
-Checks if the music is among the Nth last added custom charts.
+Checks if the music is among the Nth most recently added charts.\
+A negative range counts from the end. (e.g. oldest charts instead of newest charts)
 
 Notes:
 
@@ -829,28 +830,6 @@ search: New('1-5')
 ```
 
 Returns the 5 most recently added custom charts.
-
----
-
-#### `Old`
-
-Usage:
-
-- `Old(bottomRange)`
-
-Checks if the music is among the Nth first added custom charts.
-
-Notes:
-
-- Only applies to custom charts.
-
-Example:
-
-```text
-search: Old('1-5')
-```
-
-Returns the 5 oldest custom charts.
 
 ---
 
@@ -890,6 +869,22 @@ Notes:
 
 - Only works when HQ is available (`EnableHQSpam=true`).
 - There may be a delay in ranking info updating after enabling HQ spam (implementation note from help string).
+
+---
+
+#### `Recent`
+
+Usage:
+
+- `Recent()`
+
+Checks if the music is the Nth most recently played chart.\
+This is tracked by the mod itself, unlike History which is tracked by the game.\
+A negative range counts from the end. (e.g. oldest played charts instead of the most recently played charts)
+
+Notes:
+
+- Only starts tracking **after** the mod has been installed.
 
 ---
 
