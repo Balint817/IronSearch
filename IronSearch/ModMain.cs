@@ -1,4 +1,5 @@
-﻿using Il2CppAssets.Scripts.PeroTools.Commons;
+﻿using CustomAlbums.Managers;
+using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.UI.Controls;
 using IronPython.Runtime;
 using IronSearch.Core;
@@ -7,7 +8,11 @@ using IronSearch.Patches;
 using IronSearch.UI;
 using IronSearch.Utils;
 using MelonLoader;
+using MelonLoader.Utils;
+using Newtonsoft.Json;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace IronSearch
 {
@@ -32,6 +37,63 @@ namespace IronSearch
         public static ReadOnlyDictionary<string, object> UIDToCustom => new(uidToCustom);
 
         internal static List<CustomTagInfo> customTags = new();
+
+        internal static readonly string playIdFilePath = Path.Combine(MelonEnvironment.UserDataDirectory, "IronSearchPlayHistory.json");
+        internal static List<string> playIds = null!;
+        internal static ConcurrentDictionary<string, string> playIdToUidCache = new();
+
+        public static bool PlayIDToUID(string playId, [MaybeNullWhen(false)] out string uid)
+        {
+            uid = null;
+            if (string.IsNullOrEmpty(playId))
+            {
+                return false;
+            }
+            playId = playId.Trim();
+            if (playIdToUidCache.TryGetValue(playId, out uid))
+            {
+                return uid is not null;
+            }
+            if (PlayIDToUIDInternal(playId, out uid))
+            {
+                uid = null;
+            }
+            playIdToUidCache.TryAdd(playId, uid!);
+            return uid is not null;
+
+        }
+        private static bool PlayIDToUIDInternal(string playId, [MaybeNullWhen(false)]out string uid)
+        {
+            uid = null;
+            if (playId.Length == 32)
+            {
+
+                if (!CustomAlbumsLoaded)
+                {
+                    return false;
+                }
+                return PlayIDToCustomUID(playId, out uid);
+            }
+            var split = playId.Split("_", 2);
+            if (split.Length != 2 || !NumberUtils.TryParseInt(split[1], out _))
+            {
+                return false;
+            }
+            uid = split[0];
+            split = split[0].Split("-");
+            if (split.Length != 2 || !NumberUtils.TryParseInt(split[0], out _) || !NumberUtils.TryParseInt(split[1], out _))
+            {
+                uid = null;
+                return false;
+            }
+            return true;
+        }
+
+        private static bool PlayIDToCustomUID(string md5Hash, [MaybeNullWhen(false)]out string uid)
+        {
+            uid = AlbumManager.LoadedAlbums.Values.FirstOrDefault(a => a.Sheets.Values.Any(s => s.Md5 == md5Hash))?.Uid;
+            return uid is not null;
+        }
 
         public static void RegisterCustomTag(CustomTagInfo info)
         {
@@ -73,6 +135,7 @@ namespace IronSearch
         {
             Config.SavePreferences();
             DisposeAll();
+            File.WriteAllText(playIdFilePath, JsonConvert.SerializeObject(playIds));
         }
         public override void OnPreferencesLoaded()
         {
@@ -215,6 +278,16 @@ namespace IronSearch
                         MelonLogger.Msg(System.ConsoleColor.Red, "Incorrect code. Please read the warning carefully and try again.");
                     }
                 }
+            }
+
+            try
+            {
+                playIds = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(playIdFilePath)) ?? new();
+            }
+            catch (Exception ex)
+            {
+                playIds = new();
+                MelonLogger.Msg(System.ConsoleColor.Red, $"Failed to load play history from {playIdFilePath}, starting with empty history.\n{ex}");
             }
 
             SearchManager = new(Config);
