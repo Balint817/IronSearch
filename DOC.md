@@ -1423,6 +1423,41 @@ Using global variables should be combined with `RunOnce` or `RunSync` as they ar
 
 ---
 
+#### `DefineThreaded`/`DT`
+
+Usage:
+
+- `DefineThreaded(varName, value)`
+
+If the thread-global variable does not exist, initializes a **thread-global** variable with the given value.
+
+Thread-global variables are an alternative to global variables that are thread-safe, but the trade-off is that the value is different on every thread.\
+If the variable already exists, it does not overwrite.
+
+---
+
+#### `GetThreaded`/`GT`/`LoadThreaded`/`LT`
+
+Usage:
+
+- `GetThreaded(varName)`
+
+Returns the thread-global variable value for the current thread.
+
+If the variable is undefined, the search fails with a reference error.
+
+---
+
+#### `SetThreaded`/`ST`
+
+Usage:
+
+- `SetThreaded(varName, value)`
+
+Creates or overwrites a thread-global variable value for the current thread.
+
+---
+
 ### 7.5 Control-flow / debugging (VERY advanced)
 
 #### `Exit`
@@ -1494,6 +1529,25 @@ Notes:
 - The return value of the function is ignored; `RunOnce(...)` always returns `True`.
 
 So `RunOnce(...)` is best used for side effects (warming caches, precomputations, etc.).
+
+---
+
+#### `RunThreadOnce`
+
+Usage:
+
+- `RunThreadOnce(function)` or `RunThreadOnce(function, id)`
+
+Runs the provided function only once **per thread**, per `id`.
+
+Notes:
+
+- The first argument must be a **function with no arguments**.
+- The second argument is optional, but if given, must be a **string id**.
+- When a specific `id` is encountered for the first time on a specific thread, the function is executed.
+- The return value of the function is ignored; `RunThreadOnce(...)` always returns `True`.
+
+This is the thread-local equivalent of `RunOnce(...)`.
 
 ---
 
