@@ -43,6 +43,9 @@ namespace IronSearch.Core
         public void LoadCustomTags(IEnumerable<CustomTagInfo> customTags)
         {
             if (_disposed || !_isInit) throw new InvalidOperationException();
+
+            ScriptManager.DefaultPriority = (int)Priorities.CustomCLR;
+
             foreach (var tag in customTags)
             {
                 try
