@@ -45,8 +45,28 @@ namespace IronSearch.Core
             if (_disposed || !_isInit) throw new InvalidOperationException();
             foreach (var tag in customTags)
             {
-                RegisterObject(tag.Keys[0], tag.Method);
-                RegisterHelp(tag.Keys.ToList(), tag.HelpString);
+                try
+                {
+                    RegisterObject(tag.Keys[0], tag.Method);
+                    try
+                    {
+                        for (int i = 1; i < tag.Keys.Count; i++)
+                        {
+                            RegisterObject(tag.Keys[i], tag.Method);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Msg(ConsoleColor.DarkRed, $"An error occured registering an alias for the custom tag '{tag.Keys[0]}'");
+                        MelonLogger.Msg(ConsoleColor.Red, ex);
+                    }
+                    RegisterHelp(tag.Keys.ToList(), tag.HelpString);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Msg(ConsoleColor.DarkRed, $"An error occured registering a custom tag.");
+                    MelonLogger.Msg(ConsoleColor.Red, ex);
+                }
             }
         }
         public void Initialize()
