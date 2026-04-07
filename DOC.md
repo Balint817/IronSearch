@@ -139,6 +139,17 @@ How to read this:
 - evaluate like a simple `or`.
 - if `D` needs to be evaluated, evaluate `B and not C` and substitute the result in place of `D`.
 
+### Comparison operators
+
+|Operator|Meaning|
+|------|----------------|
+| `A == B` | `A` is equal to `B` |
+| `A != B` | `A` is not equal to `B` |
+| `A > B` | `A` is greater than `B` |
+| `A < B` | `A` is less than `B` |
+| `A >= B` | `A` is greater than or equal to `B`|
+| `A <= B` | `A` is less than or equal to `B`|
+
 ### Sorting (optional)
 
 Sorting is enabled by including `Sorter(...)` (alias: `Sort`) somewhere in your expression. \
@@ -161,6 +172,9 @@ search: Sort(ByBPM(), ByLength()) and Custom()
 ### Truthiness (what counts as True or False)
 
 The result of your expression is always converted to a True or False value.\
+Everything counts as `True` unless it is zero, empty, or `False` itself.\
+Examples of `False` include `0`, `None`, `[]`, `''`, `""`.
+
 This is a common point of failure:
 
 ```text
@@ -173,31 +187,7 @@ The above matches songs that have all-perfect on the highest map (probably what 
 search: AP
 ```
 
-If you forget the parentheses, the game thinks you are just naming the command instead of actually running it, so it accidentally matches everything.\
-Basically:
-- `0`, `None`, `False`, `[]` -> `False`
-- everything else -> `True` (this includes the functions themselves)
-
-You can try it yourself in-game by doing the following searches:
-```python
-search: True
-```
-
-```python
-search: 0
-```
-
-```python
-search: False
-```
-
-```python
-search: 1
-```
-
-```python
-search: 365
-```
+The above matches everything.
 
 ![Search demo](/Resources/parenthesis.gif)
 
@@ -338,6 +328,7 @@ For example, `Difficulty('11+', '3')` checks the **Master** slot, and `FC('4')` 
 5. Exclusive endpoints with `|`
    - `'|A-B'` makes the **start** exclusive: `A < value <= B`
    - `'A-B|'` makes the **end** exclusive: `A <= value < B`
+   - `'|A-'` makes **A** exclusive: `value < A`
 
 Notes about `?`:
 
