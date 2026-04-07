@@ -1,7 +1,6 @@
 using IronSearch.Exceptions;
 using MelonLoader;
 using System.Collections.Concurrent;
-using System.Text;
 
 namespace IronSearch.Tags
 {
@@ -22,13 +21,7 @@ namespace IronSearch.Tags
             }
             ThrowIfNotEmpty(varKwargs, "LogUnique", varArgs, varKwargs);
 
-            var sb = new StringBuilder();
-            foreach (var item in varArgs)
-            {
-                sb.Append((object)item);
-                sb.Append(separator);
-            }
-            var result = sb.ToString();
+            var result = string.Join(separator, varArgs.Select(x => ((object)x)?.ToString() ?? "None"));
             if (logUnique.TryAdd(result, false))
             {
                 MelonLogger.Msg(ConsoleColor.DarkCyan, result);

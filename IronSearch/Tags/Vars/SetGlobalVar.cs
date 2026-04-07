@@ -5,7 +5,7 @@ namespace IronSearch.Tags
 {
     internal partial class BuiltIns
     {
-        internal static readonly ConcurrentDictionary<string, dynamic> GlobalVariables = new();
+        internal static readonly Dictionary<string, dynamic> GlobalVariables = new();
         private static readonly object _globalVarLock = new();
         internal static dynamic EvalSetGlobalVar(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

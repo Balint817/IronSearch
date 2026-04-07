@@ -32,16 +32,8 @@ namespace IronSearch.Tags
 
         internal static void AddBPMInfo(MusicInfo musicInfo)
         {
-            if (bpmDict.ContainsKey(musicInfo.uid))
-            {
-                return;
-            }
-            if (RangeUtils.DetectParseBPM(musicInfo.bpm, out var range))
-            {
-                bpmDict[musicInfo.uid] = range;
-                return;
-            }
-            bpmDict[musicInfo.uid] = null;
+            bpmDict.GetOrAdd(musicInfo.uid, _ =>
+                RangeUtils.DetectParseBPM(musicInfo.bpm, out var range) ? range : null);
         }
 
         internal static bool EvalBPM(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

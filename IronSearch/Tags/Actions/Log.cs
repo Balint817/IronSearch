@@ -1,6 +1,5 @@
 using IronSearch.Exceptions;
 using MelonLoader;
-using System.Text;
 
 namespace IronSearch.Tags
 {
@@ -20,13 +19,7 @@ namespace IronSearch.Tags
             }
             ThrowIfNotEmpty(varKwargs, "Log", varArgs, varKwargs);
 
-            var sb = new StringBuilder();
-            foreach (var item in varArgs)
-            {
-                sb.Append((object)item);
-                sb.Append(separator);
-            }
-            MelonLogger.Msg(ConsoleColor.DarkCyan, sb.ToString());
+            MelonLogger.Msg(ConsoleColor.DarkCyan, string.Join(separator, varArgs.Select(x => ((object)x)?.ToString() ?? "None")));
             return true;
         }
     }

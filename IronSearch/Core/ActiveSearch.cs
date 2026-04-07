@@ -108,7 +108,7 @@ namespace IronSearch.Core
             }
             else if (searchCache.TryGetValue(expression, out cache))
             {
-                if (!(cache.Expiration is not { } exp || exp < DateTime.UtcNow))
+                if (cache.Expiration is { } exp && exp >= DateTime.UtcNow)
                 {
                     CachedSearch(finalResult, cache, allMusic);
                     return SearchResult.OK;

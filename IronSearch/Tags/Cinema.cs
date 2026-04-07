@@ -8,10 +8,6 @@ namespace IronSearch.Tags
     {
         internal static HashSet<string> hasCinema { get; set; } = new();
 
-        internal static DateTime lastCheckedCinema;
-
-        internal static bool isCinemaModified;
-
         internal static bool EvalCinema(MusicInfo musicInfo)
         {
             if (!EvalCustom(musicInfo))
@@ -22,25 +18,7 @@ namespace IronSearch.Tags
         }
         internal static bool EvalCinemaInternal(MusicInfo musicInfo)
         {
-            var customInfo = (Album)ModMain.uidToCustom[musicInfo.uid];
-            if (!customInfo.IsPackaged)
-            {
-                return MapUtils.TryParseCinemaJson(customInfo, false);
-            }
-            var lastModified = File.GetLastAccessTimeUtc(customInfo.Path);
-            if (lastCheckedCinema >= lastModified)
-            {
-                return hasCinema.Contains(musicInfo.uid);
-            }
-            isCinemaModified = true;
-            if (MapUtils.TryParseCinemaJson(customInfo))
-            {
-                hasCinema.Add(musicInfo.uid);
-                return true;
-            }
-            ;
-            hasCinema.Remove(musicInfo.uid);
-            return false;
+            return hasCinema.Contains(musicInfo.uid);
         }
         internal static bool EvalCinema(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {

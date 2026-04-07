@@ -62,7 +62,6 @@ namespace IronSearch
                 MelonLogger.Msg("Checking charts for cinemas, this shouldn't take long...");
                 BuiltIns.hasCinema = AlbumManager.LoadedAlbums.Values.Where(x => MapUtils.TryParseCinemaJson(x)).Select(x => x.Uid).ToHashSet();
                 MelonLogger.Msg("Cinema tag initialized");
-                BuiltIns.lastCheckedCinema = DateTime.UtcNow;
             }
             catch (Exception ex)
             {

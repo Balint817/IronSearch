@@ -127,8 +127,9 @@ namespace IronSearch.Utils
         }
 
 
-        internal static bool TryParseCinemaJson(Album album, bool skipUnpackaged = true)
+        internal static bool TryParseCinemaJson(object albumBoxed, bool skipUnpackaged = true)
         {
+            var album = (Album)albumBoxed;
             string path = album.Path;
             JObject items;
 

@@ -16,12 +16,12 @@ namespace IronSearch.Tags
             {
                 var uidToInfo = Singleton<ConfigManager>.instance
                     .GetConfigObject<DBConfigMusicSearchTag>(0).m_Dictionary;
-                if (!uidToInfo.ContainsKey(musicInfo.uid))
+                if (!uidToInfo.TryGetValue(musicInfo.uid, out var tagInfo))
                 {
                     yield break;
                 }
 
-                var tags = uidToInfo[musicInfo.uid]?.tag;
+                var tags = tagInfo?.tag;
                 if (tags != null)
                 {
                     foreach (var tag in tags)

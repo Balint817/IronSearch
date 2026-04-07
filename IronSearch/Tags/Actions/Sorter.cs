@@ -39,7 +39,6 @@ namespace IronSearch.Tags
                 varKwargs.Remove("id");
             }
             ThrowIfNotEmpty(varKwargs, "Sort", varArgs, varKwargs);
-            ThrowIfEmpty(varArgs, "Sort", varArgs, varKwargs);
 
             ActiveSearch._activeSorters.TryAdd(id, new());
             var dict = ActiveSearch._activeSorters[id];
