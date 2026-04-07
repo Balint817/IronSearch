@@ -28,7 +28,7 @@ namespace IronSearch.Records
         {
             get
             {
-                if (_accStrParsedSet)
+                if (!_accStrParsedSet)
                 {
                     _accStrParsedSet = true;
                     if (string.IsNullOrEmpty(AccuracyStr))
