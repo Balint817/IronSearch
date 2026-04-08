@@ -4,6 +4,7 @@ using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.GameCore;
 using Il2CppPeroTools2.Resources;
+using IronSearch.Patches;
 using IronSearch.Tags;
 using IronSearch.Utils;
 using MelonLoader;
@@ -228,9 +229,12 @@ namespace IronSearch.Loaders
             }
             return _loadBmsDelegate(stream, name);
         }
-
+        private static readonly Dictionary<int, object> EmptyMaps = new();
         private static Dictionary<int, object> LoadBmsMaps(string uid, string path, bool isPackaged)
         {
+            if (!BmsLoader_MathPatch.IsPatched)
+                return EmptyMaps;
+            
             if (BmsCache.TryGetValue(uid, out var cached))
                 return cached;
 
@@ -292,7 +296,7 @@ namespace IronSearch.Loaders
 
         private static float? GetMaxTimeFromMaps(Dictionary<int, object> maps)
         {
-            float maxTime = -1f;
+            float maxTime = 0f;
             bool foundAny = false;
 
             foreach (Bms bms in maps.Values.Cast<Bms>())

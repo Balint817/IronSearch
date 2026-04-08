@@ -10,6 +10,7 @@ namespace IronSearch.Patches
     internal class BmsLoader_MathPatch
     {
         private static readonly Dictionary<MethodInfo, MethodInfo> Replacements = new();
+        internal static bool IsPatched { get; private set; } = false;
 
         internal static void RunPatch(HarmonyLib.Harmony harmonyInstance)
         {
@@ -27,11 +28,12 @@ namespace IronSearch.Patches
                 var loadMethod = AccessTools.Method(type, "Load");
                 var transpiler = new HarmonyMethod(typeof(BmsLoader_MathPatch), nameof(Transpiler));
                 harmonyInstance.Patch(loadMethod, transpiler: transpiler);
+                IsPatched = true;
             }
             catch (Exception ex)
             {
                 MelonLogger.Msg(ConsoleColor.Red, ex);
-                MelonLogger.Msg(ConsoleColor.Red, "Error occurred while patching BmsLoader, thread-safe math replacements will not be applied. The game will likely crash!");
+                MelonLogger.Msg(ConsoleColor.Red, "Error occurred while patching BmsLoader, thread-safe math replacements will not be applied. The game may crash!");
             }
         }
 
