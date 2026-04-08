@@ -11,7 +11,7 @@ namespace IronSearch.Tags
             public override string EvaluatorName => "Length";
             public override IEnumerable<double> GetDoubles(MusicInfo musicInfo)
             {
-                var length = LengthLoader.GetMusicLength(musicInfo);
+                var length = ChartDataLoader.GetMusicLength(musicInfo);
                 if (length is not { } ts)
                 {
                     return Array.Empty<double>();

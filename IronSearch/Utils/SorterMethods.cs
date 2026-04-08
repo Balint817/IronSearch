@@ -152,8 +152,8 @@ namespace IronSearch.Utils
             {
                 throw new SearchCallNotAllowed("ByLength()", Array.Empty<dynamic>(), new Dictionary<string, dynamic>());
             }
-            var length1null = LengthLoader.GetMusicLength(musicInfo1);
-            var length2null = LengthLoader.GetMusicLength(musicInfo2);
+            var length1null = ChartDataLoader.GetMusicLength(musicInfo1);
+            var length2null = ChartDataLoader.GetMusicLength(musicInfo2);
 
             if (length1null is not { } length1)
             {

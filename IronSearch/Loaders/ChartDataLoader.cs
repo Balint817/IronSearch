@@ -1,28 +1,28 @@
 ﻿using CustomAlbums.Data;
 using CustomAlbums.Managers;
+using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
+using Il2CppAssets.Scripts.GameCore;
 using Il2CppPeroTools2.Resources;
 using IronSearch.Tags;
 using IronSearch.Utils;
 using MelonLoader;
 using MelonLoader.Utils;
-using NAudio.Vorbis;
 using Newtonsoft.Json;
-using NLayer;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Compression;
-using UnityEngine;
 
 namespace IronSearch.Loaders
 {
 
-    public static class LengthLoader
+    public static class ChartDataLoader
     {
-        private const string AudioLengthBackupFile = "chartLengthSearchCache.json";
+        private const string AudioLengthBackupFile = "IronSearchChartLengthCache.json";
         private static readonly string AudioLengthBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, AudioLengthBackupFile);
 
         public static readonly ConcurrentDictionary<string, TimeSpan?> CustomCache = new();
+        public static readonly ConcurrentDictionary<string, Dictionary<int, object>> BmsCache = new();
         public static ConcurrentDictionary<string, TimeSpan>? VanillaCache { get; private set; }
         private static bool _vanillaCacheUpdated = true;
         public static void ForceBuildVanillaCache()
@@ -60,11 +60,9 @@ namespace IronSearch.Loaders
             {
                 return null;
             }
-            TimeSpan? result;
             if (BuiltIns.EvalCustom(musicInfo))
             {
-
-                if (CustomCache.TryGetValue(musicInfo.uid, out result))
+                if (CustomCache.TryGetValue(musicInfo.uid, out TimeSpan? result))
                 {
                     return result;
                 }
@@ -121,21 +119,48 @@ namespace IronSearch.Loaders
 
         private static TimeSpan LoadVanillaOne(MusicInfo musicInfo)
         {
-            if (musicInfo.music is null)
+            if (musicInfo.noteJson is null)
             {
                 return TimeSpan.FromSeconds(-1);
             }
             try
             {
-                var ac = ResourcesManager.instance.LoadFromName<AudioClip>(musicInfo.music);
-                var length = ac.length;
-                ac.UnloadAudioData();
-                return TimeSpan.FromSeconds(length);
-            }
-            catch (Exception)
-            {
+                if (!MapUtils.GetAvailableMaps(musicInfo, out var availableMaps))
+                {
+                    return TimeSpan.FromSeconds(-1);
+                }
 
-                MelonLogger.Msg(System.ConsoleColor.DarkRed, (musicInfo.music ?? "<null>") + ", " + (musicInfo.musicName ?? "<null>") + ", " + (musicInfo.uid ?? "<null>"));
+                float maxTime = -1f;
+                foreach (var diff in availableMaps)
+                {
+                    try
+                    {
+                        var stageInfo = ResourcesManager.instance.LoadFromName<StageInfo>(musicInfo.noteJson + diff);
+                        var musicDatas = stageInfo.musicDatas;
+                        if (musicDatas == null || musicDatas.Count == 0)
+                            continue;
+
+                        for (int i = 0; i < musicDatas.Count; i++)
+                        {
+                            var tick = Il2CppSystem.Decimal.ToSingle(musicDatas[i].tick);
+                            if (tick > maxTime)
+                                maxTime = tick;
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                return maxTime >= 0f
+                    ? TimeSpan.FromSeconds(maxTime)
+                    : TimeSpan.FromSeconds(-1);
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Msg(ConsoleColor.DarkRed, ex);
+                MelonLogger.Msg(ConsoleColor.DarkRed, (musicInfo.noteJson ?? "<null>") + ", " + (musicInfo.musicName ?? "<null>") + ", " + (musicInfo.uid ?? "<null>"));
                 throw;
             }
         }
@@ -191,91 +216,116 @@ namespace IronSearch.Loaders
             return GetCustomLengthDirect(musicInfo.uid);
         }
 
+        private static Func<Stream, string, Bms>? _loadBmsDelegate;
+
+        private static Bms LoadBms(Stream stream, string name)
+        {
+            if (_loadBmsDelegate is null)
+            {
+                var type = AccessTools.TypeByName("CustomAlbums.BmsLoader");
+                var method = AccessTools.Method(type, "Load");
+                _loadBmsDelegate = method.CreateDelegate<Func<Stream, string, Bms>>();
+            }
+            return _loadBmsDelegate(stream, name);
+        }
+
+        private static Dictionary<int, object> LoadBmsMaps(string uid, string path, bool isPackaged)
+        {
+            if (BmsCache.TryGetValue(uid, out var cached))
+                return cached;
+
+            var maps = isPackaged
+                ? LoadBmsMapsFromZip(path)
+                : LoadBmsMapsFromDirectory(path);
+
+            BmsCache.TryAdd(uid, maps);
+            return maps;
+        }
+
+        private static Dictionary<int, object> LoadBmsMapsFromZip(string zipPath)
+        {
+            var maps = new Dictionary<int, object>();
+            using var archive = ZipFile.OpenRead(zipPath);
+
+            for (int i = 1; i <= 5; i++)
+            {
+                try
+                {
+                    var entry = archive.GetEntry($"map{i}.bms");
+                    if (entry == null) continue;
+
+                    using var stream = entry.Open();
+                    using var ms = stream.CopyToMemory();
+                    maps[i] = LoadBms(ms, $"map{i}.bms");
+                }
+                catch
+                {
+                    // silent ignore
+                }
+            }
+
+            return maps;
+        }
+
+        private static Dictionary<int, object> LoadBmsMapsFromDirectory(string dirPath)
+        {
+            var maps = new Dictionary<int, object>();
+
+            for (int i = 1; i <= 5; i++)
+            {
+                try
+                {
+                    var bmsPath = Path.Combine(dirPath, $"map{i}.bms");
+                    if (!File.Exists(bmsPath)) continue;
+
+                    using var fs = File.OpenRead(bmsPath);
+                    maps[i] = LoadBms(fs, $"map{i}.bms");
+                }
+                catch
+                {
+                    // silent ignore
+                }
+            }
+
+            return maps;
+        }
+
+        private static float? GetMaxTimeFromMaps(Dictionary<int, object> maps)
+        {
+            float maxTime = -1f;
+            bool foundAny = false;
+
+            foreach (Bms bms in maps.Values.Cast<Bms>())
+            {
+                foreach (var note in bms.Notes)
+                {
+                    if (note is System.Text.Json.Nodes.JsonObject jo
+                        && jo.TryGetPropertyValue("time", out var timeNode)
+                        && timeNode is System.Text.Json.Nodes.JsonValue jv
+                        && jv.TryGetValue<float>(out var time)
+                        && time >= maxTime)
+                    {
+                        maxTime = time;
+                    }
+                }
+                foundAny = true;
+            }
+
+            return foundAny ? maxTime : null;
+        }
+
         private static TimeSpan? GetCustomLengthDirect(string uid)
         {
             var album = (Album)ModMain.uidToCustom[uid];
             try
             {
-                if (album.IsPackaged)
-                {
-                    var t = GetFromZip(album.Path);
-                    return t;
-                }
-                else
-                {
-                    return GetFromDirectory(album.Path);
-                }
+                var maps = LoadBmsMaps(uid, album.Path, album.IsPackaged);
+                var maxTime = GetMaxTimeFromMaps(maps);
+                return maxTime != null ? TimeSpan.FromSeconds(maxTime.Value) : null;
             }
-            catch
+            catch (Exception e)
             {
-                return null;
-            }
-        }
-
-        private static TimeSpan? GetFromDirectory(string dirPath)
-        {
-            string oggPath = Path.Combine(dirPath, "music.ogg");
-            if (File.Exists(oggPath))
-            {
-                using var fs = File.OpenRead(oggPath);
-                return GetOggLength(fs);
-            }
-
-            string mp3Path = Path.Combine(dirPath, "music.mp3");
-            if (File.Exists(mp3Path))
-            {
-                using var fs = File.OpenRead(mp3Path);
-                return GetMp3Length(fs);
-            }
-
-            return null;
-        }
-        private static TimeSpan? GetFromZip(string zipPath)
-        {
-            using var archive = ZipFile.OpenRead(zipPath);
-
-            var oggEntry = archive.GetEntry("music.ogg");
-            if (oggEntry != null)
-            {
-                using var stream = oggEntry.Open();
-                using var ms = stream.CopyToMemory();
-                return GetOggLength(ms);
-            }
-
-            var mp3Entry = archive.GetEntry("music.mp3");
-            if (mp3Entry != null)
-            {
-                using var stream = mp3Entry.Open();
-                using var ms = stream.CopyToMemory();
-                return GetMp3Length(ms);
-            }
-
-            return null;
-        }
-
-        private static TimeSpan? GetOggLength(Stream stream)
-        {
-            try
-            {
-                using var reader = new VorbisWaveReader(stream);
-                return reader.TotalTime;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static TimeSpan? GetMp3Length(Stream stream)
-        {
-            try
-            {
-                using var mpeg = new MpegFile(stream);
-
-                return mpeg.Duration;
-            }
-            catch (Exception)
-            {
+                Console.WriteLine(e);
                 return null;
             }
         }

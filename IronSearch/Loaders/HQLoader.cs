@@ -70,7 +70,7 @@ namespace IronSearch.Loaders
             return result;
         }
 
-        private const string HQRankingBackupFile = "hqChartsRankInfo.json";
+        private const string HQRankingBackupFile = "IronSearchRankInfo.json";
         private static readonly string HQRankingBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, HQRankingBackupFile);
         private static async Task CreateBackup(Dictionary<string, bool> result)
         {

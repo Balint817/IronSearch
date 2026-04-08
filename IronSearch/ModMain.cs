@@ -108,14 +108,14 @@ namespace IronSearch
         {
 
             cts.Cancel();
-            LengthLoader.customCts.Cancel();
+            ChartDataLoader.customCts.Cancel();
 
             try
             {
-                LengthLoader.CustomCacheTask?.Dispose();
+                ChartDataLoader.CustomCacheTask?.Dispose();
             }
             catch (Exception) { }
-            LengthLoader.CustomCacheTask = null!;
+            ChartDataLoader.CustomCacheTask = null!;
 
             try
             {
@@ -168,80 +168,12 @@ namespace IronSearch
             {
                 UISystemLoaded = true;
                 InitLogic.BuildCacheIfNecessary();
-                LoadTest();
             }
             else
             {
                 // ...
             }
             PnlMusic_FocusChangedPatch.inputField = null;
-        }
-
-        private void LoadTest()
-        {
-            var stopwatch = Stopwatch.StartNew();
-            MelonLogger.Msg("Vanilla loading test started...");
-
-            LoadVanillaTest();
-
-            stopwatch.Stop();
-            MelonLogger.Msg("Vanilla finished in " + stopwatch.Elapsed.TotalSeconds);
-
-
-            stopwatch.Restart();
-
-
-            LoadCustomTest();
-
-            stopwatch.Stop();
-            MelonLogger.Msg("Customs finished in " + stopwatch.Elapsed.TotalSeconds);
-        }
-
-        private void LoadCustomTest()
-        {
-            var allMusic = new Il2CppSystem.Collections.Generic.List<MusicInfo>();
-            GlobalDataBase.s_DbMusicTag.GetAllMusicInfo(allMusic);
-            foreach (var mi in allMusic)
-            {
-                if (mi.uid == null || !mi.uid.StartsWith("999-"))
-                    continue;
-                if (mi.noteJson is not string noteJson)
-                    continue;
-
-                MapUtils.GetAvailableMaps(mi, out var maps);
-                foreach (var diff in maps)
-                {
-                    try
-                    {
-                        ResourcesManager.instance.LoadFromName<UnityEngine.TextAsset>(mi.noteJson + diff);
-                    }
-                    catch (Exception ex)
-                    {
-                        MelonLogger.Msg(System.ConsoleColor.Red, ex.ToString());
-                    }
-                }
-                Console.WriteLine(mi.uid);
-            }
-        }
-
-        private void LoadVanillaTest()
-        {
-            var allMusic = new Il2CppSystem.Collections.Generic.List<MusicInfo>();
-            GlobalDataBase.s_DbMusicTag.GetAllMusicInfo(allMusic);
-            foreach (var mi in allMusic)
-            {
-                if (mi.uid == null || mi.uid.StartsWith("999-"))
-                    continue;
-                if (mi.noteJson is not string noteJson)   
-                    continue;
-
-                MapUtils.GetAvailableMaps(mi, out var maps);
-                foreach (var diff in maps)
-                {
-                    ResourcesManager.instance.LoadFromName<UnityEngine.TextAsset>(mi.noteJson+diff);
-                }
-                Console.WriteLine(mi.uid);
-            }
         }
 
         public override void OnUpdate()
@@ -295,6 +227,10 @@ namespace IronSearch
                 {
                     // catch silently
                 }
+            }
+            if (CustomAlbumsLoaded)
+            {
+                BmsLoader_MathPatch.RunPatch(HarmonyInstance);
             }
             if (HeadquartersLoaded)
             {
@@ -376,7 +312,7 @@ namespace IronSearch
                 return;
             }
             _initStepTracker = false;
-            LengthLoader.LoadVanillaCache();
+            ChartDataLoader.LoadVanillaCache();
             _initStepTracker = null;
         }
         public override void OnLateInitializeMelon()
@@ -388,7 +324,7 @@ namespace IronSearch
             if (CustomAlbumsLoaded)
             {
                 InitLogic.LoadCinema();
-                LengthLoader.CustomCacheTask = LengthLoader.BuildCustomCache(LengthLoader.customCts.Token);
+                ChartDataLoader.CustomCacheTask = ChartDataLoader.BuildCustomCache(ChartDataLoader.customCts.Token);
                 InitLogic.LoadCustomDict();
             }
             InitLogic.LoadAlbumNames();

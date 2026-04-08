@@ -10,7 +10,7 @@ namespace IronSearch.Tags
             ThrowIfNotEmpty(varKwargs, "GetLength", varArgs, varKwargs);
             ThrowIfNotEmpty(varArgs, "GetLength", varArgs, varKwargs);
 
-            var l = LengthLoader.GetMusicLength(M.I);
+            var l = ChartDataLoader.GetMusicLength(M.I);
             if (l is { } ts)
             {
                 return ts.TotalSeconds;

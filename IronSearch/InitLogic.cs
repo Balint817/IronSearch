@@ -24,12 +24,12 @@ namespace IronSearch
             if (ModMain.InitSuccessful && IsFirstLengthCacheBuild)
             {
                 IsFirstLengthCacheBuild = false;
-                if (LengthLoader.VanillaCache?.IsEmpty ?? true)
+                if (ChartDataLoader.VanillaCache?.IsEmpty ?? true)
                 {
                     var s = "Re-building length cache, this may take a while!";
                     MelonLogger.Msg(System.ConsoleColor.Magenta, s);
                 }
-                LengthLoader.ForceBuildVanillaCache();
+                ChartDataLoader.ForceBuildVanillaCache();
             }
         }
         internal static void LoadAlbumNames()
