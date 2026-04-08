@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace IronSearch.Patches
 {
+    // Makes BmsLoader.Load use thread-safe math functions to avoid IL2CPP "garbage collecting on unknown thread"
     internal class BmsLoader_MathPatch
     {
         private static readonly Dictionary<MethodInfo, MethodInfo> Replacements = new();
@@ -30,7 +31,7 @@ namespace IronSearch.Patches
             catch (Exception ex)
             {
                 MelonLogger.Msg(ConsoleColor.Red, ex);
-                MelonLogger.Msg(ConsoleColor.Red, "Error occurred while patching BmsLoader, thread-safe math replacements will not be applied.");
+                MelonLogger.Msg(ConsoleColor.Red, "Error occurred while patching BmsLoader, thread-safe math replacements will not be applied. The game will likely crash!");
             }
         }
 
