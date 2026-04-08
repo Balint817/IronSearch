@@ -1,6 +1,8 @@
 ﻿using CustomAlbums.Managers;
+using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.UI.Controls;
+using Il2CppPeroTools2.Resources;
 using IronPython.Runtime;
 using IronSearch.Core;
 using IronSearch.Loaders;
@@ -12,6 +14,7 @@ using MelonLoader.Utils;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace IronSearch
@@ -165,6 +168,7 @@ namespace IronSearch
             {
                 UISystemLoaded = true;
                 InitLogic.BuildCacheIfNecessary();
+                LoadTest();
             }
             else
             {
@@ -172,6 +176,74 @@ namespace IronSearch
             }
             PnlMusic_FocusChangedPatch.inputField = null;
         }
+
+        private void LoadTest()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            MelonLogger.Msg("Vanilla loading test started...");
+
+            LoadVanillaTest();
+
+            stopwatch.Stop();
+            MelonLogger.Msg("Vanilla finished in " + stopwatch.Elapsed.TotalSeconds);
+
+
+            stopwatch.Restart();
+
+
+            LoadCustomTest();
+
+            stopwatch.Stop();
+            MelonLogger.Msg("Customs finished in " + stopwatch.Elapsed.TotalSeconds);
+        }
+
+        private void LoadCustomTest()
+        {
+            var allMusic = new Il2CppSystem.Collections.Generic.List<MusicInfo>();
+            GlobalDataBase.s_DbMusicTag.GetAllMusicInfo(allMusic);
+            foreach (var mi in allMusic)
+            {
+                if (mi.uid == null || !mi.uid.StartsWith("999-"))
+                    continue;
+                if (mi.noteJson is not string noteJson)
+                    continue;
+
+                MapUtils.GetAvailableMaps(mi, out var maps);
+                foreach (var diff in maps)
+                {
+                    try
+                    {
+                        ResourcesManager.instance.LoadFromName<UnityEngine.TextAsset>(mi.noteJson + diff);
+                    }
+                    catch (Exception ex)
+                    {
+                        MelonLogger.Msg(System.ConsoleColor.Red, ex.ToString());
+                    }
+                }
+                Console.WriteLine(mi.uid);
+            }
+        }
+
+        private void LoadVanillaTest()
+        {
+            var allMusic = new Il2CppSystem.Collections.Generic.List<MusicInfo>();
+            GlobalDataBase.s_DbMusicTag.GetAllMusicInfo(allMusic);
+            foreach (var mi in allMusic)
+            {
+                if (mi.uid == null || mi.uid.StartsWith("999-"))
+                    continue;
+                if (mi.noteJson is not string noteJson)   
+                    continue;
+
+                MapUtils.GetAvailableMaps(mi, out var maps);
+                foreach (var diff in maps)
+                {
+                    ResourcesManager.instance.LoadFromName<UnityEngine.TextAsset>(mi.noteJson+diff);
+                }
+                Console.WriteLine(mi.uid);
+            }
+        }
+
         public override void OnUpdate()
         {
             if (InitSuccessful)

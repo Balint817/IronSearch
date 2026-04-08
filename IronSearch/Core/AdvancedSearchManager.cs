@@ -846,7 +846,7 @@ namespace IronSearch.Core
                         var value = item.Value;
                         executor.RegisterAlias(key, value);
                         AutoCompleteManager.AllKeywords.TryAdd(key, new($"{key}(", 0));
-                        SuccessfulAliases.TryAdd(key, value);
+                        _successfulAliases.TryAdd(key, value);
                     }
                     catch (Exception ex)
                     {

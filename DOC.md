@@ -28,11 +28,20 @@ Your search text must start with the configured prefix (default: `search:`). The
 
 Example (using default settings):
 
-```text
-search: BPM('160-200') and Length('180+')
+```python
+search: Length('180+')
 ```
 
-(This example will search for songs that have a BPM between 160 and 200, and are longer than 180 seconds)
+This example will search for songs that are longer than 180 seconds.\
+It uses the tags `BPM` and `Length`.\
+
+The process goes something like:
+- The expression you provide is run for each song, one by one.
+- You can think of tags like a statement, `This song is longer than 3 minutes`.
+- Then we ask, `Is this statement actually true?`
+  - `True`: if the song is actually 180s or longer.
+  - `False`: the song is shorter than 180s.
+- Your search is evaluated step-by-step until it becomes a single `True` or a single `False`.
 
 ![Search demo](/Resources/hook.gif)
 
@@ -43,20 +52,109 @@ Use boolean operators:
 - `and`, `or`, `not` (must be lowercase)
 - parentheses for grouping
 
-Example:
+**These operators are case-sensitive, e.g. you cannot type `AND`, `OR`, `NOT`, you must type `and`, `or`, `not`**
 
-```text
-search: (Custom() and Packed()) or (Unplayed('?') and not Favorite())
+#### not A
+
+`not A` will simply reverse the result of statement A.\
+For example, we can turn this:
+
+```python
+search: Custom()
 ```
 
-(This example will search for custom .mdm songs, or for songs that you haven't yet played and aren't favorited.)
+...which shows only customs, into this:
+
+```python
+search: not Custom()
+```
+
+This will show songs that are not custom songs, e.g. only vanilla songs.\
+Basically:
+- `Custom()` == "This song is a custom song"
+- If `Custom()` is `True`
+  - `not True` -> `False`
+  - song is hidden
+- If `Custom()` is `False`
+  - `not False` -> `True`
+  - song is shown
+
+
+#### A and B
+
+`A and B` means both statements must be true.
+
+```python
+search: Length('180+') and Custom()
+```
+
+This will show songs that are custom songs, and are longer than 180 seconds.\
+How it evaluates:
+- If the first part is `False`, the rest is skipped and the result is `False`.
+  - (`False and ...` can never become `True`)
+- Only if the first part is `True`, the second part is checked.
+
+For this example: 
+- "Too short" -> `False and ...` -> hidden
+- "Long enough but not custom" -> `True and False` -> hidden
+- "Long enough and custom" -> `True and True` = `True` -> shown
+
+#### A or B
+
+`A or B` means at least one statement must be true.\
+Example:
+    
+```python
+search: HasHidden() or Favorite()
+```
+
+This will show songs that have a hidden difficulty, or they're in your favorites.\
+How it evaluates:
+- if the first part is `True`, the rest is skipped and the result is `True`
+  - (`True or ...` can never become `False`)
+- Only if the first part is `False`, the second part is checked.
+
+For this example:
+- "Has hidden" -> `True or ...` -> shown
+- "No hidden, but favorited" -> `False or True` -> shown
+- "Neither" -> `False or False` -> hidden
+
+#### Grouping with parentheses
+
+Parentheses `()` let you control evaluation order.\
+For example:
+
+```text
+search: Custom() or (Unplayed() and not Favorite())
+```
+
+Shows songs that are:
+- custom
+OR
+- unplayed AND not favorited
+
+How to read this:
+- `A or (B and not C)`
+- let `B and not C` be `D`, e.g.: `A or D`
+- evaluate like a simple `or`.
+- if `D` needs to be evaluated, evaluate `B and not C` and substitute the result in place of `D`.
+
+### Comparison operators
+
+|Operator|Meaning|
+|------|----------------|
+| `A == B` | `A` is equal to `B` |
+| `A != B` | `A` is not equal to `B` |
+| `A > B` | `A` is greater than `B` |
+| `A < B` | `A` is less than `B` |
+| `A >= B` | `A` is greater than or equal to `B`|
+| `A <= B` | `A` is less than or equal to `B`|
 
 ### Sorting (optional)
 
 Sorting is enabled by including `Sorter(...)` (alias: `Sort`) somewhere in your expression. \
 Multiple comparers can be chained inside one `Sorter(...)` call. \
-`Sorter(...)` itself always returns `True` and does not filter; it only registers an ordering. \
-
+`Sorter(...)` itself always returns `True` and does not filter. \
 
 Example:
 
@@ -71,9 +169,12 @@ search: Sort(ByBPM(), ByLength()) and Custom()
 
 ## 2) Syntax
 
-### Truthiness
+### Truthiness (what counts as True or False)
 
 The result of your expression is always converted to a True or False value.\
+Everything counts as `True` unless it is zero, empty, or `False` itself.\
+Examples of `False` include `0`, `None`, `[]`, `''`, `""`.
+
 This is a common point of failure:
 
 ```text
@@ -86,7 +187,7 @@ The above matches songs that have all-perfect on the highest map (probably what 
 search: AP
 ```
 
-If you forget the parentheses, the game thinks you are just naming the command instead of actually running it, so it accidentally matches everything.
+The above matches everything.
 
 ![Search demo](/Resources/parenthesis.gif)
 
@@ -101,10 +202,10 @@ search: BPM("160+")
 
 Both of these are identical.
 
-A string that is passed to a tag expecting a range will be **parsed as a range string** automatically. A bare (unquoted) number is just a number - it is *not* a range.
+A string that is passed to a tag expecting a range will be **parsed as a range expression** automatically. A bare (unquoted) number is just a number - it is *not* a range.
 
 ```text
-search: BPM('160-180')    # range string '160-180' → matches BPM from 160 to 180
+search: BPM('160-180')    # range expression '160-180' → matches BPM from 160 to 180
 search: BPM(160-180)      # the result of the mathematical expression 160-180, e.g. -20, or BPM(-20) (obviously no such song exists)
 ```
 
@@ -171,6 +272,22 @@ Example of an invalid input:
 
 ![Input error demo](/Resources/error_tag.gif)
 
+### Debugging
+
+If you have errors, and the error messages aren't helping you, try following this logic:
+
+```python
+search: Custom() and Favorite() and Accuracy('?') and Difficulty('?')
+```
+
+- Start simple:
+    - `Custom()`
+- Add one condition at a time:
+    - `Custom() and Favorite()`
+    - `Custom() and Favorite() and Accuracy('?')`
+    - etc.
+- If it breaks: the last thing you added is invalid.
+
 ### Keyword arguments
 
 Keyword arguments are supported, but each tag controls which keywords it accepts.
@@ -181,7 +298,7 @@ For example, the `Range(...)` object allows you to specify whether the start or 
 
 ## 3) Range Syntax
 
-Many tags accept "range strings" (e.g. BPM ranges, difficulty ranges, etc.).
+Many tags accept "range expressions" (e.g. BPM ranges, difficulty ranges, etc.).
 
 ### Map index reference
 
@@ -211,6 +328,7 @@ For example, `Difficulty('11+', '3')` checks the **Master** slot, and `FC('4')` 
 5. Exclusive endpoints with `|`
    - `'|A-B'` makes the **start** exclusive: `A < value <= B`
    - `'A-B|'` makes the **end** exclusive: `A <= value < B`
+   - `'|A-'` makes **A** exclusive: `value < A`
 
 Notes about `?`:
 
@@ -218,7 +336,7 @@ Notes about `?`:
 - However, several tags interpret `'?'` specially as "select the highest available map"
 - Which tags do this is implemented per-tag (see reference below or the Help text).
 
-### Multi-range strings (OR of multiple ranges)
+### Multi-range expressions (OR of multiple ranges)
 
 Some inputs accept multi-ranges. A multi-range takes multiple ranges, and matches any value that matches any of the ranges that make it up.
 
@@ -1090,7 +1208,7 @@ Usage:
 
 - `Range(rangeString) or Range(a, b)`
 
-Parses a range string and returns a range object usable in other functions.
+Parses a range expression and returns a range object usable in other functions.
 
 Examples:
 
@@ -1127,11 +1245,11 @@ Returns a multi-range that matches if **any** of the given ranges match.
 
 Each argument can be:
 
-- a range string
+- a range expression
 - a `Range` object
 - a `MultiRange` object
 
-Special case: strings in multi-range can include multiple segments separated by spaces, e.g. `MultiRange('0-1 5-7')`.
+Special case: strings in multi-range can include multiple segments separated by spaces, for example: `MultiRange('0-1 5-7')`.
 
 ---
 
