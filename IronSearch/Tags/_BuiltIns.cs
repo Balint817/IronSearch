@@ -77,13 +77,13 @@ namespace IronSearch.Tags
         {
             WrappableCLRDelegate castingDel = (input, tagDict, varArgs, varKwargs) =>
             {
-                return baseDel((SearchArgument)input, varArgs, varKwargs);
+                SearchArgument SA = GetSearchArgument(input);
+
+                return baseDel(SA, varArgs, varKwargs);
             };
             WrappedCLRDelegate wrappedDel = scriptManager.ScriptExecutor.FromUnwrapped(castingDel);
             WrappedCLRDelegate del2 = (input, tagDict, args, kwargs) =>
             {
-                var SA = GetSearchArgument(input);
-
                 return wrappedDel(input, tagDict, args, kwargs);
             };
             return del2;
@@ -115,13 +115,12 @@ namespace IronSearch.Tags
         {
             WrappableCLRDelegate castingDel = (input, tagDict, varArgs, varKwargs) =>
             {
-                return baseDel((SearchArgument)input, varArgs, varKwargs);
+                SearchArgument SA = GetSearchArgument(input);
+                return baseDel(SA, varArgs, varKwargs);
             };
             WrappedCLRDelegate wrappedDel = scriptManager.ScriptExecutor.FromUnwrapped(castingDel);
             WrappedCLRDelegate del2 = (input, tagDict, args, kwargs) =>
             {
-                var SA = GetSearchArgument(input);
-
                 return wrappedDel(input, tagDict, args, kwargs);
             };
             return del2;
