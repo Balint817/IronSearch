@@ -1,4 +1,4 @@
-﻿# IronSearch Advanced Search Guide
+# IronSearch Advanced Search Guide
 
 This is the documentation for the "advanced search" features implemented by IronSearch.\
 For example, functions like `BPM('160-200')`.
@@ -10,13 +10,14 @@ It's a good idea to put longer queries into an 'Expression' to re-use later.
 |---------|----------|
 | [§1 Quick Start](#1-quick-start) | Prefix, first examples, booleans, sorting teaser |
 | [§2 Syntax](#2-syntax) | Truthiness, quoting, types, operators, errors, `M`, keyword arguments |
-| [§3 Range syntax](#3-range-syntax) | `'10+'`, `'?\|…'`, multi-ranges |
-| [§4 Settings](#4-settings) | `IronSearch.cfg`, aliases, `AutoCompleteItems` |
-| [§5 Auto-complete](#5-auto-complete-tab-suggestions) | **Tab** dropdown: when it works, keys, behavior (`AutoCompleteManager.cs`) |
-| [§6 Sorting](#6-sorting-guide) | `Sorter(...)` / comparers |
-| [§7 Tag reference](#7-tag-reference) | Full tag list |
-| [§8 Advanced](#8-advanced-features) | Lambdas, `Scripts/`, config hooks |
-| [§9 Cookbook](#9-example-cookbook) | Copy-paste patterns |
+| [§3 Language essentials](#3-language-essentials) | `True`/`False`/`None`, type conversions, math helpers, collection helpers |
+| [§4 Range syntax](#4-range-syntax) | `'10+'`, `'?\|…'`, multi-ranges |
+| [§5 Settings](#5-settings) | `IronSearch.cfg`, aliases, `AutoCompleteItems` |
+| [§6 Auto-complete](#6-auto-complete-tab-suggestions) | **Tab** dropdown: when it works, keys, behavior (`AutoCompleteManager.cs`) |
+| [§7 Sorting](#7-sorting-guide) | `Sorter(...)` / comparers |
+| [§8 Tag reference](#8-tag-reference) | Full tag list |
+| [§9 Advanced](#9-advanced-features) | Lambdas, `Scripts/`, config hooks, collection tools |
+| [§10 Cookbook](#10-example-cookbook) | Copy-paste patterns |
 
 ---
 
@@ -296,7 +297,44 @@ For example, the `Range(...)` object allows you to specify whether the start or 
 
 ---
 
-## 3) Range Syntax
+## 3) Language Essentials
+
+### True, False, and None
+
+There are three special values that come up constantly:
+
+| Value | Meaning |
+|-------|---------|
+| `True` | Yes / on / matches |
+| `False` | No / off / doesn't match |
+| `None` | "No value" - the result is absent or unknown |
+
+You already saw `True` and `False` in [§1 Quick Start](#1-quick-start): every tag returns one or the other.\
+`None` shows up when something genuinely has no answer. For example, `GetLength()` returns `None` if a chart is corrupted and has no known length.
+
+### Type conversions
+
+Sometimes a value is the wrong type. For example, a difficulty field like `M.difficulty3` is text like `'11'`, not a number.\
+You can fix this by changing the type of the value:
+
+| Function | What it does | Example |
+|----------|-------------|---------|
+| `int(x)` | Converts to a whole number | `int('11')` → `11` |
+| `float(x)` | Converts to a decimal number | `float('3.5')` → `3.5` |
+| `str(x)` | Converts to text | `str(100)` → `'100'` |
+| `bool(x)` | Converts to `True`/`False` | `bool(0)` → `False`, `bool(1)` → `True` |
+
+### Basic math helpers
+
+| Function | What it does | Example |
+|----------|-------------|---------|
+| `abs(x)` | Absolute value (removes the sign) | `abs(-5)` → `5` |
+| `round(x)` | Rounds to the nearest whole number | `round(3.7)` → `4` |
+| `round(x, n)` | Rounds to `n` decimal places | `round(3.14159, 2)` → `3.14` |
+
+---
+
+## 4) Range Syntax
 
 Many tags accept "range expressions" (e.g. BPM ranges, difficulty ranges, etc.).
 
@@ -367,7 +405,7 @@ Narrow to songs where your **top-slot** scores are 95%-100% accuracy.
 
 ---
 
-## 4) Settings
+## 5) Settings
 
 Settings are stored under the path: `<Muse Dash Folder>/UserData/IronSearch.cfg`
 
@@ -468,7 +506,7 @@ Unlike an expression, does not register an entirely new tag, but simply adds an 
 
 ---
 
-## 5) Auto-complete (Tab suggestions)
+## 6) Auto-complete (Tab suggestions)
 
 IronSearch can suggest keywords while you type an advanced search.
 
@@ -494,7 +532,7 @@ All of the following must be true:
 
 ---
 
-## 6) Sorting Guide
+## 7) Sorting Guide
 
 Sorting is done only when:
 
@@ -559,7 +597,7 @@ search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
 
 ---
 
-## 7) Tag Reference
+## 8) Tag Reference
 
 This section documents **every tag** available by default. But first...
 
@@ -567,7 +605,7 @@ This section documents **every tag** available by default. But first...
 
 - `Help("TagName")` prints the built-in help text for the given tag.
 
-### 7.1 Filters (returns `True`/`False`)
+### 8.1 Filters (returns `True`/`False`)
 
 #### `Accuracy` / `Acc`
 
@@ -890,7 +928,7 @@ Usage:
 
 - `Length(lengthRange)`
 
-Returns `True` if the music’s length falls within the given range (see also `GetLength` in §7.3 which returns the actual length as a number).
+Returns `True` if the music’s length falls within the given range (see also `GetLength` in §8.3 which returns the actual length as a number).
 
 Notes:
 
@@ -1106,7 +1144,7 @@ Matches songs where the Master is unplayed.
 
 ---
 
-### 7.2 Sorting comparers
+### 8.2 Sorting comparers
 
 These tags return comparers that can be used inside `Sorter(...)`.
 
@@ -1198,7 +1236,7 @@ Usage:
 
 Returns a comparer function that sorts by UID.
 
-### 7.3 Objects (advanced)
+### 8.3 Objects (advanced)
 
 ---
 
@@ -1445,7 +1483,7 @@ Usage:
 
 Returns the music length in seconds **as a number**, or `None` if the mod failed to obtain it. (The latter is only possible for corrupted customs)
 
-This is different from the `Length(range)` filter in §7.1 which checks whether the length is *within* a range and returns `True`/`False`.
+This is different from the `Length(range)` filter in §8.1 which checks whether the length is *within* a range and returns `True`/`False`.
 
 ---
 
@@ -1461,7 +1499,7 @@ It returns the custom chart’s last-modified time.
 
 ---
 
-### 7.4 Variables (VERY advanced)
+### 8.4 Variables (VERY advanced)
 
 Variable tags let you keep state across songs or within a song evaluation.
 
@@ -1576,7 +1614,7 @@ Creates or overwrites a thread-global variable value for the current thread.
 
 ---
 
-### 7.5 Control-flow / debugging (VERY advanced)
+### 8.5 Control-flow / debugging (VERY advanced)
 
 #### `Exit`
 
@@ -1685,9 +1723,9 @@ Notes:
 
 ---
 
-## 8) Advanced Features
+## 9) Advanced Features
 
-### 8.1 The implicit current-song object: `M`
+### 9.1 The implicit current-song object: `M`
 
 During evaluation, the expression has a parameter `M` which contains the objects related to the current search:
 - `M.I`, the underlying `MusicInfo`
@@ -1720,7 +1758,7 @@ For this example, you can use `Author('banana')` instead; `M` is for checks or l
 | `M.difficultyX` | The difficulty **as a string** for a specific map of the chart, for example, `'6'` |
 | `M.callbackDifficultyX` | The callback difficulty **as an `int`** for a specific map of the chart, for example, `6` |
 
-### 8.2 The `Scripts/` directory (user-defined tags)
+### 9.2 The `Scripts/` directory (user-defined tags)
 
 User scripts live in a folder created automatically at:
 
@@ -1771,7 +1809,7 @@ The script file name must be a valid Python identifier.
 
 Reserved keywords (like `and`, `def`, `class`, `return`, etc.) are not allowed as script/tag names.
 
-### 8.3 Custom sorting comparers (your own `lambda A, B: ...`)
+### 9.3 Custom sorting comparers (your own `lambda A, B: ...`)
 
 You can pass any callable into `Sorter(...)` as long as it matches the comparer contract:
 
@@ -1784,7 +1822,168 @@ example, sort by UID:
 search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
 ```
 
-## 9) Example cookbook
+### 9.4 collection tools
+
+#### Lists
+
+A **list** is an ordered collection of values, written with square brackets:
+
+```python
+[1, 2, 3]
+['easy', 'hard', 'master']
+```
+
+Several tags return lists - for example, `GetDifficulties()` returns a list of difficulty strings, and `GetHighscores()` returns a list of highscores.
+
+You can access individual items by index (starting from 0):
+
+```python
+GetDifficulties()[0]   # first difficulty (Easy slot)
+GetDifficulties()[4]  # 5th item (Touhou slot)
+GetDifficulties()[-1]  # last item (Touhou slot, same as above)
+```
+
+#### List comprehensions
+
+A **list comprehension** builds a new list from an existing one. The basic syntax is:
+
+```python
+[expression for item in collection]
+```
+
+Read it as: "for each `item` in `collection`, compute `expression` and put the result in a new list."
+
+**Basic example** - extract the accuracy from every score:
+
+```python
+[s.Accuracy for s in NotNone(GetHighscores())]
+```
+
+This produces something like `[97.5, 88.2, 0.0, 0.0]`.
+
+**Filtered example** - only keep non-zero accuracies:
+
+```python
+[s.Accuracy for s in NotNone(GetHighscores()) if s.Accuracy > 0]
+```
+
+The `if` part keeps only items that pass the condition. Result: `[97.5, 88.2]`.
+
+The general pattern:
+
+```python
+[expression for item in collection if condition]
+```
+
+reads as: "for each `item` in `collection` **where** `condition` is true, compute `expression`."
+
+Combining with the helpers from [§3](#3-python-essentials):
+
+```text
+search: max([s.Accuracy for s in NotNone(GetHighscores()) if s.Accuracy > 0] or [0]) >= 95
+```
+
+This finds songs where your best accuracy across all played maps is 95% or higher.\
+The `or [0]` part is a safety net: if the filtered list is empty (no scores at all), `max([])` would crash, so `or [0]` provides a fallback list containing just `0`.
+
+#### any() and all()
+
+These answer yes-or-no questions about a collection:
+
+| Function | Question it answers |
+|----------|---------------------|
+| `any(...)` | Is **at least one** item true? |
+| `all(...)` | Is **every** item true? |
+
+They work especially well with **generator expressions** - the same syntax as list comprehensions, but without the square brackets:
+
+**any example** - does this song have at least one difficulty of 11 or higher?
+
+```text
+search: any(int(d) >= 11 for d in NotNone(GetDifficulties()) if d not in ('?', 'E', ''))
+```
+
+Reading this: "for each difficulty `d` that isn't a special string, check if `int(d) >= 11` - is **any** of them true?"
+
+**all example** - do you have a full combo on every map you've played?
+
+```text
+search: all(s.Evaluate >= 2 for s in NotNone(GetHighscores()) if s.Clears > 0)
+```
+
+Reading this: "for each score where you have at least 1 clear, is `Evaluate >= 2` (FC)? Is that true for **all** of them?"
+
+#### sorted() and reversed()
+
+These re-order collections:
+
+| Function | What it does |
+|----------|-------------|
+| `sorted(collection)` | Returns a new list in ascending order |
+| `sorted(collection, key=func)` | Sorts by a custom key |
+
+**sorted example** - get your second-best accuracy:
+
+```text
+search: sorted([s.Accuracy for s in NotNone(GetHighscores()) if s.Accuracy > 0])[-1] >= 90
+```
+
+`sorted(...)` puts accuracies in ascending order, `[-1]` picks the last (highest) item.
+
+(For this purpose, `max(...)` is simpler, `sorted` shines when you need the Nth item or actually need the ordering)
+
+#### Collection types: set(), tuple(), list(), dict()
+
+These convert between collection types:
+
+| Function | What it produces |
+|----------|-----------------|
+| `list(x)` | An ordered, changeable list: `[1, 2, 3]` |
+| `set(x)` | A collection with **no duplicates**: `{1, 2, 3}` |
+| `tuple(x)` | An ordered, unchangeable sequence: `(1, 2, 3)` |
+| `dict(x)` | A key-value mapping: `{'a': 1, 'b': 2}` |
+
+### Collection helpers
+
+Certain tags may return **collections**. These helpers let you inspect them:
+
+| Function | What it does | Example |
+|----------|-------------|---------|
+| `len(x)` | Counts how many items | `len([1, 2, 3])` → `3` |
+| `min(x)` | Smallest item | `min([3, 1, 2])` → `1` |
+| `max(x)` | Largest item | `max([3, 1, 2])` → `3` |
+| `sum(x)` | Adds all items together | `sum([1, 2, 3])` → `6` |
+
+#### enumerate() and zip()
+
+These are specialized iteration tools:
+
+| Function | What it does |
+|----------|-------------|
+| `enumerate(x)` | Pairs each item with its index: `[(0, 'a'), (1, 'b')]` |
+| `zip(a, b)` | Pairs items from two collections: `[(1, 'a'), (2, 'b')]` |
+
+**enumerate example** - find which map slot has your highest accuracy:
+
+```python
+max(enumerate(GetHighscores()), key=lambda pair: pair[1].Accuracy)[0]
+```
+
+`enumerate(...)` pairs each score with its slot index (0, 1, 2, ...), then `max(...)` picks the pair with the highest accuracy, and `[0]` extracts the slot index.
+
+**zip example** - pair difficulties with their scores:
+
+```python
+list(zip(GetDifficulties(), GetHighscores()))
+```
+
+#### type()
+
+`type(x)` returns the type of a value. Useful for debugging.
+
+---
+
+## 10) Example cookbook
 
 Short patterns you can copy, then edit. Prefix is assumed to be present.
 
