@@ -15,6 +15,7 @@ using PythonExpressionManager;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Numerics;
 
 namespace IronSearch.Core
 {
@@ -199,7 +200,11 @@ namespace IronSearch.Core
                                 var t = processor(musicInfo1, musicInfo2);
                                 if (t is not int result)
                                 {
-                                    throw new InvalidCastException($"expected an integer as comparison result, got '{(t is null ? "null" : t.GetType().Name)}'");
+                                    if (t is not BigInteger bi || bi > int.MaxValue || bi < int.MinValue)
+                                    {
+                                        throw new InvalidCastException($"expected an integer as comparison result, got '{(t is null ? "null" : t.GetType().Name)}'");
+                                    }
+                                    result = (int)bi;
                                 }
                                 if (result != 0)
                                 {
