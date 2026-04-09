@@ -18,7 +18,7 @@ namespace IronSearch.Core
         private T[]? _data;
         private int _count;
 
-        private int _generation; // 🔥 key fix
+        private int _generation;
 
         private readonly ManualResetEventSlim _startEvent = new(false);
         private readonly CountdownEvent _doneEvent;
