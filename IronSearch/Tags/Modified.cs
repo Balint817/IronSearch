@@ -11,11 +11,11 @@ namespace IronSearch.Tags
             public override IEnumerable<double> GetDoubles(MusicInfo musicInfo)
             {
                 var modified = GetModified(musicInfo);
-                if (modified is not { } modifiedDate)
+                if (modified is not { } modifiedSeconds)
                 {
                     yield break;
                 }
-                yield return DateTime.Now.Subtract(modifiedDate).TotalSeconds;
+                yield return modifiedSeconds;
             }
         }
         internal static bool EvalModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)

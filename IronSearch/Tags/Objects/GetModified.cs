@@ -6,13 +6,13 @@ namespace IronSearch.Tags
     internal partial class BuiltIns
     {
 
-        internal static DateTime? GetModified(MusicInfo musicInfo)
+        internal static double? GetModified(MusicInfo musicInfo)
         {
             if (!EvalCustom(musicInfo))
             {
                 return null;
             }
-            return GetModifiedInternal(musicInfo);
+            return DateTime.Now.Subtract(GetModifiedInternal(musicInfo)).TotalSeconds;
         }
         internal static DateTime GetModifiedInternal(MusicInfo musicInfo)
         {
@@ -21,8 +21,12 @@ namespace IronSearch.Tags
         }
         internal static dynamic EvalGetModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "GetModified", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "GetModified", varArgs, varKwargs);
+            if (varArgs[0] is MusicInfo mi)
+            {
+                return GetModified(mi)!;
+            }
+            ThrowIfNotEmpty(varArgs, "GetModified", varArgs, varKwargs);
             return GetModified(M.I)!;
         }
     }

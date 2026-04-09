@@ -1,3 +1,4 @@
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
 using IronSearch.Utils;
 
@@ -8,8 +9,12 @@ namespace IronSearch.Tags
 
         internal static dynamic EvalGetDifficulties(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotEmpty(varArgs, "GetDifficulties", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "GetDifficulties", varArgs, varKwargs);
+            if (varArgs[0] is MusicInfo mi)
+            {
+                return EvalGetDifficulties(new(M.I, null!), Array.Empty<dynamic>(), varKwargs);
+            }
+            ThrowIfNotEmpty(varArgs, "GetDifficulties", varArgs, varKwargs);
             MapUtils.GetMapDifficulties(M.I, out var maps);
             var l = new PythonList();
             foreach (var map in maps)
