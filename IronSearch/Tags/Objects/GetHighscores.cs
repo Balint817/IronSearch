@@ -10,10 +10,6 @@ namespace IronSearch.Tags
         internal static dynamic EvalGetHighscores(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs, "GetHighScores", varArgs, varKwargs);
-            if (varArgs[0] is MusicInfo mi)
-            {
-                return EvalGetHighscores(new(M.I, null!), Array.Empty<dynamic>(), varKwargs);
-            }
             ThrowIfNotEmpty(varArgs, "GetHighScores", varArgs, varKwargs);
             var l = new PythonList();
             for (int i = 1; i <= 5; i++)

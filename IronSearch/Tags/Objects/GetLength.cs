@@ -9,10 +9,6 @@ namespace IronSearch.Tags
         internal static dynamic EvalGetLength(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs, "GetLength", varArgs, varKwargs);
-            if (varArgs[0] is MusicInfo mi)
-            {
-                return EvalGetLength(new(M.I, null!), Array.Empty<dynamic>(), varKwargs);
-            }
             ThrowIfNotEmpty(varArgs, "GetLength", varArgs, varKwargs);
 
             var l = ChartDataLoader.GetMusicLength(M.I);

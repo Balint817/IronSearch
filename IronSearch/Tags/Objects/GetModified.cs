@@ -22,10 +22,6 @@ namespace IronSearch.Tags
         internal static dynamic EvalGetModified(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs, "GetModified", varArgs, varKwargs);
-            if (varArgs[0] is MusicInfo mi)
-            {
-                return GetModified(mi)!;
-            }
             ThrowIfNotEmpty(varArgs, "GetModified", varArgs, varKwargs);
             return GetModified(M.I)!;
         }
