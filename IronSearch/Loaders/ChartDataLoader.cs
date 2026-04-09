@@ -3,6 +3,9 @@ using CustomAlbums.Managers;
 using HarmonyLib;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.GameCore;
+using Il2CppAssets.Scripts.GameCore.Managers;
+using Il2CppAssets.Scripts.PeroTools.Commons;
+using Il2CppGameLogic;
 using Il2CppPeroTools2.Resources;
 using IronSearch.Patches;
 using IronSearch.Tags;
@@ -13,49 +16,21 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Text.Json.Nodes;
 
 namespace IronSearch.Loaders
 {
-
     public static class ChartDataLoader
     {
-        private const string AudioLengthBackupFile = "IronSearchChartLengthCache.json";
-        private static readonly string AudioLengthBackupFilePath = Path.Join(MelonEnvironment.UserDataDirectory, AudioLengthBackupFile);
+        private const string ChartLengthCacheFile = "IronSearchChartLengthCache.json";
+        private static readonly string ChartLengthCacheFilePath = Path.Join(MelonEnvironment.UserDataDirectory, ChartLengthCacheFile);
 
-        public static readonly ConcurrentDictionary<string, TimeSpan?> CustomCache = new();
-        public static readonly ConcurrentDictionary<string, Dictionary<int, object>> BmsCache = new();
-        public static ConcurrentDictionary<string, TimeSpan>? VanillaCache { get; private set; }
+        public static readonly ConcurrentDictionary<string, ChartData?> CustomCache = new();
+        public static ConcurrentDictionary<string, ChartData>? VanillaCache { get; private set; }
         private static bool _vanillaCacheUpdated = true;
-        public static void ForceBuildVanillaCache()
-        {
-            if (VanillaCache is not null)
-            {
-                MelonLogger.Msg($"Vanilla length cache currently contains {VanillaCache.Count} items.");
-            }
-            VanillaCache ??= new();
-            var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => x.albumIndex != 999 && !VanillaCache.ContainsKey(x.uid)).ToList();
-            MelonLogger.Msg(ConsoleColor.Magenta, $"Need to load {allMusic.Count} items." + (allMusic.Count > 100 ? " This may take a while." : ""));
-            _vanillaCacheUpdated = allMusic.Count != 0;
-            var prevRatio = -1M;
-            var currentRatio = 0.0M;
+        private static readonly Dictionary<string, object> NoteConfigDatas = new();
 
-            var count = allMusic.Count;
-            var countDecimal = (decimal)count;
-
-            for (int i = 0; i < count; i++)
-            {
-                _ = GetMusicLength(allMusic[i]);
-                currentRatio = decimal.Floor((i + 1) / countDecimal * 1000) / 1000;
-                if (currentRatio > prevRatio)
-                {
-                    var text = $"\rProgress: {currentRatio * 100:F1}%";
-                    Console.Write(text.PadRight(Console.WindowWidth - 1));
-                    prevRatio = currentRatio;
-                }
-            }
-            SaveVanillaCache();
-        }
-        public static TimeSpan? GetMusicLength(MusicInfo musicInfo)
+        public static ChartData? GetChartData(MusicInfo musicInfo)
         {
             if (musicInfo.uid is null)
             {
@@ -63,11 +38,11 @@ namespace IronSearch.Loaders
             }
             if (BuiltIns.EvalCustom(musicInfo))
             {
-                if (CustomCache.TryGetValue(musicInfo.uid, out TimeSpan? result))
+                if (CustomCache.TryGetValue(musicInfo.uid, out ChartData? result))
                 {
                     return result;
                 }
-                result = GetCustomLength(musicInfo);
+                result = GetCustomChartData(musicInfo);
                 CustomCache.TryAdd(musicInfo.uid, result);
 
                 return result;
@@ -78,10 +53,49 @@ namespace IronSearch.Loaders
             }
             if (!VanillaCache.TryGetValue(musicInfo.uid, out var value))
             {
-                value = LoadVanillaOne(musicInfo);
-                VanillaCache.TryAdd(musicInfo.uid, value);
+                return null;
             }
             return value;
+        }
+
+        public static TimeSpan? GetMusicLength(MusicInfo musicInfo)
+        {
+            return GetChartData(musicInfo)?.Length;
+        }
+
+        public static void ForceBuildVanillaCache()
+        {
+            if (VanillaCache is not null)
+            {
+                MelonLogger.Msg($"Vanilla chart data cache currently contains {VanillaCache.Count} items.");
+            }
+            VanillaCache ??= new();
+            var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => x.albumIndex != 999 && x.noteJson is not null && !VanillaCache.ContainsKey(x.uid)).ToList();
+            MelonLogger.Msg(ConsoleColor.Magenta, $"Need to load {allMusic.Count} items." + (allMusic.Count > 100 ? " This may take a while." : ""));
+            _vanillaCacheUpdated = allMusic.Count != 0;
+            var prevRatio = -1M;
+            var currentRatio = 0.0M;
+
+            var count = allMusic.Count;
+            var countDecimal = (decimal)count;
+
+            InitNoteDatas();
+
+            for (int i = 0; i < count; i++)
+            {
+                var musicInfo = allMusic[i];
+                var value = LoadVanillaOne(musicInfo);
+                VanillaCache.TryAdd(musicInfo.uid, value);
+
+                currentRatio = decimal.Floor((i + 1) / countDecimal * 1000) / 1000;
+                if (currentRatio > prevRatio)
+                {
+                    var text = $"\rProgress: {currentRatio * 100:F1}%";
+                    Console.Write(text.PadRight(Console.WindowWidth - 1));
+                    prevRatio = currentRatio;
+                }
+            }
+            SaveVanillaCache();
         }
 
         internal static void LoadVanillaCache()
@@ -89,7 +103,7 @@ namespace IronSearch.Loaders
             string? text = null;
             try
             {
-                text = File.ReadAllText(AudioLengthBackupFilePath);
+                text = File.ReadAllText(ChartLengthCacheFilePath);
             }
             catch (Exception)
             {
@@ -113,40 +127,52 @@ namespace IronSearch.Loaders
             VanillaCache = new();
             foreach (var item in loadCache)
             {
-                VanillaCache.TryAdd(item.Key, item.Value);
+                VanillaCache.TryAdd(item.Key, ChartData.FromLength(item.Value));
             }
-
         }
 
-        private static TimeSpan LoadVanillaOne(MusicInfo musicInfo)
+        private static ChartData LoadVanillaOne(MusicInfo musicInfo)
         {
-            if (musicInfo.noteJson is null)
-            {
-                return TimeSpan.FromSeconds(-1);
-            }
             try
             {
                 if (!MapUtils.GetAvailableMaps(musicInfo, out var availableMaps))
                 {
-                    return TimeSpan.FromSeconds(-1);
+                    throw new InvalidOperationException("vanilla song with no maps???");
                 }
 
+                var maps = new Dictionary<int, MapData>();
                 float maxTime = -1f;
+                int stageInfoCount = 0;
+
                 foreach (var diff in availableMaps)
                 {
                     try
                     {
                         var stageInfo = ResourcesManager.instance.LoadFromName<StageInfo>(musicInfo.noteJson + diff);
-                        var musicDatas = stageInfo.musicDatas;
-                        if (musicDatas == null || musicDatas.Count == 0)
+                        if (stageInfo?.musicDatas == null || stageInfo.musicDatas.Count == 0)
                             continue;
 
-                        for (int i = 0; i < musicDatas.Count; i++)
+                        stageInfoCount++;
+                        var notes = new List<NoteInfo>();
+                        var musicDatas = stageInfo.musicDatas;
+                        for (int j = 0; j < musicDatas.Count; j++)
                         {
-                            var tick = Il2CppSystem.Decimal.ToSingle(musicDatas[i].tick);
-                            if (tick > maxTime)
-                                maxTime = tick;
+                            var md = musicDatas[j];
+                            var time = Il2CppSystem.Decimal.ToSingle(md.tick);
+                            var noteUid = md.configData?.note_uid;
+
+                            if (noteUid is null || !NoteConfigDatas.TryGetValue(noteUid, out var configObj))
+                                continue;
+
+                            var configData = (NoteConfigData)configObj;
+                            var ibmsId = configData.ibms_id;
+                            var pathway = configData.pathway == 1 ? "13" : "14";
+                            notes.Add(new NoteInfo(time, ibmsId, pathway));
+
+                            if (time > maxTime)
+                                maxTime = time;
                         }
+                        maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5);
                     }
                     catch
                     {
@@ -154,9 +180,12 @@ namespace IronSearch.Loaders
                     }
                 }
 
-                return maxTime >= 0f
-                    ? TimeSpan.FromSeconds(maxTime)
-                    : TimeSpan.FromSeconds(-1);
+                if (stageInfoCount == 0)
+                {
+                    throw new InvalidOperationException("vanilla song with no stageInfos???");
+                }
+
+                return new ChartData(maps, maxTime >= 0f ? TimeSpan.FromSeconds(maxTime) : null);
             }
             catch (Exception ex)
             {
@@ -170,7 +199,7 @@ namespace IronSearch.Loaders
         internal static CancellationTokenSource customCts = new();
         internal static async Task BuildCustomCache(CancellationToken token)
         {
-            MelonLogger.Msg($"Started async calculation of custom chart lengths.");
+            MelonLogger.Msg($"Started async calculation of custom chart data.");
             await Task.Run(() =>
             {
                 var sw = Stopwatch.StartNew();
@@ -187,23 +216,23 @@ namespace IronSearch.Loaders
                     }
                     var album = allCustoms[i];
 
-                    var length = GetCustomLengthDirect(album.Uid);
+                    var chartData = GetCustomChartDataDirect(album.Uid);
 
-                    CustomCache.TryAdd(album.Uid, length);
+                    CustomCache.TryAdd(album.Uid, chartData);
                 }
                 sw.Stop();
                 MelonLogger.Msg($"Finished customs calculation in {sw.Elapsed.TotalSeconds:F1} seconds.");
             }, token);
         }
 
-        private static TimeSpan? GetCustomLength(MusicInfo musicInfo)
+        private static ChartData? GetCustomChartData(MusicInfo musicInfo)
         {
             if (!customCts.IsCancellationRequested)
             {
                 customCts.Cancel();
                 if ((AlbumManager.LoadedAlbums.Count - CustomCache.Count) > 25)
                 {
-                    MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Still need to calculate length for {(AlbumManager.LoadedAlbums.Count - CustomCache.Count)}/{AlbumManager.LoadedAlbums.Count} custom charts! Please wait.");
+                    MelonLogger.Msg(ConsoleColor.DarkMagenta, $"Still need to calculate chart data for {(AlbumManager.LoadedAlbums.Count - CustomCache.Count)}/{AlbumManager.LoadedAlbums.Count} custom charts! Please wait.");
                 }
                 try
                 {
@@ -214,12 +243,12 @@ namespace IronSearch.Loaders
 
                 }
             }
-            return GetCustomLengthDirect(musicInfo.uid);
+            return GetCustomChartDataDirect(musicInfo.uid);
         }
 
-        private static Func<Stream, string, Bms>? _loadBmsDelegate;
+        private static Delegate? _loadBmsDelegate;
 
-        private static Bms LoadBms(Stream stream, string name)
+        private static object LoadBms(Stream stream, string name)
         {
             if (_loadBmsDelegate is null)
             {
@@ -227,23 +256,19 @@ namespace IronSearch.Loaders
                 var method = AccessTools.Method(type, "Load");
                 _loadBmsDelegate = method.CreateDelegate<Func<Stream, string, Bms>>();
             }
-            return _loadBmsDelegate(stream, name);
+            return ((Func<Stream, string, Bms>)_loadBmsDelegate)(stream, name);
         }
-        private static readonly Dictionary<int, object> EmptyMaps = new();
-        private static Dictionary<int, object> LoadBmsMaps(string uid, string path, bool isPackaged)
+
+        private static readonly Dictionary<int, object> EmptyBmsMaps = new();
+
+        private static Dictionary<int, object> LoadBmsMaps(string path, bool isPackaged)
         {
             if (!BmsLoader_MathPatch.IsPatched)
-                return EmptyMaps;
-            
-            if (BmsCache.TryGetValue(uid, out var cached))
-                return cached;
+                return EmptyBmsMaps;
 
-            var maps = isPackaged
+            return isPackaged
                 ? LoadBmsMapsFromZip(path)
                 : LoadBmsMapsFromDirectory(path);
-
-            BmsCache.TryAdd(uid, maps);
-            return maps;
         }
 
         private static Dictionary<int, object> LoadBmsMapsFromZip(string zipPath)
@@ -294,43 +319,59 @@ namespace IronSearch.Loaders
             return maps;
         }
 
-        private static float? GetMaxTimeFromMaps(Dictionary<int, object> maps)
-        {
-            float maxTime = 0f;
-            bool foundAny = false;
-
-            foreach (Bms bms in maps.Values.Cast<Bms>())
-            {
-                foreach (var note in bms.Notes)
-                {
-                    if (note is System.Text.Json.Nodes.JsonObject jo
-                        && jo.TryGetPropertyValue("time", out var timeNode)
-                        && timeNode is System.Text.Json.Nodes.JsonValue jv
-                        && jv.TryGetValue<float>(out var time)
-                        && time >= maxTime)
-                    {
-                        maxTime = time;
-                    }
-                }
-                foundAny = true;
-            }
-
-            return foundAny ? maxTime : null;
-        }
-
-        private static TimeSpan? GetCustomLengthDirect(string uid)
+        private static ChartData? GetCustomChartDataDirect(string uid)
         {
             var album = (Album)ModMain.uidToCustom[uid];
             try
             {
-                var maps = LoadBmsMaps(uid, album.Path, album.IsPackaged);
-                var maxTime = GetMaxTimeFromMaps(maps);
-                return maxTime != null ? TimeSpan.FromSeconds(maxTime.Value) : null;
+                var bmsMaps = LoadBmsMaps(album.Path, album.IsPackaged);
+                if (bmsMaps.Count == 0)
+                    return null;
+
+                var maps = new Dictionary<int, MapData>();
+                float maxTime = -1f;
+
+                foreach (var (index, bmsObj) in bmsMaps)
+                {
+                    var bms = (Bms)bmsObj;
+                    var notes = new List<NoteInfo>();
+                    foreach (var note in bms.Notes)
+                    {
+                        if (note is not JsonObject jo)
+                            continue;
+
+                        if (!jo.TryGetPropertyValue("time", out var timeNode)
+                            || timeNode is not JsonValue jv
+                            || !jv.TryGetValue<float>(out var time))
+                            continue;
+
+                        var value = jo["value"]?.GetValue<string>() ?? "";
+                        var tone = jo["tone"]?.GetValue<string>() ?? "";
+                        notes.Add(new NoteInfo(time, value, tone));
+
+                        if (time > maxTime)
+                            maxTime = time;
+                    }
+                    maps[index] = new MapData(notes, bms.Bpm, bms.Md5);
+                }
+
+                return new ChartData(maps, maxTime >= 0f ? TimeSpan.FromSeconds(maxTime) : null);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 return null;
+            }
+        }
+
+        internal static void InitNoteDatas()
+        {
+            var noteDatas = SingletonScriptableObject<NoteDataMananger>.instance.m_NoteDatas.ToSystem();
+            foreach (var item in noteDatas)
+            {
+                if (item == null || item.uid == null)
+                    continue;
+                NoteConfigDatas.TryAdd(item.uid, item);
             }
         }
 
@@ -341,9 +382,12 @@ namespace IronSearch.Loaders
                 return;
             }
 
-            var json = JsonConvert.SerializeObject(VanillaCache.ToDictionary(x => x.Key, x => x.Value.Ticks));
+            var json = JsonConvert.SerializeObject(
+                VanillaCache.ToDictionary(
+                    x => x.Key,
+                    x => x.Value.Length?.Ticks ?? TimeSpan.FromSeconds(-1).Ticks));
 
-            await File.WriteAllTextAsync(AudioLengthBackupFilePath, json);
+            await File.WriteAllTextAsync(ChartLengthCacheFilePath, json);
         }
     }
 }

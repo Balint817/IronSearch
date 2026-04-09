@@ -18,18 +18,18 @@ namespace IronSearch
                 ModMain.uidToCustom[album.Uid] = album;
             }
         }
-        internal static bool IsFirstLengthCacheBuild { get; private set; } = true;
-        internal static void BuildCacheIfNecessary()
-        {
-            if (ModMain.InitSuccessful && IsFirstLengthCacheBuild)
+        internal static bool IsFirstChartCacheBuild { get; private set; } = true;
+            internal static void BuildCacheIfNecessary()
             {
-                IsFirstLengthCacheBuild = false;
-                if (ChartDataLoader.VanillaCache?.IsEmpty ?? true)
+                if (ModMain.InitSuccessful && IsFirstChartCacheBuild)
                 {
-                    var s = "Re-building length cache, this may take a while!";
-                    MelonLogger.Msg(System.ConsoleColor.Magenta, s);
-                }
-                ChartDataLoader.ForceBuildVanillaCache();
+                    IsFirstChartCacheBuild = false;
+                    if (ChartDataLoader.VanillaCache?.IsEmpty ?? true)
+                    {
+                        var s = "Re-building chart data cache, this may take a while!";
+                        MelonLogger.Msg(System.ConsoleColor.Magenta, s);
+                    }
+                    ChartDataLoader.ForceBuildVanillaCache();
             }
         }
         internal static void LoadAlbumNames()
