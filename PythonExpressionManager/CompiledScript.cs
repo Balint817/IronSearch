@@ -39,6 +39,7 @@ namespace PythonExpressionManager
             scriptBuilder.AppendLine($"\t{tagDict} = {{}}");
             scriptBuilder.AppendLine($"\ttrue = True");
             scriptBuilder.AppendLine($"\tfalse = False");
+            scriptBuilder.AppendLine($"\tnone = None");
 
             foreach (var item in Scripts)
             {
