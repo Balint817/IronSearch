@@ -8,7 +8,7 @@
 
         public const string Author = "PBalint817";
 
-        public const string Version = "0.6.0";
+        public const string Version = "0.6.1";
 
         public const string DownloadLink = "";
 
