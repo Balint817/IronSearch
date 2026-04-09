@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using IronSearch.Core;
+using IronSearch.Loaders;
 using MelonLoader;
 using Playlists.Patches;
 using System.Reflection;
@@ -21,6 +22,18 @@ namespace IronSearch.Patches
                 return;
             }
             hasRun = true;
+
+            MelonLogger.Msg(ConsoleColor.DarkYellow, "Playlists integration requires us to build the vanilla cache early, building it now...");
+            try
+            {
+                ChartDataLoader.ForceBuildVanillaCache();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Msg(ConsoleColor.Red, ex);
+                MelonLogger.Msg(ConsoleColor.DarkRed, "Error occurred while building the vanilla cache in the playlists integration.");
+                return;
+            }
 
             foreach (var cp in Playlists.Playlists.LoadedPlaylists)
             {

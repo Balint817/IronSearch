@@ -167,7 +167,10 @@ namespace IronSearch
             else if (sceneName == "UISystem_PC")
             {
                 UISystemLoaded = true;
-                InitLogic.BuildCacheIfNecessary();
+                if (InitSuccessful)
+                {
+                    ChartDataLoader.ForceBuildVanillaCache();
+                }
             }
             else
             {

@@ -22,13 +22,33 @@ namespace IronSearch.Loaders
 {
     public static class ChartDataLoader
     {
-        private const string ChartLengthCacheFile = "IronSearchChartLengthCache.json";
-        private static readonly string ChartLengthCacheFilePath = Path.Join(MelonEnvironment.UserDataDirectory, ChartLengthCacheFile);
+        private const string ChartDataCacheFile = "IronSearchChartDataCache.json.gz";
+        private static readonly string ChartDataCacheFilePath = Path.Join(MelonEnvironment.UserDataDirectory, ChartDataCacheFile);
 
         public static readonly ConcurrentDictionary<string, ChartData?> CustomCache = new();
         public static ConcurrentDictionary<string, ChartData>? VanillaCache { get; private set; }
         private static bool _vanillaCacheUpdated = true;
         private static readonly Dictionary<string, object> NoteConfigDatas = new();
+
+        private class CachedNote
+        {
+            public float Time { get; set; }
+            public string Value { get; set; } = "";
+            public string Tone { get; set; } = "";
+        }
+
+        private class CachedMapData
+        {
+            public float Bpm { get; set; }
+            public string? Md5 { get; set; }
+            public List<CachedNote> Notes { get; set; } = new();
+        }
+
+        private class CachedChartData
+        {
+            public long? LengthTicks { get; set; }
+            public Dictionary<int, CachedMapData> Maps { get; set; } = new();
+        }
 
         public static ChartData? GetChartData(MusicInfo musicInfo)
         {
@@ -63,11 +83,21 @@ namespace IronSearch.Loaders
             return GetChartData(musicInfo)?.Length;
         }
 
+        static bool isFirstVanillaBuild = true;
         public static void ForceBuildVanillaCache()
         {
+            if (!isFirstVanillaBuild)
+            {
+                return;
+            }
+            isFirstVanillaBuild = false;
             if (VanillaCache is not null)
             {
                 MelonLogger.Msg($"Vanilla chart data cache currently contains {VanillaCache.Count} items.");
+            }
+            else if (VanillaCache?.IsEmpty ?? true)
+            {
+                MelonLogger.Msg(ConsoleColor.Magenta, "Need to re-build chart data cache!");
             }
             VanillaCache ??= new();
             var allMusic = GlobalDataBase.s_DbMusicTag.m_AllMusicInfo.ToSystem().Values.Where(x => x.albumIndex != 999 && x.noteJson is not null && !VanillaCache.ContainsKey(x.uid)).ToList();
@@ -100,34 +130,34 @@ namespace IronSearch.Loaders
 
         internal static void LoadVanillaCache()
         {
-            string? text = null;
+            Dictionary<string, CachedChartData>? loadCache = null;
             try
             {
-                text = File.ReadAllText(ChartLengthCacheFilePath);
+                using var fileStream = File.OpenRead(ChartDataCacheFilePath);
+                using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
+                using var reader = new StreamReader(gzipStream);
+                var json = reader.ReadToEnd();
+                loadCache = JsonConvert.DeserializeObject<Dictionary<string, CachedChartData>>(json);
             }
             catch (Exception)
             {
                 // catch silently
             }
 
-            Dictionary<string, TimeSpan> loadCache = new();
-
-            if (text is not null)
-            {
-                try
-                {
-                    loadCache = JsonConvert.DeserializeObject<Dictionary<string, long>>(text)?.ToDictionary(x => x.Key, x => new TimeSpan(x.Value)) ?? throw new NullReferenceException();
-                }
-                catch (Exception)
-                {
-                    // catch silently
-                }
-            }
-
             VanillaCache = new();
-            foreach (var item in loadCache)
+            if (loadCache is null)
+                return;
+
+            foreach (var (uid, cached) in loadCache)
             {
-                VanillaCache.TryAdd(item.Key, ChartData.FromLength(item.Value));
+                var maps = new Dictionary<int, MapData>();
+                foreach (var (index, cachedMap) in cached.Maps)
+                {
+                    var notes = cachedMap.Notes.Select(n => new NoteInfo(n.Time, n.Value, n.Tone)).ToList();
+                    maps[index] = new MapData(notes, cachedMap.Bpm, cachedMap.Md5);
+                }
+                var length = cached.LengthTicks.HasValue ? new TimeSpan(cached.LengthTicks.Value) : (TimeSpan?)null;
+                VanillaCache.TryAdd(uid, new ChartData(maps, length));
             }
         }
 
@@ -382,12 +412,32 @@ namespace IronSearch.Loaders
                 return;
             }
 
-            var json = JsonConvert.SerializeObject(
-                VanillaCache.ToDictionary(
-                    x => x.Key,
-                    x => x.Value.Length?.Ticks ?? TimeSpan.FromSeconds(-1).Ticks));
+            var cacheDto = VanillaCache.ToDictionary(
+                x => x.Key,
+                x => new CachedChartData
+                {
+                    LengthTicks = x.Value.Length?.Ticks,
+                    Maps = x.Value.Maps.ToDictionary(
+                        m => m.Key,
+                        m => new CachedMapData
+                        {
+                            Bpm = m.Value.Bpm,
+                            Md5 = m.Value.Md5,
+                            Notes = m.Value.Notes.Select(n => new CachedNote
+                            {
+                                Time = n.Time,
+                                Value = n.Value,
+                                Tone = n.Tone
+                            }).ToList()
+                        })
+                });
 
-            await File.WriteAllTextAsync(ChartLengthCacheFilePath, json);
+            var json = JsonConvert.SerializeObject(cacheDto);
+
+            await using var fileStream = File.Create(ChartDataCacheFilePath);
+            await using var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
+            await using var writer = new StreamWriter(gzipStream);
+            await writer.WriteAsync(json);
         }
     }
 }
