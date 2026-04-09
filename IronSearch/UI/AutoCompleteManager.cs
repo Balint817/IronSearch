@@ -168,28 +168,30 @@ namespace IronSearch.UI
         private static Dictionary<string, KeywordInfo> currentKeywords = new();
         public static readonly Dictionary<string, KeywordInfo> AllKeywords = new()
         {
+            ["abs"] = new("abs", 1),
+            ["all"] = new("all", 1),
+            ["any"] = new("any", 1),
             ["bool"] = new("bool", 1),
-            ["chr"] = new("chr", 1),
             ["dict"] = new("dict", 1),
-            ["divmod"] = new("divmod", 1),
             ["enumerate"] = new("enumerate", 2),
-            ["filter"] = new("filter", 2),
+            ["False"] = new("False", 0),
             ["float"] = new("float", 1),
-            ["format"] = new("format", 2),
             ["int"] = new("int", 1),
             ["len"] = new("len", 1),
             ["list"] = new("list", 1),
             ["max"] = new("max", 1),
             ["min"] = new("min", 1),
+            ["None"] = new("None", 0),
             ["reversed"] = new("reversed", 2),
             ["round"] = new("round", 1),
             ["set"] = new("set", 1),
             ["sorted"] = new("sorted", 2),
             ["str"] = new("str", 1),
+            ["sum"] = new("sum", 1),
+            ["True"] = new("True", 0),
             ["tuple"] = new("tuple", 2),
             ["type"] = new("type", 2),
             ["zip"] = new("zip", 2),
-
         };
         internal static void Update()
         {
