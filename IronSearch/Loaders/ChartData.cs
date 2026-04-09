@@ -1,6 +1,7 @@
 namespace IronSearch.Loaders
 {
     public readonly record struct NoteInfo(float Time, string Value, string Tone);
+    //public readonly record struct DialogEventInfo(float Time, string Text);
 
     public class MapData
     {

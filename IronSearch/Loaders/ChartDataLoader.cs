@@ -208,6 +208,28 @@ namespace IronSearch.Loaders
                             if (time > maxTime)
                                 maxTime = time;
                         }
+                        //var dialogEvents = new Dictionary<string, List<DialogEventInfo>>();
+                        //if (stageInfo.dialogEvents != null && stageInfo.dialogEvents.Count != 0)
+                        //{
+                        //    foreach (var kv in stageInfo.dialogEvents)
+                        //    {
+                        //        if (kv.Value == null || kv.Value.Count == 0)
+                        //        {
+                        //            continue;
+                        //        }
+                        //        var list = new List<DialogEventInfo>();
+                        //        foreach (var de in kv.Value)
+                        //        {
+                        //            list.Add(new DialogEventInfo
+                        //            {
+                        //                Time = Il2CppSystem.Decimal.ToSingle(de.time),
+                        //                Text = de.text
+                        //            });
+                        //        }
+                        //        dialogEvents[kv.Key] = list;
+                        //    }
+                        //}
+
                         maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5);
                     }
                     catch
