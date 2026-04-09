@@ -195,6 +195,12 @@ namespace IronSearch.Loaders
                                 continue;
 
                             var configData = (NoteConfigData)configObj;
+
+                            // skip hold ticks
+                            if (configData.ibms_id == "0F" && md.isLongPressing)
+                                continue;
+                            
+
                             var ibmsId = configData.ibms_id;
                             var pathway = configData.pathway == 1 ? "13" : "14";
                             notes.Add(new NoteInfo(time, ibmsId, pathway));
