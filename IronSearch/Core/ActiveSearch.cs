@@ -305,7 +305,7 @@ namespace IronSearch.Core
                 }
             }
 
-            buffer = buildUnlock.Where(x => x is not null).ToList();
+            buffer.AddRange(buildUnlock.Where(x => x is not null));
             PrintCachedSearch(cache);
             return;
         }

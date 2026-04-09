@@ -81,7 +81,7 @@ namespace IronSearch.Loaders
         {
             try
             {
-                result = JsonConvert.DeserializeObject<Dictionary<string, bool>>(File.ReadAllText(HQRankingBackupFile))!;
+                result = JsonConvert.DeserializeObject<Dictionary<string, bool>>(File.ReadAllText(HQRankingBackupFilePath))!;
                 if (result is null)
                 {
                     result = new();

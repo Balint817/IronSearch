@@ -1,4 +1,4 @@
-﻿using CustomAlbums.Managers;
+using CustomAlbums.Managers;
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.UI.Controls;
@@ -57,7 +57,7 @@ namespace IronSearch
             {
                 return uid is not null;
             }
-            if (PlayIDToUIDInternal(playId, out uid))
+            if (!PlayIDToUIDInternal(playId, out uid))
             {
                 uid = null;
             }
@@ -100,8 +100,11 @@ namespace IronSearch
 
         public static void RegisterCustomTag(CustomTagInfo info)
         {
-            ArgumentNullException.ThrowIfNull(info, nameof(info));
-            customTags.Add(info);
+            lock (customTags)
+            {
+                ArgumentNullException.ThrowIfNull(info, nameof(info));
+                customTags.Add(info);
+            }
         }
 
         private void DisposeAll()
