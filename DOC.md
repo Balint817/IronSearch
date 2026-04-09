@@ -1992,17 +1992,33 @@ Short patterns you can copy, then edit. Prefix is assumed to be present.
 | Customs only | `Custom()` |
 | Official charts only | `not Custom()` |
 | Folder customs | `Custom() and not Packed()` |
-| Has hidden or touhou| `Hidden() or Touhou()` |
+| Has hidden or touhou | `Hidden() or Touhou()` |
 | Never played (any diff) | `Unplayed()` |
 | Never played on top chart | `Unplayed('?')` |
 | FC on top chart | `FullCombo('?')` |
+| AP on top chart | `AP('?')` |
 | Streamer-safe only | `Streamer()` |
-| Recently added | `Modified('7d')` |
+| Recently added customs | `Modified('7d')` |
 | Text search | `Any('text')` |
-| High intensity | `BPM('180+') and Length("120+")` |
+| High intensity | `BPM('180+') and Length('120+')` |
 | Challenge | `Difficulty('11+', '?') and Unplayed('?')` |
 | Non-website customs | `Custom() and not Online()` |
+| BPM close to 170 | `abs(int(M.bpm) - 170) <= 10` |
+| Songs with 3+ difficulties | `len(NotNone(GetDifficulties())) >= 3` |
+| Short songs (under 2 min) | `Length('0s-2m')` |
+| Long songs (over 4 min) | `Length('4m+')` |
+| Accuracy above 95% on top map | `Accuracy('95+', '?')` |
+| Played 5+ times on Master | `Clears('5+', '3')` |
 | Favorites, shuffled | `Sort(ByRandom()) and Favorite()` |
 | Oldest customs | `Sort(ByModified()) and Custom()` |
+| Customs by length | `Sort(ByLength()) and Custom()` |
+| Hardest first | `Sort(ByDifficulty(), reverse=True)` |
+| By accuracy, then name | `Sort(ByAccuracy(), ByName())` |
+| Newest customs first | `Sort(ByModified(), reverse=True) and Custom()` |
+| Unplayed customs, hardest first | `Unplayed('?') and Custom() and Sort(ByDifficulty(), reverse=True)` |
+| Total clears across all maps > 50 | `sum(s.Clears for s in NotNone(GetHighscores())) > 50` |
+| FC on every played map | `all(s.Evaluate >= 2 for s in NotNone(GetHighscores()) if s.Clears > 0)` |
+| Worst played accuracy still ≥ 90% | `min([s.Accuracy for s in NotNone(GetHighscores()) if s.Accuracy > 0] or [0]) >= 90` |
+| Customs sorted by date added (grouped by week), then difficulty | `Custom() and Sort((lambda a,b:(lambda db, da: int((da > db) - (da < db)))(T['GetModified'](a, T) // 604800,T['GetModified'](b, T) // 604800)), ByDifficulty(), reverse=True)` |
 
 Final Pro-Tip: If you find yourself using one of these constantly, consider adding it to your Expressions in IronSearch.cfg config so you can just type that instead!
