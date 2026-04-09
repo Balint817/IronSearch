@@ -1,3 +1,4 @@
+using Il2CppAssets.Scripts.Database;
 using IronPython.Runtime;
 using IronSearch.Exceptions;
 using PythonExpressionManager;
@@ -57,6 +58,21 @@ namespace IronSearch.Tags
         private static dynamic[] ConvertArgs(PythonTuple args) => args!.ToArray<dynamic>();
         private static Dictionary<string, dynamic> ConvertKwargs(PythonDictionary kwargs) => kwargs.ToDictionary(x => (string)x.Key, x => (dynamic)x.Value);
 
+        internal static SearchArgument GetSearchArgument(dynamic input)
+        {
+            if (input is SearchArgument SA)
+            {
+                return SA;
+            }
+            else if (input is MusicInfo MI)
+            {
+                return new(MI, new(1000));
+            }
+            else
+            {
+                throw new SearchValidationException("Invalid search context.", "<unknown>", new dynamic[] { input }, new Dictionary<string, dynamic>());
+            }
+        }
         internal static WrappedCLRDelegate WrapCommonChecks(UserScriptManager scriptManager, BuiltInDelegate baseDel)
         {
             WrappableCLRDelegate castingDel = (input, tagDict, varArgs, varKwargs) =>
@@ -66,10 +82,7 @@ namespace IronSearch.Tags
             WrappedCLRDelegate wrappedDel = scriptManager.ScriptExecutor.FromUnwrapped(castingDel);
             WrappedCLRDelegate del2 = (input, tagDict, args, kwargs) =>
             {
-                if (input is not SearchArgument SA)
-                {
-                    throw new SearchValidationException("Invalid search context.", "<unknown>", ConvertArgs(args), ConvertKwargs(kwargs));
-                }
+                var SA = GetSearchArgument(input);
 
                 return wrappedDel(input, tagDict, args, kwargs);
             };
@@ -85,7 +98,10 @@ namespace IronSearch.Tags
                     case ExpressionSearchArgument ESA:
                         break;
                     case SearchArgument SA:
-                        input = new ExpressionSearchArgument(SA, new(), new());
+                        input = new ExpressionSearchArgument(SA, args, kwargs);
+                        break;
+                    case MusicInfo MI:
+                        input = new ExpressionSearchArgument(new(MI, new(1000)), args, kwargs);
                         break;
                     default:
                         throw new SearchValidationException("Invalid search context.", "<unknown>", ConvertArgs(args), ConvertKwargs(kwargs));
@@ -104,10 +120,7 @@ namespace IronSearch.Tags
             WrappedCLRDelegate wrappedDel = scriptManager.ScriptExecutor.FromUnwrapped(castingDel);
             WrappedCLRDelegate del2 = (input, tagDict, args, kwargs) =>
             {
-                if (input is not SearchArgument SA)
-                {
-                    throw new SearchValidationException("Invalid search context.", "<unknown>", ConvertArgs(args), ConvertKwargs(kwargs));
-                }
+                var SA = GetSearchArgument(input);
 
                 return wrappedDel(input, tagDict, args, kwargs);
             };
