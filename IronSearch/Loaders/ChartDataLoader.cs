@@ -95,7 +95,7 @@ namespace IronSearch.Loaders
             {
                 MelonLogger.Msg($"Vanilla chart data cache currently contains {VanillaCache.Count} items.");
             }
-            else if (VanillaCache?.IsEmpty ?? true)
+            if (VanillaCache?.IsEmpty ?? true)
             {
                 MelonLogger.Msg(ConsoleColor.Magenta, "Need to re-build chart data cache!");
             }
@@ -241,7 +241,7 @@ namespace IronSearch.Loaders
                     {
                         sw.Stop();
                         MelonLogger.Msg($"Custom async calculation cancelled after {sw.Elapsed.TotalSeconds:F1} seconds. Progress: {i}/{count}");
-                        MelonLogger.Msg($"Remaining time estimate: {(1 - i / count) * sw.Elapsed.TotalSeconds:F1} seconds");
+                        MelonLogger.Msg($"Remaining time estimate: {(1 - i / (double)count) * sw.Elapsed.TotalSeconds:F1} seconds");
                         return;
                     }
                     var album = allCustoms[i];
