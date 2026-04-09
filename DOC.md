@@ -2019,6 +2019,6 @@ Short patterns you can copy, then edit. Prefix is assumed to be present.
 | Total clears across all maps > 50 | `sum(s.Clears for s in NotNone(GetHighscores())) > 50` |
 | FC on every played map | `all(s.Evaluate >= 2 for s in NotNone(GetHighscores()) if s.Clears > 0)` |
 | Worst played accuracy still ≥ 90% | `min([s.Accuracy for s in NotNone(GetHighscores()) if s.Accuracy > 0] or [0]) >= 90` |
-| Customs sorted by date added (grouped by week), then difficulty | `Custom() and Sort((lambda a,b:(lambda db, da: int((da > db) - (da < db)))(T['GetModified'](a, T) // 604800,T['GetModified'](b, T) // 604800)), ByDifficulty(), reverse=True)` |
+| Customs sorted by date added (grouped by week, newest first), then difficulty (highest first) | `Custom() and Sort((lambda a,b:(lambda db, da: int((da > db) - (da < db)))(T['GetModified'](a, T) // 604800,T['GetModified'](b, T) // 604800)), ByDifficulty(), reverse=True)` |
 
 Final Pro-Tip: If you find yourself using one of these constantly, consider adding it to your Expressions in IronSearch.cfg config so you can just type that instead!
