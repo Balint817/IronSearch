@@ -4,7 +4,7 @@ It modifies the search bar in the song selection, allowing you to quickly find s
 It includes a variety of filters and sorting options to help you find the perfect song for your next session.
 
 ## Installation
-- Download the latest release from the [Releases](/releases/latest) page.
+- Download the latest release from the [Releases](../../releases/latest) page.
 - Place the zip in your Muse Dash folder root.
 - Extract the zip file's contents (such that files in Mods go into Mods, UserLibs into UserLibs)
 - Launch the game. First launch may take a while as the mod initializes and pre-loads data.
