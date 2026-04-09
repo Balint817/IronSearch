@@ -4,32 +4,35 @@ namespace IronSearch.Loaders
 
     public class MapData
     {
-        public List<NoteInfo> Notes { get; }
+        public List<NoteInfo> Notes { get; } = new();
         public float Bpm { get; }
         public string? Md5 { get; }
 
-        internal MapData(List<NoteInfo> notes, float bpm, string? md5)
+        public MapData(List<NoteInfo> notes, float bpm, string? md5)
         {
-            Notes = notes;
+            Notes = notes ?? new();
             Bpm = bpm;
             Md5 = md5;
+        }
+        public MapData()
+        {
+            
         }
     }
 
     public class ChartData
     {
-        public Dictionary<int, MapData> Maps { get; }
-        public TimeSpan? Length { get; }
+        public Dictionary<int, MapData> Maps { get; } = new();
+        public TimeSpan? MaxLength { get; }
 
-        internal ChartData(Dictionary<int, MapData> maps, TimeSpan? length)
+        public ChartData(Dictionary<int, MapData> maps, TimeSpan? length)
         {
-            Maps = maps;
-            Length = length;
+            Maps = maps ?? new();
+            MaxLength = length;
         }
-
-        internal static ChartData FromLength(TimeSpan length)
+        public ChartData()
         {
-            return new ChartData(new Dictionary<int, MapData>(), length);
+            
         }
     }
 }

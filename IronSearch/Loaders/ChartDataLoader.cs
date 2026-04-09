@@ -80,7 +80,7 @@ namespace IronSearch.Loaders
 
         public static TimeSpan? GetMusicLength(MusicInfo musicInfo)
         {
-            return GetChartData(musicInfo)?.Length;
+            return GetChartData(musicInfo)?.MaxLength;
         }
 
         static bool isFirstVanillaBuild = true;
@@ -416,7 +416,7 @@ namespace IronSearch.Loaders
                 x => x.Key,
                 x => new CachedChartData
                 {
-                    LengthTicks = x.Value.Length?.Ticks,
+                    LengthTicks = x.Value.MaxLength?.Ticks,
                     Maps = x.Value.Maps.ToDictionary(
                         m => m.Key,
                         m => new CachedMapData
