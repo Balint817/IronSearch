@@ -115,6 +115,9 @@ namespace IronSearch.Loaders
             {
                 var musicInfo = allMusic[i];
                 var value = LoadVanillaOne(musicInfo);
+                if (value is null)
+                    continue;
+
                 VanillaCache.TryAdd(musicInfo.uid, value);
 
                 currentRatio = decimal.Floor((i + 1) / countDecimal * 1000) / 1000;
@@ -247,9 +250,10 @@ namespace IronSearch.Loaders
             }
             catch (Exception ex)
             {
+                Console.WriteLine();
                 MelonLogger.Msg(ConsoleColor.DarkRed, ex);
                 MelonLogger.Msg(ConsoleColor.DarkRed, (musicInfo.noteJson ?? "<null>") + ", " + (musicInfo.musicName ?? "<null>") + ", " + (musicInfo.uid ?? "<null>"));
-                throw;
+                return null!;
             }
         }
 
