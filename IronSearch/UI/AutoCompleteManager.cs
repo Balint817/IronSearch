@@ -182,7 +182,6 @@ namespace IronSearch.UI
             ["max"] = new("max", 1),
             ["min"] = new("min", 1),
             ["None"] = new("None", 0),
-            ["reversed"] = new("reversed", 2),
             ["round"] = new("round", 1),
             ["set"] = new("set", 1),
             ["sorted"] = new("sorted", 2),
