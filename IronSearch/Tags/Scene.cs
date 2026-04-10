@@ -106,8 +106,14 @@ namespace IronSearch.Tags
             {
                 return false;
             }
+            if (data.SceneTimes.Count == 0)
+            {
+                return musicInfo.scene[6..] == sceneFilter;
+            }
 
-            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
+            var maxValue = data.SceneTimes.Values.Max();
+
+            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value/maxValue)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
 
             foreach (var scene in scenes)
             {
