@@ -84,7 +84,7 @@ namespace IronSearch.Loaders
             return GetChartData(musicInfo)?.MaxLength;
         }
 
-        static bool isFirstVanillaBuild = true;
+        private static bool isFirstVanillaBuild = true;
         public static void ForceBuildVanillaCache()
         {
             if (!isFirstVanillaBuild)
@@ -117,7 +117,9 @@ namespace IronSearch.Loaders
                 var musicInfo = allMusic[i];
                 var value = LoadVanillaOne(musicInfo);
                 if (value is null)
+                {
                     continue;
+                }
 
                 VanillaCache.TryAdd(musicInfo.uid, value);
 
@@ -150,7 +152,9 @@ namespace IronSearch.Loaders
 
             VanillaCache = new();
             if (loadCache is null)
+            {
                 return;
+            }
 
             foreach (var (uid, cached) in loadCache)
             {
@@ -184,7 +188,9 @@ namespace IronSearch.Loaders
                     {
                         var stageInfo = ResourcesManager.instance.LoadFromName<StageInfo>(musicInfo.noteJson + diff);
                         if (stageInfo?.musicDatas == null || stageInfo.musicDatas.Count == 0)
+                        {
                             continue;
+                        }
 
                         stageInfoCount++;
                         var notes = new List<NoteInfo>();
@@ -196,21 +202,26 @@ namespace IronSearch.Loaders
                             var noteUid = md.configData?.note_uid;
 
                             if (noteUid is null || !NoteConfigDatas.TryGetValue(noteUid, out var configObj))
+                            {
                                 continue;
+                            }
 
                             var configData = (NoteConfigData)configObj;
 
                             // skip hold ticks
                             if (configData.ibms_id == "0F" && md.isLongPressing)
+                            {
                                 continue;
-                            
+                            }
 
                             var ibmsId = configData.ibms_id;
                             var pathway = configData.pathway == 1 ? "13" : "14";
                             notes.Add(new NoteInfo(time, ibmsId, pathway));
 
                             if (time > maxTime)
+                            {
                                 maxTime = time;
+                            }
                         }
                         //var dialogEvents = new Dictionary<string, List<DialogEventInfo>>();
                         //if (stageInfo.dialogEvents != null && stageInfo.dialogEvents.Count != 0)
@@ -327,7 +338,9 @@ namespace IronSearch.Loaders
         private static Dictionary<int, object> LoadBmsMaps(string path, bool isPackaged)
         {
             if (!BmsLoader_MathPatch.IsPatched)
+            {
                 return EmptyBmsMaps;
+            }
 
             return isPackaged
                 ? LoadBmsMapsFromZip(path)
@@ -344,7 +357,10 @@ namespace IronSearch.Loaders
                 try
                 {
                     var entry = archive.GetEntry($"map{i}.bms");
-                    if (entry == null) continue;
+                    if (entry == null)
+                    {
+                        continue;
+                    }
 
                     using var stream = entry.Open();
                     using var ms = stream.CopyToMemory();
@@ -368,7 +384,10 @@ namespace IronSearch.Loaders
                 try
                 {
                     var bmsPath = Path.Combine(dirPath, $"map{i}.bms");
-                    if (!File.Exists(bmsPath)) continue;
+                    if (!File.Exists(bmsPath))
+                    {
+                        continue;
+                    }
 
                     using var fs = File.OpenRead(bmsPath);
                     maps[i] = LoadBms(fs, $"map{i}.bms");
@@ -389,7 +408,9 @@ namespace IronSearch.Loaders
             {
                 var bmsMaps = LoadBmsMaps(album.Path, album.IsPackaged);
                 if (bmsMaps.Count == 0)
+                {
                     return null;
+                }
 
                 var maps = new Dictionary<int, MapData>();
                 float maxTime = -1f;
@@ -401,19 +422,25 @@ namespace IronSearch.Loaders
                     foreach (var note in bms.Notes)
                     {
                         if (note is not JsonObject jo)
+                        {
                             continue;
+                        }
 
                         if (!jo.TryGetPropertyValue("time", out var timeNode)
                             || timeNode is not JsonValue jv
                             || !jv.TryGetValue<float>(out var time))
+                        {
                             continue;
+                        }
 
                         var value = jo["value"]?.GetValue<string>() ?? "";
                         var tone = jo["tone"]?.GetValue<string>() ?? "";
                         notes.Add(new NoteInfo(time, value, tone));
 
                         if (time > maxTime)
+                        {
                             maxTime = time;
+                        }
                     }
                     maps[index] = new MapData(notes, bms.Bpm, bms.Md5);
                 }
@@ -433,7 +460,10 @@ namespace IronSearch.Loaders
             foreach (var item in noteDatas)
             {
                 if (item == null || item.uid == null)
+                {
                     continue;
+                }
+
                 NoteConfigDatas.TryAdd(item.uid, item);
             }
         }

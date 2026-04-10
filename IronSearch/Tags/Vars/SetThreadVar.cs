@@ -1,5 +1,4 @@
 using IronSearch.Exceptions;
-using System.Collections.Concurrent;
 
 namespace IronSearch.Tags
 {

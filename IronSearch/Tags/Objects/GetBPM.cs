@@ -1,5 +1,3 @@
-using Il2CppAssets.Scripts.Database;
-
 namespace IronSearch.Tags
 {
     internal partial class BuiltIns

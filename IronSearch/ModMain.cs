@@ -1,8 +1,6 @@
 using CustomAlbums.Managers;
-using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.UI.Controls;
-using Il2CppPeroTools2.Resources;
 using IronPython.Runtime;
 using IronSearch.Core;
 using IronSearch.Loaders;
@@ -14,7 +12,6 @@ using MelonLoader.Utils;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace IronSearch

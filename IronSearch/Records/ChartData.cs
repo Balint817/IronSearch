@@ -17,7 +17,7 @@ namespace IronSearch.Records
         }
         public MapData()
         {
-            
+
         }
     }
 
@@ -33,7 +33,7 @@ namespace IronSearch.Records
         }
         public ChartData()
         {
-            
+
         }
     }
 }

@@ -2,7 +2,6 @@
 using Il2CppAssets.Scripts.Database;
 using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppAssets.Scripts.PeroTools.Managers;
-using IronSearch.Loaders;
 using IronSearch.Tags;
 using IronSearch.Utils;
 using MelonLoader;

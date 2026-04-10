@@ -96,7 +96,7 @@ namespace IronSearch.Core
             catch { }
             BuiltIns.runThreadOnceTracker = new(() => new());
 
-            
+
 
             var allMusic = new Il2CppSystem.Collections.Generic.List<MusicInfo>();
             GlobalDataBase.s_DbMusicTag.GetAllMusicInfo(allMusic);

@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using IronPython.Compiler;
+﻿using IronPython.Compiler;
 using IronPython.Compiler.Ast;
 using IronPython.Runtime;
 using IronSearch.Records;
@@ -13,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace IronSearch.Utils
 {
-    class NameCallWalker : PythonWalker
+    internal class NameCallWalker : PythonWalker
     {
         public NameCallWalker(List<string> varList, List<string> callList)
         {
@@ -64,7 +63,7 @@ namespace IronSearch.Utils
             }
         }
 
-        public static bool GetPythonNamesFromAST(ScriptEngine engine, string code, [MaybeNullWhen(false)]out List<string> varList, [MaybeNullWhen(false)] out List<string> callList)
+        public static bool GetPythonNamesFromAST(ScriptEngine engine, string code, [MaybeNullWhen(false)] out List<string> varList, [MaybeNullWhen(false)] out List<string> callList)
         {
             varList = null;
             callList = null;

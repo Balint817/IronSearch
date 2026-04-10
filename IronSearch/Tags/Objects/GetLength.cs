@@ -1,4 +1,3 @@
-using Il2CppAssets.Scripts.Database;
 using IronSearch.Loaders;
 
 namespace IronSearch.Tags

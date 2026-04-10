@@ -1,6 +1,5 @@
 using IronSearch.Exceptions;
 using IronSearch.Utils;
-using System.Collections.Concurrent;
 using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
@@ -8,7 +7,7 @@ namespace IronSearch.Tags
     internal partial class BuiltIns
     {
         internal static ThreadLocal<Dictionary<string, bool>> runThreadOnceTracker = null!;
-        internal static readonly Range _runThreadOnceArgsRange = new(1,2);
+        internal static readonly Range _runThreadOnceArgsRange = new(1, 2);
         internal static bool EvalRunThreadOnce(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             ThrowIfNotEmpty(varKwargs, "RunThreadOnce", varArgs, varKwargs);
