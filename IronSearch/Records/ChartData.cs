@@ -1,4 +1,6 @@
+using Il2CppGameLogic;
 using Newtonsoft.Json;
+using static CustomAlbums.Data.Bms;
 
 namespace IronSearch.Records
 {
@@ -11,13 +13,14 @@ namespace IronSearch.Records
         public float StartBPM { get; private set; }
         public string? MD5 { get; private set; }
         public Dictionary<string, List<DialogEventInfo>> DialogEvents { get; private set; } = new();
-
-        public MapData(List<NoteInfo> notes, float bpm, string? md5, Dictionary<string, List<DialogEventInfo>>? dialogEvents = null)
+        public string StartingScene { get; private set; } = "";
+        public MapData(List<NoteInfo> notes, float bpm, string? md5, Dictionary<string, List<DialogEventInfo>>? dialogEvents, string startingScene)
         {
             Notes = notes ?? new();
             StartBPM = bpm;
             MD5 = md5;
             DialogEvents = dialogEvents ?? new();
+            StartingScene = startingScene ?? "";
         }
         public MapData()
         {

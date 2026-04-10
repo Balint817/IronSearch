@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 
 namespace IronSearch.Loaders
 {
@@ -217,7 +218,7 @@ namespace IronSearch.Loaders
                             }
                         }
 
-                        maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5, dialogEvents);
+                        maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5, dialogEvents, stageInfo.scene);
                     }
                     catch
                     {
@@ -486,7 +487,7 @@ namespace IronSearch.Loaders
 
             return dialogEvents;
         }
-
+        private static readonly Regex sceneRegex = new(@"^scene_\d\d+$", RegexOptions.Compiled);
         private static ChartData? GetCustomChartDataDirect(string uid)
         {
             var album = (Album)ModMain.uidToCustom[uid];
@@ -507,6 +508,16 @@ namespace IronSearch.Loaders
                 {
                     var bms = (Bms)bmsObj;
                     var notes = new List<NoteInfo>();
+
+                    if (!bms.Info.TryGetPropertyValue("GENRE", out var genreNode)
+                        || genreNode is not JsonValue gv
+                        || !gv.TryGetValue<string>(out var genre)
+                        || !sceneRegex.IsMatch(genre))
+                    {
+                        continue;
+                    }
+                    var startingScene = genre;
+
                     foreach (var note in bms.Notes)
                     {
                         if (note is not JsonObject jo)
@@ -523,6 +534,9 @@ namespace IronSearch.Loaders
 
                         var value = jo["value"]?.GetValue<string>() ?? "";
                         var tone = jo["tone"]?.GetValue<string>() ?? "";
+                        if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tone))
+                            continue;
+                        
                         notes.Add(new NoteInfo(time, value, tone));
 
                         if (time > maxTime)
@@ -532,7 +546,11 @@ namespace IronSearch.Loaders
                     }
 
                     talkMaps.TryGetValue(index, out var dialogEvents);
-                    maps[index] = new MapData(notes, bms.Bpm, bms.Md5, dialogEvents);
+
+                    var sceneEvents = GetSceneChanges(notes);
+
+
+                    maps[index] = new MapData(notes, bms.Bpm, bms.Md5, dialogEvents, startingScene);
                 }
 
                 return new ChartData(maps, maxTime >= 0f ? TimeSpan.FromSeconds(maxTime) : null);
@@ -542,6 +560,11 @@ namespace IronSearch.Loaders
                 Console.WriteLine(e);
                 return null;
             }
+        }
+
+        static List<NoteInfo> GetSceneChanges(List<NoteInfo> notes)
+        {
+            //TODO
         }
 
         internal static void InitNoteDatas()

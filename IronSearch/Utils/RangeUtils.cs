@@ -8,9 +8,9 @@ namespace IronSearch.Utils
     public static class RangeUtils
     {
 
-        internal static readonly Regex regexBPM = new Regex(@"^[0-9,]*\.?[0-9,]+[^0-9.,][0-9,]*\.?[0-9,]+$");
+        internal static readonly Regex regexBPM = new(@"^[0-9,]*\.?[0-9,]+[^0-9.,][0-9,]*\.?[0-9,]+$", RegexOptions.Compiled);
 
-        internal static readonly Regex regexNonNumeric = new Regex(@"[^0-9.,]");
+        internal static readonly Regex regexNonNumeric = new(@"[^0-9.,]", RegexOptions.Compiled);
         public static bool DetectParseBPM(string input, [MaybeNullWhen(false)] out Range range, double min, double max)
         {
             range = null;
