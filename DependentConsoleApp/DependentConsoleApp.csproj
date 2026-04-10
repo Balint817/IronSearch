@@ -13,8 +13,4 @@
     <ProjectReference Include="..\PythonExpressionManager\PythonExpressionManager.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="9.0.4" />
-  </ItemGroup>
-
 </Project>
