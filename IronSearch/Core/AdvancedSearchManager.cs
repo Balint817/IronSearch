@@ -730,6 +730,12 @@ namespace IronSearch.Core
                 + "Returns a comparer function that can be used in Sort to sort by BPM."
             );
 
+            RegisterObject("ByClears", BuiltIns.EvalByClears);
+            RegisterHelp(new() { "ByClears" },
+                "Usage: ByClears()\n\n"
+                + "Returns a comparer function that can be used in Sort to sort by clears."
+            );
+
             RegisterObject("ByDifficulty", BuiltIns.EvalByDifficulty);
             RegisterObject("ByDiff", BuiltIns.EvalByDifficulty);
             RegisterHelp(new() { "ByDifficulty", "ByDiff" },

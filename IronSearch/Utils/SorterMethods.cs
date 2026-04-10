@@ -227,5 +227,26 @@ namespace IronSearch.Utils
             return max;
         }
 
+        internal static int SortByClears(MusicInfo x, MusicInfo y)
+        {
+            var clearsX = 0;
+            var clearsY = 0;
+            void AddClears(MusicInfo musicInfo, ref int clears)
+            {
+                for (int i = 1; i <= 5; i++)
+                {
+                    var s = musicInfo.uid + "_" + i;
+                    if (ActiveSearch.highScores.TryGetValue(s, out var score))
+                    {
+                        clears += score.Clears;
+                    }
+                }
+            }
+
+            AddClears(x, ref clearsX);
+            AddClears(y, ref clearsY);
+
+            return clearsX.CompareTo(clearsY);
+        }
     }
 }
