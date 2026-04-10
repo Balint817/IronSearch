@@ -126,7 +126,7 @@ namespace IronSearch.Tags
         }
 
         private static readonly Range _evalSceneArgCount = new(1, 2);
-        private static readonly MultiRange defaultSceneRange = (new Range(0.25, double.PositiveInfinity)
+        private static readonly MultiRange defaultSceneRange = (new Range(0.35, double.PositiveInfinity)
         {
             ExclusiveStart = true,
         }).AsMultiRange();
