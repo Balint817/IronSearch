@@ -102,22 +102,28 @@ namespace IronSearch.Tags
             {
                 data = ChartDataLoader.VanillaCache![musicInfo.uid];
             }
-            if (data is null)
+            // implies corrupt data
+            if (data is null || data.SceneTimes is null)
             {
                 return false;
             }
+            // possible only for empty charts
             if (data.SceneTimes.Count == 0)
             {
-                return musicInfo.scene[6..] == sceneFilter;
+                if (!durationSelector.Contains(1))
+                    return false;
+                
+                var maps = data.Maps ?? new();
+                return maps.Values.Select(x => x?.StartingScene).Append(musicInfo.scene).Any(x => x is not null && x.Length > 6 && x[6..] == sceneFilter);
             }
 
             var maxValue = data.SceneTimes.Values.Max();
 
-            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value / maxValue * 100)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
+            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value / maxValue * 100)).Select(x => x.Key).Append(musicInfo.scene).Distinct();
 
             foreach (var scene in scenes)
             {
-                if (scene[6..] == sceneFilter)
+                if (scene.Length > 6 && scene[6..] == sceneFilter)
                 {
                     return true;
                 }
