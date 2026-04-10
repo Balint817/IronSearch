@@ -178,6 +178,14 @@ namespace IronSearch.Core
             MelonLogger.Msg($"Advanced search found {finalResult.Count} songs in {_sw.Elapsed.TotalSeconds:F1}s.");
             _sw.Restart();
 
+            if (finalResult.Count == allMusic.Count)
+            {
+                if (PythonUtils.GetPythonNamesFromAST(ModMain.SearchManager.ScriptManager.ScriptExecutor.Engine, expression, out var varList, out var callList))
+                {
+                    // TODO: a rough way to detect if the search has any incorrectly used tags.
+                }
+            }
+
 
             SorterMethods.sortingFlag = true;
             bool criticalFlag = true;
