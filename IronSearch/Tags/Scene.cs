@@ -1,6 +1,9 @@
 using Il2CppAssets.Scripts.Database;
 using IronSearch.Exceptions;
+using IronSearch.Loaders;
+using IronSearch.Records;
 using IronSearch.Utils;
+using Range=IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
@@ -47,7 +50,7 @@ namespace IronSearch.Tags
             {"jade_temple", "12"},
         };
 
-        internal static bool EvalScene(MusicInfo musicInfo, string value, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
+        internal static bool EvalScene(MusicInfo musicInfo, string value, MultiRange durationSelector, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
             value = value.Trim(' ');
             string sceneFilter = null!;
@@ -89,29 +92,55 @@ namespace IronSearch.Tags
                     sceneFilter = matches.Keys.First();
                     break;
             }
-            if (musicInfo.scene[6..] == sceneFilter)
+
+            ChartData? data;
+            if (EvalCustom(musicInfo))
             {
-                return true;
+                data = ChartDataLoader.CustomCache.TryGetValue(musicInfo.uid, out var d) ? d : null;
+            }
+            else
+            {
+                data = ChartDataLoader.VanillaCache![musicInfo.uid];
+            }
+            if (data is null)
+            {
+                return false;
+            }
+
+            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
+
+            foreach (var scene in scenes)
+            {
+                if (scene[6..] == sceneFilter)
+                {
+                    return true;
+                }
             }
             return false;
         }
-        internal static bool EvalScene(MusicInfo musicInfo, int value, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
+
+        private static readonly Range _evalSceneArgCount = new(1, 2);
+        private static readonly MultiRange defaultSceneRange = (new Range(0.25, double.PositiveInfinity)
         {
-            return EvalScene(musicInfo, value.ToString(), varArgs, varKwargs);
-        }
+            ExclusiveStart = true,
+        }).AsMultiRange();
         internal static bool EvalScene(SearchArgument M, dynamic[] varArgs, Dictionary<string, dynamic> varKwargs)
         {
-            ThrowIfNotMatching(varArgs, 1, "Scene", varArgs, varKwargs);
+            ThrowIfNotMatching(varArgs, _evalSceneArgCount, "Scene", varArgs, varKwargs);
             ThrowIfNotEmpty(varKwargs, "Scene", varArgs, varKwargs);
-            var arg1 = varArgs[0];
-            switch (arg1)
+            var arg0 = varArgs[0];
+            string sceneInput = arg0 switch
             {
-                case int n:
-                    return EvalScene(M.I, n, varArgs, varKwargs);
-                case string s:
-                    return EvalScene(M.I, s, varArgs, varKwargs);
+                int n => n.ToString(),
+                string s => s,
+                _ => throw new SearchWrongTypeException("a scene name, numeric ID, or string digits", arg0?.GetType(), "Scene", varArgs, varKwargs),
+            };
+            var arg1 = defaultSceneRange;
+            if (varArgs.Length == 2)
+            {
+                arg1 = RangeArgumentParser.GetRange(varArgs[1], "Scene", varArgs, varKwargs);
             }
-            throw new SearchWrongTypeException("a scene name, numeric ID, or string digits", arg1?.GetType(), "Scene", varArgs, varKwargs);
+            return EvalScene(M.I, sceneInput, arg1, varArgs, varKwargs);
 
         }
     }
