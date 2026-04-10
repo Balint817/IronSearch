@@ -1049,6 +1049,7 @@ Notes:
 Usage:
 
 - `Scene(sceneName) or Scene(sceneIndex)`
+- `Scene(sceneName, range) or Scene(sceneIndex, range)`
 
 Checks if the music is in a specific scene.
 
@@ -1060,6 +1061,16 @@ Accepted inputs:
 Ambiguity:
 
 - If the typed scene name matches multiple known scenes, the search fails.
+
+Scene dominance:
+- A range parameter can be provided after the scene name to restrict how dominant the scene has to be in the song.
+- The "dominance" of a scene is decided using the follow logic:
+  - Calculate how much of the song's length is occupied by any given scene (as a percentage)
+  - The highest percentage scene becomes the "primary scene".
+  - All values are divided by the primary scene's percentage (this means the primary scene has a dominance of 100%, and other scenes have a dominance relative to that).
+- For example, Scene('candy', '50-100|') would match songs where the candy scene is at least 50% dominant, but is NOT the primary scene (due to the exclusive 100 end)
+- An unbound negative range, such as '50-' is not recommended, as this includes scenes that appear for even a single frame.
+- The default range is '35+'
 
 Example:
 
