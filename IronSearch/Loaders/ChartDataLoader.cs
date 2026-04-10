@@ -31,26 +31,6 @@ namespace IronSearch.Loaders
         private static bool _vanillaCacheUpdated = true;
         private static readonly Dictionary<string, object> NoteConfigDatas = new();
 
-        private class CachedNote
-        {
-            public float Time { get; set; }
-            public string Value { get; set; } = "";
-            public string Tone { get; set; } = "";
-        }
-
-        private class CachedMapData
-        {
-            public float Bpm { get; set; }
-            public string? Md5 { get; set; }
-            public List<CachedNote> Notes { get; set; } = new();
-        }
-
-        private class CachedChartData
-        {
-            public long? LengthTicks { get; set; }
-            public Dictionary<int, CachedMapData> Maps { get; set; } = new();
-        }
-
         public static ChartData? GetChartData(MusicInfo musicInfo)
         {
             if (musicInfo.uid is null)
@@ -136,14 +116,14 @@ namespace IronSearch.Loaders
 
         internal static void LoadVanillaCache()
         {
-            Dictionary<string, CachedChartData>? loadCache = null;
+            Dictionary<string, ChartData>? loadCache = null;
             try
             {
                 using var fileStream = File.OpenRead(ChartDataCacheFilePath);
                 using var gzipStream = new GZipStream(fileStream, CompressionMode.Decompress);
                 using var reader = new StreamReader(gzipStream);
                 var json = reader.ReadToEnd();
-                loadCache = JsonConvert.DeserializeObject<Dictionary<string, CachedChartData>>(json);
+                loadCache = JsonConvert.DeserializeObject<Dictionary<string, ChartData>>(json);
             }
             catch (Exception)
             {
@@ -156,16 +136,9 @@ namespace IronSearch.Loaders
                 return;
             }
 
-            foreach (var (uid, cached) in loadCache)
+            foreach (var (uid, chartData) in loadCache)
             {
-                var maps = new Dictionary<int, MapData>();
-                foreach (var (index, cachedMap) in cached.Maps)
-                {
-                    var notes = cachedMap.Notes.Select(n => new NoteInfo(n.Time, n.Value, n.Tone)).ToList();
-                    maps[index] = new MapData(notes, cachedMap.Bpm, cachedMap.Md5);
-                }
-                var length = cached.LengthTicks.HasValue ? new TimeSpan(cached.LengthTicks.Value) : (TimeSpan?)null;
-                VanillaCache.TryAdd(uid, new ChartData(maps, length));
+                VanillaCache.TryAdd(uid, chartData);
             }
         }
 
@@ -223,29 +196,28 @@ namespace IronSearch.Loaders
                                 maxTime = time;
                             }
                         }
-                        //var dialogEvents = new Dictionary<string, List<DialogEventInfo>>();
-                        //if (stageInfo.dialogEvents != null && stageInfo.dialogEvents.Count != 0)
-                        //{
-                        //    foreach (var kv in stageInfo.dialogEvents)
-                        //    {
-                        //        if (kv.Value == null || kv.Value.Count == 0)
-                        //        {
-                        //            continue;
-                        //        }
-                        //        var list = new List<DialogEventInfo>();
-                        //        foreach (var de in kv.Value)
-                        //        {
-                        //            list.Add(new DialogEventInfo
-                        //            {
-                        //                Time = Il2CppSystem.Decimal.ToSingle(de.time),
-                        //                Text = de.text
-                        //            });
-                        //        }
-                        //        dialogEvents[kv.Key] = list;
-                        //    }
-                        //}
+                        var dialogEvents = new Dictionary<string, List<DialogEventInfo>>();
+                        if (stageInfo.dialogEvents != null && stageInfo.dialogEvents.Count != 0)
+                        {
+                            foreach (var kv in stageInfo.dialogEvents)
+                            {
+                                if (kv.Value == null || kv.Value.Count == 0)
+                                {
+                                    continue;
+                                }
+                                var list = new List<DialogEventInfo>();
+                                foreach (var de in kv.Value)
+                                {
+                                    list.Add(new DialogEventInfo(
+                                        Il2CppSystem.Decimal.ToSingle(de.time),
+                                        de.text
+                                    ));
+                                }
+                                dialogEvents[kv.Key] = list;
+                            }
+                        }
 
-                        maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5);
+                        maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5, dialogEvents);
                     }
                     catch
                     {
@@ -401,6 +373,120 @@ namespace IronSearch.Loaders
             return maps;
         }
 
+        private static Dictionary<int, Dictionary<string, List<DialogEventInfo>>> LoadTalkMaps(string path, bool isPackaged)
+        {
+            return isPackaged
+                ? LoadTalkMapsFromZip(path)
+                : LoadTalkMapsFromDirectory(path);
+        }
+
+        private static Dictionary<int, Dictionary<string, List<DialogEventInfo>>> LoadTalkMapsFromZip(string zipPath)
+        {
+            var result = new Dictionary<int, Dictionary<string, List<DialogEventInfo>>>();
+            using var archive = ZipFile.OpenRead(zipPath);
+
+            for (int i = 1; i <= 5; i++)
+            {
+                try
+                {
+                    var entry = archive.GetEntry($"map{i}.talk");
+                    if (entry == null)
+                    {
+                        continue;
+                    }
+
+                    using var stream = entry.Open();
+                    using var reader = new StreamReader(stream);
+                    var json = reader.ReadToEnd();
+                    var dialogEvents = ParseTalkJson(json);
+                    if (dialogEvents.Count > 0)
+                    {
+                        result[i] = dialogEvents;
+                    }
+                }
+                catch
+                {
+                    // silent ignore
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<int, Dictionary<string, List<DialogEventInfo>>> LoadTalkMapsFromDirectory(string dirPath)
+        {
+            var result = new Dictionary<int, Dictionary<string, List<DialogEventInfo>>>();
+
+            for (int i = 1; i <= 5; i++)
+            {
+                try
+                {
+                    var talkPath = Path.Combine(dirPath, $"map{i}.talk");
+                    if (!File.Exists(talkPath))
+                    {
+                        continue;
+                    }
+
+                    var json = File.ReadAllText(talkPath);
+                    var dialogEvents = ParseTalkJson(json);
+                    if (dialogEvents.Count > 0)
+                    {
+                        result[i] = dialogEvents;
+                    }
+                }
+                catch
+                {
+                    // silent ignore
+                }
+            }
+
+            return result;
+        }
+
+        private static Dictionary<string, List<DialogEventInfo>> ParseTalkJson(string json)
+        {
+            var dialogEvents = new Dictionary<string, List<DialogEventInfo>>();
+            var root = JsonNode.Parse(json);
+            if (root is not JsonObject rootObj)
+            {
+                return dialogEvents;
+            }
+
+            foreach (var (lang, eventsNode) in rootObj)
+            {
+                if (eventsNode is not JsonArray events)
+                {
+                    continue;
+                }
+
+                var list = new List<DialogEventInfo>();
+                foreach (var ev in events)
+                {
+                    if (ev is not JsonObject evObj)
+                    {
+                        continue;
+                    }
+
+                    if (!evObj.TryGetPropertyValue("time", out var timeNode)
+                        || timeNode is not JsonValue tv
+                        || !tv.TryGetValue<float>(out var time))
+                    {
+                        continue;
+                    }
+
+                    var text = evObj["text"]?.GetValue<string>() ?? "";
+                    list.Add(new DialogEventInfo(time, text));
+                }
+
+                if (list.Count > 0)
+                {
+                    dialogEvents[lang] = list;
+                }
+            }
+
+            return dialogEvents;
+        }
+
         private static ChartData? GetCustomChartDataDirect(string uid)
         {
             var album = (Album)ModMain.uidToCustom[uid];
@@ -411,6 +497,8 @@ namespace IronSearch.Loaders
                 {
                     return null;
                 }
+
+                var talkMaps = LoadTalkMaps(album.Path, album.IsPackaged);
 
                 var maps = new Dictionary<int, MapData>();
                 float maxTime = -1f;
@@ -442,7 +530,9 @@ namespace IronSearch.Loaders
                             maxTime = time;
                         }
                     }
-                    maps[index] = new MapData(notes, bms.Bpm, bms.Md5);
+
+                    talkMaps.TryGetValue(index, out var dialogEvents);
+                    maps[index] = new MapData(notes, bms.Bpm, bms.Md5, dialogEvents);
                 }
 
                 return new ChartData(maps, maxTime >= 0f ? TimeSpan.FromSeconds(maxTime) : null);
@@ -475,27 +565,7 @@ namespace IronSearch.Loaders
                 return;
             }
 
-            var cacheDto = VanillaCache.ToDictionary(
-                x => x.Key,
-                x => new CachedChartData
-                {
-                    LengthTicks = x.Value.MaxLength?.Ticks,
-                    Maps = x.Value.Maps.ToDictionary(
-                        m => m.Key,
-                        m => new CachedMapData
-                        {
-                            Bpm = m.Value.Bpm,
-                            Md5 = m.Value.Md5,
-                            Notes = m.Value.Notes.Select(n => new CachedNote
-                            {
-                                Time = n.Time,
-                                Value = n.Value,
-                                Tone = n.Tone
-                            }).ToList()
-                        })
-                });
-
-            var json = JsonConvert.SerializeObject(cacheDto);
+            var json = JsonConvert.SerializeObject(VanillaCache);
 
             await using var fileStream = File.Create(ChartDataCacheFilePath);
             await using var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
