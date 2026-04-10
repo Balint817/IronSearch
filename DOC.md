@@ -1179,6 +1179,16 @@ Returns a comparer function to sort by BPM.
 
 ---
 
+#### `ByClears`
+
+Usage:
+
+- `ByClears()`
+
+Returns a comparer function to sort by clears.
+
+---
+
 #### `ByDifficulty`/`ByDiff`
 
 Usage:
