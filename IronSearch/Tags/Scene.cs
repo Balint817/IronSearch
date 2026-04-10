@@ -113,7 +113,7 @@ namespace IronSearch.Tags
 
             var maxValue = data.SceneTimes.Values.Max();
 
-            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value / maxValue)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
+            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value / maxValue * 100)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
 
             foreach (var scene in scenes)
             {
