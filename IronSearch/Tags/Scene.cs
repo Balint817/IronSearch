@@ -110,7 +110,7 @@ namespace IronSearch.Tags
             // possible only for empty charts
             if (data.SceneTimes.Count == 0)
             {
-                if (!durationSelector.Contains(1))
+                if (!durationSelector.Contains(100))
                     return false;
                 
                 var maps = data.Maps ?? new();
