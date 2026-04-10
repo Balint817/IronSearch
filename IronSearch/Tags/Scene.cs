@@ -3,7 +3,7 @@ using IronSearch.Exceptions;
 using IronSearch.Loaders;
 using IronSearch.Records;
 using IronSearch.Utils;
-using Range=IronSearch.Records.Range;
+using Range = IronSearch.Records.Range;
 
 namespace IronSearch.Tags
 {
@@ -113,7 +113,7 @@ namespace IronSearch.Tags
 
             var maxValue = data.SceneTimes.Values.Max();
 
-            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value/maxValue)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
+            var scenes = data.SceneTimes.Where(x => durationSelector.Contains(x.Value / maxValue)).Select(x => x.Key).Append(musicInfo.scene).ToHashSet().ToList();
 
             foreach (var scene in scenes)
             {

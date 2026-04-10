@@ -1,7 +1,5 @@
-using Il2CppGameLogic;
 using IronPython.Runtime;
 using Newtonsoft.Json;
-using static CustomAlbums.Data.Bms;
 
 namespace IronSearch.Records
 {
@@ -49,7 +47,10 @@ namespace IronSearch.Records
             {
                 var currentScene = sceneChange.Scene;
                 if (currentScene == lastScene)
+                {
                     continue;
+                }
+
                 currentTime = sceneChange.Time;
                 if (!times.TryGetValue(lastScene, out accumulatedTime))
                 {

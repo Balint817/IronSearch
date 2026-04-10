@@ -223,11 +223,15 @@ namespace IronSearch.Loaders
                         foreach (var sceneEvent in stageInfo.sceneEvents)
                         {
                             if (sceneEvent is null || string.IsNullOrEmpty(sceneEvent.uid))
+                            {
                                 continue;
-                            
+                            }
+
                             var split = sceneEvent.uid.Split('/');
                             if (split.Length != 2 || !SceneSwitchBmsIds.TryGetValue(split[1], out var scene))
+                            {
                                 continue;
+                            }
 
                             sceneChanges.Add(new SceneSwitch(Il2CppSystem.Decimal.ToSingle(sceneEvent.time), scene));
                         }
@@ -562,8 +566,10 @@ namespace IronSearch.Loaders
                         var value = jo["value"]?.GetValue<string>() ?? "";
                         var tone = jo["tone"]?.GetValue<string>() ?? "";
                         if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tone))
+                        {
                             continue;
-                        
+                        }
+
                         notes.Add(new NoteInfo(time, value, tone));
 
                         if (time > maxTime)
@@ -588,7 +594,7 @@ namespace IronSearch.Loaders
                 return null;
             }
         }
-        static List<SceneSwitch> GetSceneChanges(List<NoteInfo> notes)
+        private static List<SceneSwitch> GetSceneChanges(List<NoteInfo> notes)
         {
             var sceneChanges = new List<SceneSwitch>();
             foreach (var note in notes)
