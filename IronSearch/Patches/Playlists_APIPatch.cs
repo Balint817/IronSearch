@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using IronSearch.Core;
 using IronSearch.Loaders;
+using IronSearch.Records;
 using MelonLoader;
 using Playlists.Patches;
 using System.Reflection;

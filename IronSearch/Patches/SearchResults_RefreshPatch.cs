@@ -1,6 +1,7 @@
 using HarmonyLib;
 using Il2CppAssets.Scripts.Structs.Modules;
 using IronSearch.Core;
+using IronSearch.Records;
 
 namespace IronSearch.Patches
 {

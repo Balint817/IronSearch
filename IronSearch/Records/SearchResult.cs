@@ -1,4 +1,4 @@
-namespace IronSearch.Core
+namespace IronSearch.Records
 {
     public enum SearchResult
     {

@@ -8,6 +8,7 @@ using Il2CppAssets.Scripts.PeroTools.Commons;
 using Il2CppGameLogic;
 using Il2CppPeroTools2.Resources;
 using IronSearch.Patches;
+using IronSearch.Records;
 using IronSearch.Tags;
 using IronSearch.Utils;
 using MelonLoader;
