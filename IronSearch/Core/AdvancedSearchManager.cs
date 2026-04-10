@@ -352,7 +352,7 @@ namespace IronSearch.Core
                 + "Checks if the music is in a scene with the specified name or index.\n"
                 + "For example, 'candyland', 'castle', etc.\n"
                 + "If the match is ambiguous, (for example typing 'r' and matching 'rainynight' and 'retrocity'), the search fails.\n"
-                + "A second range parameter can be provided to specify the relative dominance of a scene within the given map, where 100% is the primary scene.\n"
+                + "A second range parameter can be provided to specify the relative prominence of a scene within the given map, where 100% is the primary scene.\n"
             );
 
             RegisterScript("Modified", BuiltIns.EvalModified);
