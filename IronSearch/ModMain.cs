@@ -142,6 +142,10 @@ namespace IronSearch
         }
         public override void OnPreferencesLoaded()
         {
+            ForceReload();
+        }
+        public static void ForceReload()
+        {
             if (!InitSuccessful)
             {
                 return;
@@ -183,7 +187,7 @@ namespace IronSearch
         {
             if (InitSuccessful)
             {
-                AutoCompleteManager.Update();
+                SearchManager.AutoComplete.Update();
             }
         }
         internal static bool UISystemLoaded { get; private set; }
@@ -355,9 +359,6 @@ namespace IronSearch
 
             SearchManager.LoadCustomTags(customTags);
             autoLoadCustomTags = true;
-
-            AutoCompleteManager.AddManagerKeywords();
-
 
             MelonLogger.Msg(System.ConsoleColor.Green, "Initialization successful.");
             InitSuccessful = true;

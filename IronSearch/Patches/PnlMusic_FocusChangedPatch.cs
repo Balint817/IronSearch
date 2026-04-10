@@ -19,7 +19,7 @@ namespace IronSearch.Patches
             }
             else
             {
-                AutoCompleteManager.StopCurrentAutoComplete();
+                ModMain.SearchManager?.AutoComplete?.StopCurrentAutoComplete();
                 inputField = null;
             }
         }

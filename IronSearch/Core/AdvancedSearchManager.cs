@@ -23,6 +23,7 @@ namespace IronSearch.Core
 
         internal const double MiniCacheTimeout = 0.25;
         public UserScriptManager ScriptManager { get; private set; } = null!;
+        public AutoCompleteManager AutoComplete { get; private set; } = null!;
 
         internal readonly Dictionary<string, string> _helpStrings = new();
         public ReadOnlyDictionary<string, string> HelpStrings => new(_helpStrings);
@@ -93,6 +94,7 @@ namespace IronSearch.Core
             File.WriteAllText(ExampleScriptFilePath, templateString);
 
             ScriptManager = new(ScriptDirectory, new(new ScriptMelonLogger(), ArgumentName, BaseDictName), (int)Priorities.UserScript);
+            AutoComplete = new AutoCompleteManager();
 
             MelonLogger.Msg("Loading built-ins...");
             ScriptManager.DefaultPriority = (int)Priorities.BuiltIn;
@@ -110,6 +112,8 @@ namespace IronSearch.Core
             {
                 LoadCustomTags(ModMain.customTags);
             }
+
+            AutoComplete.AddManagerKeywords(ScriptManager.ScriptExecutor);
         }
 
         private void RegisterScript(string key, BuiltInDelegate del)
@@ -791,7 +795,7 @@ namespace IronSearch.Core
                         var script = ScriptManager.ScriptExecutor.FromDelegate(BuiltIns.WrapCommonChecks(LoadExpression(kv.Value)));
                         _loadedExpressions.Add(key, script);
                         ScriptManager.ScriptExecutor.RegisterScript(key, script);
-                        AutoCompleteManager.AllKeywords.TryAdd(key, new($"{key}(", 0));
+                        AutoComplete.AllKeywords.TryAdd(key, new($"{key}(", 0));
                     }
                     catch (Exception ex)
                     {
@@ -845,7 +849,7 @@ namespace IronSearch.Core
                         var key = item.Key;
                         var value = item.Value;
                         executor.RegisterAlias(key, value);
-                        AutoCompleteManager.AllKeywords.TryAdd(key, new($"{key}(", 0));
+                        AutoComplete.AllKeywords.TryAdd(key, new($"{key}(", 0));
                         _successfulAliases.TryAdd(key, value);
                     }
                     catch (Exception ex)
@@ -872,6 +876,7 @@ namespace IronSearch.Core
             _disposed = true;
             _loadedExpressions.Clear();
             _helpStrings.Clear();
+            AutoComplete?.StopCurrentAutoComplete();
             ScriptManager?.Dispose();
         }
     }

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace IronSearch.UI
 {
-    public static class AutoCompleteManager
+    public class AutoCompleteManager
     {
         public class KeywordInfo
         {
@@ -163,10 +163,10 @@ namespace IronSearch.UI
                 return dp[a.Length, b.Length];
             }
         }
-        private static CurrentCompleteInfo? CurrentInfo;
+        private CurrentCompleteInfo? CurrentInfo;
 
-        private static Dictionary<string, KeywordInfo> currentKeywords = new();
-        public static readonly Dictionary<string, KeywordInfo> AllKeywords = new()
+        private Dictionary<string, KeywordInfo> currentKeywords = new();
+        public readonly Dictionary<string, KeywordInfo> AllKeywords = new()
         {
             ["abs"] = new("abs", 1),
             ["all"] = new("all", 1),
@@ -193,7 +193,7 @@ namespace IronSearch.UI
             ["type"] = new("type", 2),
             ["zip"] = new("zip", 2),
         };
-        internal static void Update()
+        internal void Update()
         {
             if (CurrentInfo == null)
             {
@@ -216,7 +216,7 @@ namespace IronSearch.UI
                 }
             }
         }
-        private static void AutoCompleteShow()
+        private void AutoCompleteShow()
         {
             if (!ModMain.PopupLibLoaded || !ModMain.UISystemLoaded || !ModMain.InitSuccessful)
             {
@@ -225,12 +225,12 @@ namespace IronSearch.UI
             AutoCompleteShowInternal();
         }
 
-        internal static void StopCurrentAutoComplete()
+        internal void StopCurrentAutoComplete()
         {
             CurrentInfo?.Dispose();
             CurrentInfo = null;
         }
-        private static void AutoCompleteShowInternal()
+        private void AutoCompleteShowInternal()
         {
             if (CurrentInfo != null)
             {
@@ -367,7 +367,7 @@ namespace IronSearch.UI
 
         }
 
-        private static void SetText(string newText, int newCaret)
+        private void SetText(string newText, int newCaret)
         {
             var inputField = PnlMusic_FocusChangedPatch.inputField;
             if (inputField == null)
@@ -380,9 +380,9 @@ namespace IronSearch.UI
             inputField.m_CaretSelectPosition = inputField.m_CaretPosition;
         }
 
-        internal static void AddManagerKeywords()
+        internal void AddManagerKeywords(ScriptExecutor scriptExecutor)
         {
-            foreach (var item in ModMain.SearchManager.ScriptManager.ScriptExecutor.RegisteredKeys)
+            foreach (var item in scriptExecutor.RegisteredKeys)
             {
                 AllKeywords.TryAdd(item.Key, new($"{item.Key}(", 0));
             }

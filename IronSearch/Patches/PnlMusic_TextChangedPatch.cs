@@ -9,7 +9,7 @@ namespace IronSearch.Patches
     {
         private static void Postfix(PnlMusicSearchItem __instance)
         {
-            AutoCompleteManager.StopCurrentAutoComplete();
+            ModMain.SearchManager?.AutoComplete?.StopCurrentAutoComplete();
         }
     }
 }
