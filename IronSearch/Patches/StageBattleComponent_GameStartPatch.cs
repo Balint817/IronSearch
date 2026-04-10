@@ -25,6 +25,13 @@ namespace IronSearch.Patches
                 var selectedDiff = GlobalDataBase.s_DbMusicTag.selectedDiffTglIndex;
                 result = $"{uid}_{selectedDiff}";
             }
+
+            var idx = ModMain.playIds.IndexOf(result);
+            if (idx != -1)
+            {
+                ModMain.playIds.RemoveAt(idx);
+            }
+
             ModMain.playIds.Add(result);
         }
     }
