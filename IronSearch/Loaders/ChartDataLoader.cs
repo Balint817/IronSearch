@@ -218,7 +218,21 @@ namespace IronSearch.Loaders
                             }
                         }
 
-                        maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5, dialogEvents, stageInfo.scene);
+                        var sceneChanges = GetSceneChanges(notes);
+
+                        foreach (var sceneEvent in stageInfo.sceneEvents)
+                        {
+                            if (sceneEvent is null || string.IsNullOrEmpty(sceneEvent.uid))
+                                continue;
+                            
+                            var split = sceneEvent.uid.Split('/');
+                            if (split.Length != 2 || !SceneSwitchBmsIds.TryGetValue(split[1], out var scene))
+                                continue;
+
+                            sceneChanges.Add(new SceneSwitch(Il2CppSystem.Decimal.ToSingle(sceneEvent.time), scene));
+                        }
+
+                        maps[diff] = new MapData(notes, stageInfo.bpm, stageInfo.md5, dialogEvents, stageInfo.scene, sceneChanges);
                     }
                     catch
                     {
@@ -488,6 +502,19 @@ namespace IronSearch.Loaders
             return dialogEvents;
         }
         private static readonly Regex sceneRegex = new(@"^scene_\d\d+$", RegexOptions.Compiled);
+        private static readonly Dictionary<string, string> SceneSwitchBmsIds = new()
+        {
+            ["1O"] = "scene_01",
+            ["1P"] = "scene_02",
+            ["1Q"] = "scene_03",
+            ["1R"] = "scene_04",
+            ["1S"] = "scene_05",
+            ["1T"] = "scene_06",
+            ["1U"] = "scene_07",
+            ["1V"] = "scene_08",
+            ["1W"] = "scene_09",
+            ["1X"] = "scene_10",
+        };
         private static ChartData? GetCustomChartDataDirect(string uid)
         {
             var album = (Album)ModMain.uidToCustom[uid];
@@ -550,7 +577,7 @@ namespace IronSearch.Loaders
                     var sceneEvents = GetSceneChanges(notes);
 
 
-                    maps[index] = new MapData(notes, bms.Bpm, bms.Md5, dialogEvents, startingScene);
+                    maps[index] = new MapData(notes, bms.Bpm, bms.Md5, dialogEvents, startingScene, sceneEvents);
                 }
 
                 return new ChartData(maps, maxTime >= 0f ? TimeSpan.FromSeconds(maxTime) : null);
@@ -561,10 +588,17 @@ namespace IronSearch.Loaders
                 return null;
             }
         }
-
-        static List<NoteInfo> GetSceneChanges(List<NoteInfo> notes)
+        static List<SceneSwitch> GetSceneChanges(List<NoteInfo> notes)
         {
-            //TODO
+            var sceneChanges = new List<SceneSwitch>();
+            foreach (var note in notes)
+            {
+                if (SceneSwitchBmsIds.TryGetValue(note.Value, out var scene))
+                {
+                    sceneChanges.Add(new SceneSwitch(note.Time, scene));
+                }
+            }
+            return sceneChanges;
         }
 
         internal static void InitNoteDatas()
