@@ -14,6 +14,7 @@ namespace IronSearch
         private MelonPreferences_Entry<double> _waitMultiplierEntry = null!;
         private MelonPreferences_Entry<bool> _enableHQSpamEntry = null!;
         private MelonPreferences_Entry<bool> _enteredCodeEntry = null!;
+        private MelonPreferences_Entry<bool> _astWarningEntry = null!;
         private MelonPreferences_Entry<bool> _enablePersistentSearchCachingEntry = null!;
         private MelonPreferences_Entry<string> _startSearchStringEntry = null!;
         private MelonPreferences_Entry<List<string>> _searchHistoryEntry = null!;
@@ -80,6 +81,12 @@ namespace IronSearch
 
         }
 
+        public bool ASTWarning
+        {
+            get => _astWarningEntry.Value;
+            internal set => _astWarningEntry.Value = value;
+        }
+
         private static GenericValidator<T> Validator<T>(T defaultValue) => new(defaultValue);
 
         internal void CreatePreferences()
@@ -107,6 +114,10 @@ namespace IronSearch
             _enteredCodeEntry = _category.CreateEntry<bool>("_Code", false, "_Code",
                 "\nFor internal use.",
                 validator: Validator(false));
+
+            _astWarningEntry = _category.CreateEntry<bool>("ASTWarning", true, "ASTWarning",
+                "\nWhether to parse the abstract syntax tree to display warnings for potential issues in your search expressions.\nIf you have no idea what that means, you should probably keep it on.",
+                validator: Validator(true));
 
             _searchHistoryEntry = _category.CreateEntry<List<string>>("SearchHistory", new(), "SearchHistory",
                 "\nYour 20 most successful advanced searches.",

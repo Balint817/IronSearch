@@ -178,11 +178,16 @@ namespace IronSearch.Core
             MelonLogger.Msg($"Advanced search found {finalResult.Count} songs in {_sw.Elapsed.TotalSeconds:F1}s.");
             _sw.Restart();
 
-            if (finalResult.Count == allMusic.Count)
+            if (ModMain.Config.ASTWarning)
             {
                 if (PythonUtils.GetPythonNamesFromAST(ModMain.SearchManager.ScriptManager.ScriptExecutor.Engine, expression, out var varList, out var callList))
                 {
-                    // TODO: a rough way to detect if the search has any incorrectly used tags.
+                    var autoComplete = ModMain.SearchManager.AutoComplete;
+                    var uncalledTags = autoComplete.AllKeywords.Values.Select(x => x.Value).ToHashSet().Intersect(varList).ToArray();
+                    foreach (var tag in uncalledTags)
+                    {
+                        MelonLogger.Msg(ConsoleColor.Yellow, $"The search contains the tag '{tag}' as-is. Did you forget to call it by putting '()' after it?");
+                    }
                 }
             }
 
