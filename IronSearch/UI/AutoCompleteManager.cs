@@ -36,7 +36,7 @@ namespace IronSearch.UI
 
             public SimpleDropdown? CurrentDropdown { get; private set; }
 
-            private int GetMatchTier(string key, string input)
+            private static int GetMatchTier(string key, string input)
             {
                 if (key.Equals(input, StringComparison.Ordinal))
                 {
