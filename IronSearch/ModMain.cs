@@ -5,7 +5,6 @@ using IronPython.Runtime;
 using IronSearch.Core;
 using IronSearch.Loaders;
 using IronSearch.Patches;
-using IronSearch.UI;
 using IronSearch.Utils;
 using MelonLoader;
 using MelonLoader.Utils;

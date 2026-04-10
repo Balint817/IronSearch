@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Il2CppAssets.Scripts.UI.Panels.PnlMusicTag;
-using IronSearch.UI;
 
 namespace IronSearch.Patches
 {
