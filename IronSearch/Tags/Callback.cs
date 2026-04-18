@@ -15,9 +15,9 @@ namespace IronSearch.Tags
             {
                 MapUtils.GetAvailableMaps(musicInfo, out var availableMaps);
                 MapUtils.GetMapCallbacks(musicInfo, out var difficulties);
-                foreach (var i in availableMaps)
+                foreach (var diffIndex in availableMaps)
                 {
-                    yield return new(i, difficulties[i - 1]);
+                    yield return new(diffIndex, difficulties[diffIndex - 1]);
                 }
             }
         }
