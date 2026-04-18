@@ -155,6 +155,16 @@ namespace IronSearch
             SearchManager.Initialize();
             Config.HandleReload();
         }
+
+        static bool _didPostInit = false;
+        public static void PostInit()
+        {
+            if (InitSuccessful && _didPostInit)
+            {
+                _didPostInit = true;
+                ChartDataLoader.ForceBuildVanillaCache();
+            }
+        }
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             if (sceneName == "Welcome")
@@ -170,10 +180,7 @@ namespace IronSearch
             else if (sceneName == "UISystem_PC")
             {
                 UISystemLoaded = true;
-                if (InitSuccessful)
-                {
-                    ChartDataLoader.ForceBuildVanillaCache();
-                }
+                PostInit();
             }
             else
             {

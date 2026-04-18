@@ -27,7 +27,7 @@ namespace IronSearch.Patches
             MelonLogger.Msg(ConsoleColor.DarkYellow, "Playlists integration requires us to build the vanilla cache early, building it now...");
             try
             {
-                ChartDataLoader.ForceBuildVanillaCache();
+                ModMain.PostInit();
             }
             catch (Exception ex)
             {
