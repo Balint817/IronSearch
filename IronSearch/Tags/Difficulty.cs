@@ -25,14 +25,13 @@ namespace IronSearch.Tags
                         continue;
                     }
 
-
                     if (musicDiff.TryParseInt(out int x))
                     {
-                        yield return new(i, x);
+                        yield return new(i+1, x);
                     }
                     else
                     {
-                        yield return new(i, double.NaN);
+                        yield return new(i+1, double.NaN);
                     }
                 }
             }
