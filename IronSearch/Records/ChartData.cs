@@ -4,17 +4,17 @@ using Newtonsoft.Json;
 namespace IronSearch.Records
 {
     public readonly record struct NoteInfo(float Time, string Value, string Tone);
-    public readonly record struct DialogEventInfo(float Time, string Text);
     public readonly record struct SceneSwitch(float Time, string Scene);
+    public readonly record struct DialogEventInfo(float Time, string Text);
 
     public class MapData
     {
-        public List<NoteInfo> Notes { get; private set; } = new();
         public float StartBPM { get; private set; }
         public string? MD5 { get; private set; }
-        public Dictionary<string, List<DialogEventInfo>> DialogEvents { get; private set; } = new();
         public string StartingScene { get; private set; } = "";
+        public List<NoteInfo> Notes { get; private set; } = new();
         public List<SceneSwitch> SceneChanges { get; private set; } = new();
+        public Dictionary<string, List<DialogEventInfo>> DialogEvents { get; private set; } = new();
         public MapData(List<NoteInfo> notes, float bpm, string? md5, Dictionary<string, List<DialogEventInfo>>? dialogEvents, string startingScene, List<SceneSwitch> sceneChanges)
         {
             Notes = notes ?? new();

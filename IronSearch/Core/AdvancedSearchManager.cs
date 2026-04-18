@@ -252,6 +252,16 @@ namespace IronSearch.Core
                 + "Checks if the chart's level designer matches the specified name.\n"
                 );
 
+            RegisterScript("HasDialogue", BuiltIns.EvalDialogue);
+            RegisterScript("Dialogue", BuiltIns.EvalDialogue);
+            RegisterScript("HasDialog", BuiltIns.EvalDialogue);
+            RegisterScript("Dialog", BuiltIns.EvalDialogue);
+            RegisterHelp(new() { "HasDialogue", "Dialogue", "HasDialog", "Dialog" },
+                "Usage: Designer()\n\n"
+                + "Checks if the chart has dialogue (a .talk file).\n"
+                );
+
+
             RegisterScript("Difficulty", BuiltIns.EvalDifficulty);
             RegisterScript("Diff", BuiltIns.EvalDifficulty);
             RegisterHelp(new() { "Difficulty", "Diff" },
@@ -389,6 +399,13 @@ namespace IronSearch.Core
             );
 
 
+            RegisterObject("ChartData", BuiltIns.EvalChartData);
+            RegisterObject("Chart", BuiltIns.EvalChartData);
+            RegisterHelp(new() { "ChartData", "Chart" },
+                "Usage: ChartData()\n\n"
+                + "Returns the chart data of the current song, if parsing was successful.\n"
+                + "If it failed for whatever reason, returns None."
+            );
 
             RegisterObject("CustomInfo", BuiltIns.EvalCustomInfo);
             RegisterHelp(new() { "CustomInfo" },

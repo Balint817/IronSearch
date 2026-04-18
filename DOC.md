@@ -819,6 +819,16 @@ Matches if `vig` appears in the designer's name.
 
 ---
 
+#### `HasDialogue`/`Dialogue`/`HasDialog`/`Dialog`
+
+Usage:
+
+- `HasDialogue()`
+
+Checks if the song has dialogue (a .talk file)
+
+---
+
 #### `Difficulty`/`Diff`
 
 Usage:
@@ -1349,6 +1359,58 @@ Returns:
 - `Random()` => random **real number** in `[0.0, 1.0)` (end exclusive)
 - `Random(range)` => random **real number** in `[start, end)` (end exclusive)
 - `Random(start, end)` => random **integer** in `[start, end)` (end exclusive)
+
+---
+
+#### `ChartData`
+
+Usage:
+
+- `ChartData()`
+
+Returns the chart data of the current song, if parsing was successful.\
+If it failed for whatever reason, returns None.\
+Some useful properties:
+
+| Property | Value |
+|------|----------------|
+| `HasDialogue` | Whether the chart has dialogue on any difficulty |
+| `MaxLength` | similar to `GetLength()`, but instead of a float, returns a TimeSpan (or None) |
+| `SceneTimes` | A `dict[uid, float]` containing the total time each scene takes up (of every difficulty) as a percentage of the total time of all difficulties. |
+| `Maps` | The available maps of the custom as a `dict[int, MapData]` |
+
+Properties of the `MapData` object returned by `Data = Maps[int]`:
+
+| Property | Value |
+|------|----------------|
+| `StartBPM` | returns the starting BPM as a float |
+| `MD5` | returns the MD5 hash of the map |
+| `StartingScene` | returns the starting scene ID |
+| `Notes` | returns a `list[NoteInfo]` which contains the notes in the chart. |
+| `SceneChanges` | returns a `list[SceneSwitch]` which contains the scene changes in the chart. (note: this information can often be manually extracted from Notes, if you prefer) |
+| `DialogEvents` | returns a `dict[languageString, list[DialogEventInfo]]` which contains the dialogues of the chart. |
+
+Properties of a `NoteInfo` returned by `Note = Data.Notes[int]`:
+
+| Property | Value |
+|------|----------------|
+| `Time` | The time at which the note is placed |
+| `Value` | The actual note itself (as a BMS note ID) |
+| `Tone` | The lane the note is placed in (as a BMS lane ID) |
+
+Properties of a `SceneSwitch` returned by `Scene = Data.SceneChanges[int]`:
+
+| Property | Value |
+|------|----------------|
+| `Time` | The time at which the scene change occurs |
+| `Scene` | The actual scene we're switching to (scene ID) |
+
+Properties of a `DialogEventInfo` returned by `Dialog = Data.DialogEvents[language][int]`:
+
+| Property | Value |
+|------|----------------|
+| `Time` | The time at which the dialog occurs |
+| `Text` | The actual text of the dialogue itself |
 
 ---
 
