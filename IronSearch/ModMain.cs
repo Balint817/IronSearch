@@ -257,12 +257,22 @@ namespace IronSearch
             var category = MelonPreferences.CreateCategory("IronSearch");
             category.SetFilePath("UserData/IronSearch.cfg");
 
-            if (!Config.EnteredCode)
+
+            var seed = HashCode.Combine(
+                Environment.MachineName,
+                Environment.UserName,
+                Environment.OSVersion.VersionString,
+                Environment.ProcessorCount,
+                MelonEnvironment.GameRootDirectory
+            );
+
+            var random = new Random(seed);
+            const string chars = "abcdefghijklmnopqrstuvwxyz"; // avoid confusing chars
+            var generatedCode = new string(Enumerable.Repeat(chars, 8)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            if (Config.EnteredCode != generatedCode)
             {
-                var random = new Random();
-                const string chars = "abcdefghijklmnopqrstuvwxyz"; // avoid confusing chars
-                var generatedCode = new string(Enumerable.Repeat(chars, 8)
-                    .Select(s => s[random.Next(s.Length)]).ToArray());
 
                 MelonLogger.Msg(System.ConsoleColor.DarkGreen, "Before we proceed, please read the following carefully:\n");
 
@@ -290,7 +300,7 @@ namespace IronSearch
 
                     if (input == generatedCode)
                     {
-                        Config.EnteredCode = true;
+                        Config.EnteredCode = generatedCode;
                         MelonLogger.Msg(System.ConsoleColor.Green, "Welcome to IronSearch!");
                         break;
                     }

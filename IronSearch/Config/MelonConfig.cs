@@ -13,7 +13,7 @@ namespace IronSearch
         private MelonPreferences_Entry<Dictionary<string, string>> _autoCompleteItemsEntry = null!;
         private MelonPreferences_Entry<double> _waitMultiplierEntry = null!;
         private MelonPreferences_Entry<bool> _enableHQSpamEntry = null!;
-        private MelonPreferences_Entry<bool> _enteredCodeEntry = null!;
+        private MelonPreferences_Entry<string> _enteredCodeEntry = null!;
         private MelonPreferences_Entry<bool> _astWarningEntry = null!;
         private MelonPreferences_Entry<bool> _enablePersistentSearchCachingEntry = null!;
         private MelonPreferences_Entry<string> _startSearchStringEntry = null!;
@@ -31,7 +31,7 @@ namespace IronSearch
             get => _enableHQSpamEntry.Value;
             internal set => _enableHQSpamEntry.Value = value;
         }
-        public bool EnteredCode
+        public string EnteredCode
         {
             get => _enteredCodeEntry.Value;
             internal set => _enteredCodeEntry.Value = value;
@@ -111,9 +111,9 @@ namespace IronSearch
                 "\nThe text that your search needs to start with in order for this mod to be enabled.\nMay be left empty if you want the mod to always use advanced search.\nFor obvious reasons, this is not a good idea.",
                 validator: Validator("search:"));
 
-            _enteredCodeEntry = _category.CreateEntry<bool>("_Code", false, "_Code",
+            _enteredCodeEntry = _category.CreateEntry<string>("_Code", "", "_Code",
                 "\nFor internal use.",
-                validator: Validator(false));
+                validator: Validator(""));
 
             _astWarningEntry = _category.CreateEntry<bool>("ASTWarning", true, "ASTWarning",
                 "\nWhether to parse the abstract syntax tree to display warnings for potential issues in your search expressions.\nIf you have no idea what that means, you should probably keep it on.",
