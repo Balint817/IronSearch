@@ -258,13 +258,21 @@ namespace IronSearch
             category.SetFilePath("UserData/IronSearch.cfg");
 
 
-            var seed = HashCode.Combine(
+            var s = string.Join("|",
                 Environment.MachineName,
                 Environment.UserName,
                 Environment.OSVersion.VersionString,
                 Environment.ProcessorCount,
                 MelonEnvironment.GameRootDirectory
             );
+
+            int seed;
+
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
+            {
+                var hash = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(s));
+                seed = BitConverter.ToInt32(hash, 0);
+            }
 
             var random = new Random(seed);
             const string chars = "abcdefghijklmnopqrstuvwxyz"; // avoid confusing chars
