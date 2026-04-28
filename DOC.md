@@ -125,7 +125,7 @@ For this example:
 Parentheses `()` let you control evaluation order.\
 For example:
 
-```text
+```python
 search: Custom() or (Unplayed() and not Favorite())
 ```
 
@@ -159,7 +159,7 @@ Multiple comparers can be chained inside one `Sorter(...)` call. \
 
 Example:
 
-```text
+```python
 search: Sort(ByBPM(), ByLength()) and Custom()
 ```
 
@@ -178,13 +178,13 @@ Examples of `False` include `0`, `None`, `[]`, `''`, `""`.
 
 This is a common point of failure:
 
-```text
+```python
 search: AP()
 ```
 
 The above matches songs that have all-perfect on the highest map (probably what you intended).
 
-```text
+```python
 search: AP
 ```
 
@@ -196,7 +196,7 @@ The above matches everything.
 
 Single quotes (`'...'`) and double quotes (`"..."`) are interchangeable - they both produce the same 'string' ('string' means 'text'). Use whichever you prefer; just make sure the opening and closing quotes match.
 
-```text
+```python
 search: BPM('160+')
 search: BPM("160+")
 ```
@@ -205,7 +205,7 @@ Both of these are identical.
 
 A string that is passed to a tag expecting a range will be **parsed as a range expression** automatically. A bare (unquoted) number is just a number - it is *not* a range.
 
-```text
+```python
 search: BPM('160-180')    # range expression '160-180' → matches BPM from 160 to 180
 search: BPM(160-180)      # the result of the mathematical expression 160-180, e.g. -20, or BPM(-20) (obviously no such song exists)
 ```
@@ -235,13 +235,13 @@ The boolean operators, from **highest** to **lowest** precedence:
 
 Use parentheses to override the default order:
 
-```text
+```python
 search: Custom() and not Packed() or Favorite()
 ```
 
 is interpreted as `(Custom() and (not Packed())) or Favorite()`. If you meant "custom charts that are either unpacked or favorited", write:
 
-```text
+```python
 search: Custom() and (not Packed() or Favorite())
 ```
 
@@ -382,19 +382,19 @@ For example, `MR('100- 200+')` or `MR('100-', '200+')` (preference), matches val
 
 ### Working examples for simple tags using ranges:
 
-```text
+```python
 search: BPM('160+')
 ```
 
 BPM 160 or higher.
 
-```text
+```python
 search: Difficulty('9-11', '?')
 ```
 
 Displayed difficulty 9 through 11 on the **highest** map index.
 
-```text
+```python
 search: Accuracy('95-100', '?')
 ```
 
@@ -550,7 +550,7 @@ You can provide built-in comparer key functions:
 
 Example:
 
-```text
+```python
 search: Custom() and Sort(ByLength())
 ```
 
@@ -560,7 +560,7 @@ search: Custom() and Sort(ByLength())
 
 You can pass multiple comparer functions:
 
-```text
+```python
 search: Sorter(ByBPM(), ByName()) and Custom()
 ```
 
@@ -591,7 +591,7 @@ The `comparer` concept:
 
 For example, the ByUID sorting can be re-implemented like this:
 
-```text
+```python
 search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
 ```
 
@@ -622,7 +622,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: Accuracy('90+', '3')
 ```
 
@@ -644,7 +644,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: Album('treatment')
 ```
 
@@ -668,7 +668,7 @@ Checks if the music matches any of the following:
 
 Example:
 
-```text
+```python
 search: Any('cyber')
 ```
 
@@ -691,7 +691,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: AP('3-4')
 ```
 
@@ -709,7 +709,7 @@ Checks if the music’s author matches the specified input.
 
 Example:
 
-```text
+```python
 search: Author('leaf')
 ```
 
@@ -727,7 +727,7 @@ Checks if the music’s BPM is within the given BPM range.
 
 Example:
 
-```text
+```python
 search: BPM('150-200')
 ```
 
@@ -751,7 +751,7 @@ Notes:
 
 Examples:
 
-```text
+```python
 search: Callback('11+', '3')
 ```
 
@@ -783,7 +783,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: Clears('5+', '3')
 ```
 
@@ -811,7 +811,7 @@ Checks if the chart’s level designer matches the specified input.
 
 Example:
 
-```text
+```python
 search: Designer('vig')
 ```
 
@@ -844,7 +844,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: Difficulty('11+', '3')
 ```
 
@@ -876,7 +876,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: FC('3')
 ```
 
@@ -904,7 +904,7 @@ Checks whether the music has a map in the specified range.
 
 Example:
 
-```text
+```python
 search: Map('3')
 ```
 
@@ -948,7 +948,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: Length('1m30s-3m')
 ```
 
@@ -968,7 +968,7 @@ Checks if the custom chart was last modified within the given time window.
 
 Example:
 
-```text
+```python
 search: Modified('0s-7d')
 ```
 
@@ -991,7 +991,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: New('1-5')
 ```
 
@@ -1084,7 +1084,7 @@ Scene prominence:
 
 Example:
 
-```text
+```python
 search: Scene('candy')
 ```
 
@@ -1117,7 +1117,7 @@ Checks if the music has a "music tag" whose text matches the provided string/reg
 
 Example:
 
-```text
+```python
 search: Tag('anime')
 ```
 
@@ -1135,7 +1135,7 @@ Checks if the music’s title matches.
 
 Example:
 
-```text
+```python
 search: Title('Muse')
 ```
 
@@ -1157,7 +1157,7 @@ Notes:
 
 Example:
 
-```text
+```python
 search: Unplayed('3')
 ```
 
@@ -1294,11 +1294,11 @@ Implementation details:
 
 Examples:
 
-```text
+```python
 search: R('10-12')
 ```
 
-```text
+```python
 search: R(10, 12)
 ```
 
@@ -1821,7 +1821,7 @@ Examples:
 
 Example filter using `M` directly:
 
-```text
+```python
 search: Custom() and 'banana' in M.author
 ```
 
@@ -1901,7 +1901,7 @@ You can pass any callable into `Sorter(...)` as long as it matches the comparer 
 
 example, sort by UID:
 
-```text
+```python
 search: Sorter(lambda A, B: (A.uid > B.uid) - (A.uid < B.uid))
 ```
 
@@ -1962,7 +1962,7 @@ reads as: "for each `item` in `collection` **where** `condition` is true, comput
 
 Combining with the helpers from [§3](#3-python-essentials):
 
-```text
+```python
 search: max([s.Accuracy for s in NotNone(GetHighscores()) if s.Accuracy > 0] or [0]) >= 95
 ```
 
@@ -1982,7 +1982,7 @@ They work especially well with **generator expressions** - the same syntax as li
 
 **any example** - does this song have at least one difficulty of 11 or higher?
 
-```text
+```python
 search: any(int(d) >= 11 for d in NotNone(GetDifficulties()) if d not in ('?', 'E', ''))
 ```
 
@@ -1990,7 +1990,7 @@ Reading this: "for each difficulty `d` that isn't a special string, check if `in
 
 **all example** - do you have a full combo on every map you've played?
 
-```text
+```python
 search: all(s.Evaluate >= 2 for s in NotNone(GetHighscores()) if s.Clears > 0)
 ```
 
@@ -2007,7 +2007,7 @@ These re-order collections:
 
 **sorted example** - get your second-best accuracy:
 
-```text
+```python
 search: sorted([s.Accuracy for s in NotNone(GetHighscores()) if s.Accuracy > 0])[-1] >= 90
 ```
 
