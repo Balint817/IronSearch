@@ -540,10 +540,10 @@ namespace IronSearch.Loaders
                     var bms = (Bms)bmsObj;
                     var notes = new List<NoteInfo>();
 
-                    if (!bms.Info.TryGetPropertyValue("GENRE", out var genreNode)
-                        || genreNode is not JsonValue gv
-                        || !gv.TryGetValue<string>(out var genre)
-                        || !sceneRegex.IsMatch(genre))
+                    // finally, strongly typed goodness...
+                    // type of shit that makes me wanna nut
+                    var genre = bms.Info.Genre;
+                    if (string.IsNullOrEmpty(genre) || !sceneRegex.IsMatch(genre))
                     {
                         continue;
                     }
@@ -551,20 +551,9 @@ namespace IronSearch.Loaders
 
                     foreach (var note in bms.Notes)
                     {
-                        if (note is not JsonObject jo)
-                        {
-                            continue;
-                        }
-
-                        if (!jo.TryGetPropertyValue("time", out var timeNode)
-                            || timeNode is not JsonValue jv
-                            || !jv.TryGetValue<float>(out var time))
-                        {
-                            continue;
-                        }
-
-                        var value = jo["value"]?.GetValue<string>() ?? "";
-                        var tone = jo["tone"]?.GetValue<string>() ?? "";
+                        var time = note.Time;
+                        var value = note.Value;
+                        var tone = note.Tone;
                         if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(tone))
                         {
                             continue;
