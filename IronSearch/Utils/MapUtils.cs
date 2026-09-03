@@ -122,7 +122,7 @@ namespace IronSearch.Utils
         private static object? GetCustomAlbumsSaveInternal()
         {
             var saveManagerType = AccessTools.TypeByName("CustomAlbums.Managers.SaveManager");
-            var saveDataField = AccessTools.Field(saveManagerType, "SaveData");
+            var saveDataField = AccessTools.Property(saveManagerType, "SaveData");
             return saveDataField.GetValue(null);
         }
 
