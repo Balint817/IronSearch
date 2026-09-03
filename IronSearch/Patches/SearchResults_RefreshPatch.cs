@@ -54,7 +54,10 @@ namespace IronSearch.Patches
 
         internal static void Finalizer(Exception __exception)
         {
-            MelonLogger.Error(__exception);
+            if (__exception != null)
+            {
+                MelonLogger.Error(__exception);
+            }
         }
     }
 }
