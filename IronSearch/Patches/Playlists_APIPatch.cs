@@ -68,7 +68,8 @@ namespace IronSearch.Patches
                             break;
                     }
                 }
-                cp.Albums = newAlbums;
+                cp.Albums.Clear();
+                cp.Albums.AddRange(newAlbums);
             }
         }
         internal static void RunPatch(HarmonyLib.Harmony harmonyInstance)
