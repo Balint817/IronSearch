@@ -2,6 +2,7 @@ using HarmonyLib;
 using Il2CppAssets.Scripts.Structs.Modules;
 using IronSearch.Core;
 using IronSearch.Records;
+using MelonLoader;
 
 namespace IronSearch.Patches
 {
@@ -51,5 +52,9 @@ namespace IronSearch.Patches
             return false;
         }
 
+        internal static void Finalizer(Exception __exception)
+        {
+            MelonLogger.Error(__exception);
+        }
     }
 }
