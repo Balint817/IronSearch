@@ -25,9 +25,23 @@ namespace IronSearch.Patches
                     AccessTools.Method(typeof(BmsLoader_MathPatch), nameof(SafeRoundToInt));
 
                 var type = AccessTools.TypeByName("CustomAlbums.BmsLoader");
-                var loadMethod = AccessTools.Method(type, "Load");
+
                 var transpiler = new HarmonyMethod(typeof(BmsLoader_MathPatch), nameof(Transpiler));
-                harmonyInstance.Patch(loadMethod, transpiler: transpiler);
+
+                var calculateNoteTimeMethod = AccessTools.Method(type, "CalculateNoteTime");
+                if (calculateNoteTimeMethod is not null)
+                {
+                    harmonyInstance.Patch(calculateNoteTimeMethod, transpiler: transpiler);
+                }
+
+                // Also patch Load itself in case a newer CustomAlbums build adds math to the main function again.
+                // Harmless no-op transpile if there is nothing to replace.
+                var loadMethod = AccessTools.Method(type, "Load");
+                if (loadMethod is not null)
+                {
+                    harmonyInstance.Patch(loadMethod, transpiler: transpiler);
+                }
+
                 IsPatched = true;
             }
             catch (Exception ex)
